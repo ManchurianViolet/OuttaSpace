@@ -15,8 +15,8 @@ public class BoosterSystem : MonoBehaviour
     public float autoFillPerSecond = 0.02f;
     public float keyPressFill = 0.03f;
 
-    [Header("Boost Settings")]
-    public float boostSpeedMultiplier = 3f;
+    [Header("Boost Base Settings")]
+    public float baseBoostMultiplier = 3f;
     public float boostDrainPerSecond = 0.2f;
     public float boostActivateDelay = 0.5f;
 
@@ -27,10 +27,9 @@ public class BoosterSystem : MonoBehaviour
 
     private Texture2D gaugeTex;
     private SpriteRenderer sr;
-    private Sprite gaugeSprite;   // 한 번만 생성
+    private Sprite gaugeSprite;
     private float fullWaitTimer;
 
-    // 갱신 최적화
     private int lastDrawnFuelPixel = -1;
     private bool lastDrawnBoostState;
 
@@ -56,6 +55,10 @@ public class BoosterSystem : MonoBehaviour
 
     void Update()
     {
+        // 정박 중이면 부스터 로직 정지
+        if (GameManager.Instance != null && GameManager.Instance.isDocked)
+            return;
+
         if (isBoosting)
         {
             fuel -= boostDrainPerSecond * Time.deltaTime;
@@ -97,13 +100,19 @@ public class BoosterSystem : MonoBehaviour
 
     void LateUpdate()
     {
-        // 화면 왼쪽 고정
+        // 정박 중이면 게이지 숨기기
+        if (GameManager.Instance != null && GameManager.Instance.isDocked)
+        {
+            if (sr != null) sr.enabled = false;
+            return;
+        }
+
+        if (sr != null) sr.enabled = true;
+
         Camera cam = Camera.main;
         if (cam == null) return;
-
         Vector3 screenPos = new Vector3(10f, Screen.height / 2f, 10f);
         transform.position = cam.ScreenToWorldPoint(screenPos);
-
         float zoomScale = cam.orthographicSize / 5f;
         transform.localScale = Vector3.one * zoomScale;
     }
@@ -112,9 +121,11 @@ public class BoosterSystem : MonoBehaviour
 
     void OnKeyPress()
     {
-        // 부스터 사용 중이 아닐 때만 충전
         if (!isBoosting && !isFullWaiting)
         {
+            // 정박 중이면 부스터 충전 안 함
+            if (GameManager.Instance != null && GameManager.Instance.isDocked) return;
+
             fuel += keyPressFill;
             if (fuel >= 1f)
             {
@@ -127,7 +138,7 @@ public class BoosterSystem : MonoBehaviour
 
     void OnMouseClick()
     {
-        // 부스터 상태 상관없이 항상 재화 +1
+        // 클릭 재화는 정박/항해/부스트 상관없이 항상
         if (GameManager.Instance != null)
         {
             GameManager.Instance.credits += 1;
@@ -135,11 +146,17 @@ public class BoosterSystem : MonoBehaviour
         }
     }
 
-    // ============ 속도 ============
+    // ============ 속도 배율 ============
 
     public float GetSpeedMultiplier()
     {
-        return isBoosting ? boostSpeedMultiplier : 1f;
+        if (!isBoosting) return 1f;
+
+        // 기본 3배 + 업그레이드 추가 배율
+        if (GameManager.Instance != null)
+            return GameManager.Instance.GetBoosterSpeedMultiplier();
+
+        return baseBoostMultiplier;
     }
 
     // ============ 게이지 비주얼 ============
@@ -156,7 +173,6 @@ public class BoosterSystem : MonoBehaviour
         sr = gameObject.AddComponent<SpriteRenderer>();
         sr.sortingOrder = sortingOrder;
 
-        // Sprite 한 번만 생성
         gaugeSprite = Sprite.Create(
             gaugeTex,
             new Rect(0, 0, totalW, totalH),
@@ -233,7 +249,6 @@ public class BoosterSystem : MonoBehaviour
 
         gaugeTex.SetPixels(pixels);
         gaugeTex.Apply();
-        // Sprite 재생성 안 함 — 텍스처만 갱신하면 자동 반영
     }
 
     static Color HexColor(string hex)

@@ -2,9 +2,6 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
-/// <summary>
-/// 개별 업그레이드 버튼. Prefab으로 만들어서 UpgradePanel에 배치.
-/// </summary>
 public class UpgradeButton : MonoBehaviour
 {
     public UpgradeType upgradeType;
@@ -20,6 +17,7 @@ public class UpgradeButton : MonoBehaviour
     [Header("Colors")]
     public Color affordableColor = new Color(0.15f, 0.24f, 0.47f, 0.8f);
     public Color unaffordableColor = new Color(0.1f, 0.1f, 0.15f, 0.5f);
+    public Color disabledColor = new Color(0.1f, 0.1f, 0.1f, 0.3f);
     public Color affordableTextColor = new Color(1f, 0.84f, 0f);
     public Color unaffordableTextColor = new Color(0.38f, 0.25f, 0.13f);
 
@@ -27,7 +25,6 @@ public class UpgradeButton : MonoBehaviour
     {
         if (buyButton != null)
             buyButton.onClick.AddListener(OnBuyClicked);
-
         UpdateDisplay();
     }
 
@@ -45,30 +42,37 @@ public class UpgradeButton : MonoBehaviour
         int level = gm.GetUpgradeLevel(upgradeType);
         double cost = gm.GetUpgradeCost(upgradeType);
         bool canAfford = gm.CanAfford(upgradeType);
+        bool isDemoLocked = (upgradeType == UpgradeType.CatSwap);
 
         if (nameText != null)
-            nameText.text = $"{data.icon} {data.name}";
+            nameText.text = $"{data.icon} {Loc.Get(data.nameKey)}";
         if (levelText != null)
-            levelText.text = $"Lv.{level}";
+            levelText.text = isDemoLocked ? "" : $"Lv.{level}";
         if (descText != null)
-            descText.text = data.description;
+            descText.text = Loc.Get(data.descKey);
         if (costText != null)
         {
-            costText.text = $"{GameManager.FormatNumber(cost)} CR";
-            costText.color = canAfford ? affordableTextColor : unaffordableTextColor;
+            if (isDemoLocked)
+            {
+                costText.text = "LOCKED";
+                costText.color = unaffordableTextColor;
+            }
+            else
+            {
+                costText.text = $"{GameManager.FormatNumber(cost)} CR";
+                costText.color = canAfford ? affordableTextColor : unaffordableTextColor;
+            }
         }
 
         if (buyButton != null)
-            buyButton.interactable = canAfford;
+            buyButton.interactable = canAfford && !isDemoLocked;
         if (buttonBackground != null)
-            buttonBackground.color = canAfford ? affordableColor : unaffordableColor;
+            buttonBackground.color = isDemoLocked ? disabledColor : (canAfford ? affordableColor : unaffordableColor);
     }
 
     void OnBuyClicked()
     {
         if (GameManager.Instance != null)
-        {
             GameManager.Instance.BuyUpgrade(upgradeType);
-        }
     }
 }

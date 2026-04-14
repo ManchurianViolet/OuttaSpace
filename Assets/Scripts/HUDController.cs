@@ -18,11 +18,9 @@ public class HUDController : MonoBehaviour
     public TextMeshProUGUI notificationText;
     private float notifTimer;
 
-    // 점 애니메이션
     private float dotTimer;
     private int dotCount = 1;
 
-    // 부스트 표시용 색상
     private Color normalSpeedColor = HexColor("#5DCA5D");
     private Color boostSpeedColor = HexColor("#44AAFF");
 
@@ -65,33 +63,23 @@ public class HUDController : MonoBehaviour
         if (creditsText != null)
             creditsText.text = GameManager.FormatNumber(gm.credits);
 
-        // 속도: 부스트 반영된 실제 속도 표시
         if (speedText != null)
         {
             double effectiveSpeed = gm.GetEffectiveSpeed();
             bool boosting = BoosterSystem.Instance != null && BoosterSystem.Instance.isBoosting;
-
-            if (boosting)
-                speedText.text = "⚡ " + GameManager.FormatSpeed(effectiveSpeed);
-            else
-                speedText.text = GameManager.FormatSpeed(effectiveSpeed);
-
+            speedText.text = (boosting ? "⚡ " : "") + GameManager.FormatSpeed(effectiveSpeed);
             speedText.color = boosting ? boostSpeedColor : normalSpeedColor;
         }
 
         StarData star = StarDatabase.Stars[gm.currentStarIndex];
+        string starName = Loc.Get(star.nameKey);
 
         if (destinationText != null)
         {
             if (gm.isDocked)
-            {
-                destinationText.text = $"{star.name}에 도착!";
-            }
+                destinationText.text = Loc.Get("hud_arrived_at", starName);
             else
-            {
-                string dots = new string('.', dotCount);
-                destinationText.text = $"{star.name}(으)로 향하는중{dots}";
-            }
+                destinationText.text = Loc.Get("hud_heading_to", starName) + new string('.', dotCount);
         }
 
         float progress = star.distanceKM > 0

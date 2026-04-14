@@ -16,10 +16,10 @@ public class GameManager : MonoBehaviour
     public bool isDocked;
 
     [Header("Upgrade Levels")]
-    public int engineLevel;
-    public int fuelLevel;
-    public int navLevel;
-    public int warpLevel;
+    public int speedLevel;
+    public int boosterCapLevel;
+    public int boosterSpdLevel;
+    public int catSwapLevel;
 
     [Header("Settings")]
     public float tickRate = 0.05f;
@@ -38,6 +38,13 @@ public class GameManager : MonoBehaviour
         DontDestroyOnLoad(gameObject);
         Application.targetFrameRate = 30;
         LoadGame();
+    }
+
+    void Start()
+    {
+        // 부스터 연료 복원
+        if (BoosterSystem.Instance != null)
+            BoosterSystem.Instance.fuel = PlayerPrefs.GetFloat("BoosterFuel", 0f);
     }
 
     void Update()
@@ -92,14 +99,11 @@ public class GameManager : MonoBehaviour
         if (isDocked) return;
 
         double baseSpeed = GetTotalSpeed();
-
-        // 부스터 배율 적용
         float boostMult = 1f;
         if (BoosterSystem.Instance != null)
             boostMult = BoosterSystem.Instance.GetSpeedMultiplier();
 
         double effectiveSpeed = baseSpeed * boostMult;
-
         double distGain = effectiveSpeed * tickRate;
         double creditGain = effectiveSpeed * 0.00001 * tickRate;
 
@@ -124,7 +128,7 @@ public class GameManager : MonoBehaviour
         isDocked = true;
 
         OnStarArrived?.Invoke(star);
-        OnNotification?.Invoke($"★ {star.name} 도착! +{star.reward} CR");
+        OnNotification?.Invoke(Loc.Get("notif_arrived", Loc.Get(star.nameKey), star.reward));
         SaveGame();
     }
 
@@ -137,21 +141,15 @@ public class GameManager : MonoBehaviour
         OnStatsChanged?.Invoke();
     }
 
-    // ============ SPEED (km/s) ============
+    // ============ SPEED ============
 
     public double GetTotalSpeed()
     {
         double spd = 100;
-        spd += GetUpgradeContribution(UpgradeType.Engine);
-        spd += GetUpgradeContribution(UpgradeType.Fuel);
-        spd += GetUpgradeContribution(UpgradeType.Nav);
-        spd += GetUpgradeContribution(UpgradeType.Warp);
+        spd += GetUpgradeContribution(UpgradeType.Speed);
         return spd;
     }
 
-    /// <summary>
-    /// UI 표시용: 부스터 포함 현재 실제 속도
-    /// </summary>
     public double GetEffectiveSpeed()
     {
         double baseSpeed = GetTotalSpeed();
@@ -159,6 +157,18 @@ public class GameManager : MonoBehaviour
         if (BoosterSystem.Instance != null)
             boostMult = BoosterSystem.Instance.GetSpeedMultiplier();
         return baseSpeed * boostMult;
+    }
+
+    /// <summary>부스터 용량 배율 (1 + 업그레이드 기여)</summary>
+    public float GetBoosterCapacityMultiplier()
+    {
+        return 1f + (float)GetUpgradeContribution(UpgradeType.BoosterCapacity);
+    }
+
+    /// <summary>부스터 속도 배율 (3 + 업그레이드 기여)</summary>
+    public float GetBoosterSpeedMultiplier()
+    {
+        return 3f + (float)GetUpgradeContribution(UpgradeType.BoosterSpeed);
     }
 
     public double GetUpgradeContribution(UpgradeType type)
@@ -173,10 +183,10 @@ public class GameManager : MonoBehaviour
     {
         return type switch
         {
-            UpgradeType.Engine => engineLevel,
-            UpgradeType.Fuel => fuelLevel,
-            UpgradeType.Nav => navLevel,
-            UpgradeType.Warp => warpLevel,
+            UpgradeType.Speed => speedLevel,
+            UpgradeType.BoosterCapacity => boosterCapLevel,
+            UpgradeType.BoosterSpeed => boosterSpdLevel,
+            UpgradeType.CatSwap => catSwapLevel,
             _ => 0
         };
     }
@@ -194,15 +204,16 @@ public class GameManager : MonoBehaviour
 
     public bool BuyUpgrade(UpgradeType type)
     {
+        if (type == UpgradeType.CatSwap) return false; // 데모 비활성화
+
         double cost = GetUpgradeCost(type);
         if (credits < cost) return false;
         credits -= cost;
         switch (type)
         {
-            case UpgradeType.Engine: engineLevel++; break;
-            case UpgradeType.Fuel: fuelLevel++; break;
-            case UpgradeType.Nav: navLevel++; break;
-            case UpgradeType.Warp: warpLevel++; break;
+            case UpgradeType.Speed: speedLevel++; break;
+            case UpgradeType.BoosterCapacity: boosterCapLevel++; break;
+            case UpgradeType.BoosterSpeed: boosterSpdLevel++; break;
         }
         OnStatsChanged?.Invoke();
         return true;
@@ -218,12 +229,11 @@ public class GameManager : MonoBehaviour
         PlayerPrefs.SetString("TotalDistance", totalDistance.ToString("R"));
         PlayerPrefs.SetInt("CurrentStar", currentStarIndex);
         PlayerPrefs.SetString("ArrivedStars", string.Join(",", arrivedStars));
-        PlayerPrefs.SetInt("EngineLevel", engineLevel);
-        PlayerPrefs.SetInt("FuelLevel", fuelLevel);
-        PlayerPrefs.SetInt("NavLevel", navLevel);
-        PlayerPrefs.SetInt("WarpLevel", warpLevel);
+        PlayerPrefs.SetInt("SpeedLevel", speedLevel);
+        PlayerPrefs.SetInt("BoosterCapLevel", boosterCapLevel);
+        PlayerPrefs.SetInt("BoosterSpdLevel", boosterSpdLevel);
+        PlayerPrefs.SetInt("CatSwapLevel", catSwapLevel);
         PlayerPrefs.SetInt("IsDocked", isDocked ? 1 : 0);
-        // 부스터 연료도 저장
         if (BoosterSystem.Instance != null)
             PlayerPrefs.SetFloat("BoosterFuel", BoosterSystem.Instance.fuel);
         PlayerPrefs.Save();
@@ -236,10 +246,10 @@ public class GameManager : MonoBehaviour
         distance = double.Parse(PlayerPrefs.GetString("Distance", "0"));
         totalDistance = double.Parse(PlayerPrefs.GetString("TotalDistance", "0"));
         currentStarIndex = PlayerPrefs.GetInt("CurrentStar", 0);
-        engineLevel = PlayerPrefs.GetInt("EngineLevel", 0);
-        fuelLevel = PlayerPrefs.GetInt("FuelLevel", 0);
-        navLevel = PlayerPrefs.GetInt("NavLevel", 0);
-        warpLevel = PlayerPrefs.GetInt("WarpLevel", 0);
+        speedLevel = PlayerPrefs.GetInt("SpeedLevel", 0);
+        boosterCapLevel = PlayerPrefs.GetInt("BoosterCapLevel", 0);
+        boosterSpdLevel = PlayerPrefs.GetInt("BoosterSpdLevel", 0);
+        catSwapLevel = PlayerPrefs.GetInt("CatSwapLevel", 0);
         isDocked = PlayerPrefs.GetInt("IsDocked", 0) == 1;
 
         string arrivedStr = PlayerPrefs.GetString("ArrivedStars", "");
@@ -247,13 +257,6 @@ public class GameManager : MonoBehaviour
         if (!string.IsNullOrEmpty(arrivedStr))
             foreach (string s in arrivedStr.Split(','))
                 if (int.TryParse(s, out int idx)) arrivedStars.Add(idx);
-    }
-
-    // Start에서 부스터 연료 복원 (BoosterSystem이 초기화된 후)
-    void Start()
-    {
-        if (BoosterSystem.Instance != null)
-            BoosterSystem.Instance.fuel = PlayerPrefs.GetFloat("BoosterFuel", 0f);
     }
 
     void OnApplicationQuit() => SaveGame();
@@ -273,9 +276,17 @@ public class GameManager : MonoBehaviour
     public static string FormatSpeed(double kmPerSec)
     {
         double c = 299792.458;
-        if (kmPerSec >= c) return (kmPerSec / c).ToString("F2") + "c";
-        if (kmPerSec >= c * 0.01) return (kmPerSec / c * 100).ToString("F1") + "% c";
-        if (kmPerSec >= 1000) return (kmPerSec / 1000).ToString("F1") + "천 km/s";
-        return kmPerSec.ToString("F0") + " km/s";
+        if (kmPerSec >= c) return Loc.Get("speed_c", (kmPerSec / c).ToString("F2"));
+        if (kmPerSec >= c * 0.01) return Loc.Get("speed_pctc", (kmPerSec / c * 100).ToString("F1"));
+        if (kmPerSec >= 1000) return Loc.Get("speed_tkms", (kmPerSec / 1000).ToString("F1"));
+        return Loc.Get("speed_kms", kmPerSec.ToString("F0"));
+    }
+
+    public static string FormatTime(double sec)
+    {
+        if (sec < 60) return Loc.Get("time_sec", $"{sec:F0}");
+        if (sec < 3600) return Loc.Get("time_min", $"{sec / 60:F0}");
+        if (sec < 86400) return Loc.Get("time_hour", $"{sec / 3600:F1}");
+        return Loc.Get("time_day", $"{sec / 86400:F1}");
     }
 }

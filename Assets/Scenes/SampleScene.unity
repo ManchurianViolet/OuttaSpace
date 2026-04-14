@@ -1430,10 +1430,10 @@ MonoBehaviour:
   currentStarIndex: 0
   arrivedStars: 
   isDocked: 0
-  engineLevel: 0
-  fuelLevel: 0
-  navLevel: 0
-  warpLevel: 0
+  speedLevel: 0
+  boosterCapLevel: 0
+  boosterSpdLevel: 0
+  catSwapLevel: 0
   tickRate: 0.05
 --- !u!4 &965683390
 Transform:
@@ -1556,10 +1556,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0e66e782367fed544a881bc36c16bc41, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PixelShipGenerator
-  design: 1
-  pixelsPerUnit: 16
-  sortingOrder: 10
-  shipTexture: {fileID: 0}
 --- !u!4 &973707808
 Transform:
   m_ObjectHideFlags: 0
@@ -1651,12 +1647,12 @@ MonoBehaviour:
   dockedFadeInTime: 0.8
   currentState: 0
   dockedStar:
-    name: 
+    nameKey: 
+    descKey: 
+    typeKey: 
     distanceKM: 0
-    starType: 
     color: {r: 0, g: 0, b: 0, a: 0}
     reward: 0
-    description: 
 --- !u!1 &1099829784
 GameObject:
   m_ObjectHideFlags: 0
@@ -3227,7 +3223,7 @@ MonoBehaviour:
   sortingOrder: 20
   autoFillPerSecond: 0.02
   keyPressFill: 0.03
-  boostSpeedMultiplier: 3
+  baseBoostMultiplier: 3
   boostDrainPerSecond: 0.2
   boostActivateDelay: 0.5
   fuel: 0

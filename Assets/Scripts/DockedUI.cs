@@ -41,50 +41,47 @@ public class DockedUI : MonoBehaviour
         var wsm = WindowStateManager.Instance;
         if (gm == null) return;
 
-        // 현재 도착한 항성 정보
         if (wsm != null && wsm.dockedStar != null)
         {
             StarData star = wsm.dockedStar;
             if (starNameText != null)
-                starNameText.text = star.name;
+                starNameText.text = Loc.Get(star.nameKey);
             if (rewardText != null)
-                rewardText.text = $"{star.starType} · {star.description}";
+                rewardText.text = Loc.Get(star.typeKey) + " · " + Loc.Get(star.descKey);
         }
 
-        // 크레딧
         if (creditsText != null)
             creditsText.text = GameManager.FormatNumber(gm.credits) + " CR";
 
-        // 현재 속도
         if (currentSpeedText != null)
             currentSpeedText.text = GameManager.FormatSpeed(gm.GetTotalSpeed());
 
-        // ★ 다음 목적지 = currentStarIndex + 1 (현재는 도착한 항성이므로)
         int nextIdx = gm.currentStarIndex + 1;
         bool hasNext = nextIdx < StarDatabase.Stars.Length;
 
         if (hasNext)
         {
             StarData next = StarDatabase.Stars[nextIdx];
+            string nextName = Loc.Get(next.nameKey);
 
             if (nextDestText != null)
-                nextDestText.text = $"다음: {next.name} ({StarDatabase.FormatKM(next.distanceKM)})";
+                nextDestText.text = Loc.Get("dock_next", nextName, StarDatabase.FormatKM(next.distanceKM));
 
             if (etaText != null)
             {
                 double speed = gm.GetTotalSpeed();
                 if (speed > 0)
-                    etaText.text = $"예상: {FormatTime(next.distanceKM / speed)}";
+                    etaText.text = Loc.Get("dock_eta", GameManager.FormatTime(next.distanceKM / speed));
             }
 
             if (departButtonText != null)
-                departButtonText.text = $"{next.name}(으)로 출발 ▶";
+                departButtonText.text = Loc.Get("dock_depart", nextName);
         }
         else
         {
-            if (nextDestText != null) nextDestText.text = "마지막 목적지입니다";
+            if (nextDestText != null) nextDestText.text = Loc.Get("dock_last_dest");
             if (etaText != null) etaText.text = "";
-            if (departButtonText != null) departButtonText.text = "탐사 완료";
+            if (departButtonText != null) departButtonText.text = Loc.Get("dock_complete");
         }
 
         if (departButton != null)
@@ -95,13 +92,5 @@ public class DockedUI : MonoBehaviour
     {
         if (WindowStateManager.Instance != null)
             WindowStateManager.Instance.Depart();
-    }
-
-    static string FormatTime(double sec)
-    {
-        if (sec < 60) return $"{sec:F0}초";
-        if (sec < 3600) return $"{sec / 60:F0}분";
-        if (sec < 86400) return $"{sec / 3600:F1}시간";
-        return $"{sec / 86400:F1}일";
     }
 }

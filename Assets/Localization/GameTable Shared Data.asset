@@ -1,0 +1,308 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5b11a58205ec3474ca216360e9fa74a8, type: 3}
+  m_Name: GameTable Shared Data
+  m_EditorClassIdentifier: Unity.Localization::UnityEngine.Localization.Tables.SharedTableData
+  m_TableCollectionName: GameTable
+  m_TableCollectionNameGuidString: 564c73971a5d01e468b82390470a4be1
+  m_Entries:
+  - m_Id: 75248013312
+    m_Key: hud_heading_to
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75315122176
+    m_Key: hud_arrived_at
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75315122177
+    m_Key: dock_next
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75315122178
+    m_Key: dock_eta
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75319316480
+    m_Key: dock_depart
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75319316481
+    m_Key: dock_last_dest
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75319316482
+    m_Key: dock_complete
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75319316483
+    m_Key: upgrade_speed
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75319316484
+    m_Key: upgrade_speed_desc
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75319316485
+    m_Key: upgrade_bcap
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75319316486
+    m_Key: upgrade_bcap_desc
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75319316487
+    m_Key: upgrade_bspd
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75319316488
+    m_Key: upgrade_bspd_desc
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75319316489
+    m_Key: upgrade_cat
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75319316490
+    m_Key: upgrade_cat_desc
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75319316491
+    m_Key: star_moon
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75319316492
+    m_Key: star_venus
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75319316493
+    m_Key: star_mars
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75319316494
+    m_Key: star_jupiter
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75319316495
+    m_Key: star_saturn
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75319316496
+    m_Key: star_uranus
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75319316497
+    m_Key: star_neptune
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75319316498
+    m_Key: star_pluto
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75319316499
+    m_Key: star_proxima
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75319316500
+    m_Key: star_alpha
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75319316501
+    m_Key: star_barnard
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75319316502
+    m_Key: star_sirius
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75319316503
+    m_Key: star_epsilon
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75319316504
+    m_Key: star_tau
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75319316505
+    m_Key: star_vega
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75319316506
+    m_Key: star_arcturus
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75319316507
+    m_Key: star_betelgeuse
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75319316508
+    m_Key: type_moon
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75319316509
+    m_Key: type_terrestrial
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75319316510
+    m_Key: type_gas_giant
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75319316511
+    m_Key: type_ice_giant
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75319316512
+    m_Key: type_dwarf_planet
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75319316513
+    m_Key: type_red_dwarf
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75319316514
+    m_Key: type_g_type
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75319316515
+    m_Key: type_k_type
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75319316516
+    m_Key: type_a_type
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75319316517
+    m_Key: type_binary
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75319316518
+    m_Key: type_red_giant
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75319316519
+    m_Key: type_red_supergiant
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75319316520
+    m_Key: desc_moon
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75323510784
+    m_Key: desc_venus
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75323510785
+    m_Key: desc_mars
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75323510786
+    m_Key: desc_jupiter
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75323510787
+    m_Key: desc_saturn
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75323510788
+    m_Key: desc_uranus
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75323510789
+    m_Key: desc_neptune
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75323510790
+    m_Key: desc_pluto
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75323510791
+    m_Key: desc_proxima
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75323510792
+    m_Key: desc_alpha
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75323510793
+    m_Key: desc_barnard
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75323510794
+    m_Key: desc_sirius
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75323510795
+    m_Key: desc_epsilon
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75323510796
+    m_Key: desc_tau
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75323510797
+    m_Key: desc_vega
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75323510798
+    m_Key: desc_arcturus
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75323510799
+    m_Key: desc_betelgeuse
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75323510800
+    m_Key: notif_arrived
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75323510801
+    m_Key: time_sec
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75323510802
+    m_Key: time_min
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75323510803
+    m_Key: time_hour
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75323510804
+    m_Key: time_day
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75323510805
+    m_Key: speed_kms
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75323510806
+    m_Key: speed_tkms
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75323510807
+    m_Key: speed_pctc
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75323510808
+    m_Key: speed_c
+    m_Metadata:
+      m_Items: []
+  m_Metadata:
+    m_Items: []
+  m_KeyGenerator:
+    rid: 3302585808071688456
+  references:
+    version: 2
+    RefIds:
+    - rid: 3302585808071688456
+      type: {class: DistributedUIDGenerator, ns: UnityEngine.Localization.Tables, asm: Unity.Localization}
+      data:
+        m_CustomEpoch: 1776155085467

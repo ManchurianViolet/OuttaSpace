@@ -80,14 +80,11 @@ public class DestinationVisual : MonoBehaviour
 
         float zoom = zoomController != null ? zoomController.GetZoomNormalized() : 0f;
 
+        // 40%부터 무조건 보임
         float visibility = 0f;
-        if (progress > 0.7f)
-            visibility = Mathf.InverseLerp(0.7f, 1f, progress);
-        else if (progress > 0.3f && zoom > 0.3f)
+        if (progress > 0.4f)
         {
-            float pf = Mathf.InverseLerp(0.3f, 0.7f, progress);
-            float zf = Mathf.InverseLerp(0.3f, 1f, zoom);
-            visibility = pf * zf * 0.5f;
+            visibility = Mathf.InverseLerp(0.4f, 1f, progress);
         }
 
         if (visibility <= 0.01f)
@@ -118,7 +115,8 @@ public class DestinationVisual : MonoBehaviour
             if (glowRenderer != null)
             {
                 StarData star = StarDatabase.Stars[gm.currentStarIndex];
-                Color gc = star.color; gc.a = visibility * 0.2f;
+                Color gc = star.color;
+                gc.a = visibility * 0.2f;
                 glowRenderer.color = gc;
             }
         }
@@ -131,8 +129,10 @@ public class DestinationVisual : MonoBehaviour
         if (planetTex != null) Destroy(planetTex);
         StarData star = StarDatabase.Stars[index];
         int size = 24;
-        if (star.starType.Contains("Giant") || star.starType.Contains("Binary")) size = 32;
-        else if (star.starType.Contains("Dwarf") || star.starType.Contains("Moon")) size = 16;
+        if (star.typeKey.Contains("giant") || star.typeKey.Contains("binary"))
+            size = 32;
+        else if (star.typeKey.Contains("dwarf") || star.typeKey.Contains("moon"))
+            size = 16;
 
         planetTex = GenerateCelestialBody(size, star.color, index);
         if (planetRenderer != null)
@@ -196,7 +196,7 @@ public class DestinationVisual : MonoBehaviour
         Color[] pixels = new Color[gs * gs]; float gc = gs / 2f;
         for (int y = 0; y < gs; y++)
             for (int x = 0; x < gs; x++)
-            { float d = Mathf.Sqrt((x-gc)*(x-gc)+(y-gc)*(y-gc)); float a = Mathf.Clamp01(1f-d/gc); a*=a; pixels[y*gs+x]=new Color(1,1,1,a*0.5f); }
+            { float d = Mathf.Sqrt((x - gc) * (x - gc) + (y - gc) * (y - gc)); float a = Mathf.Clamp01(1f - d / gc); a *= a; pixels[y * gs + x] = new Color(1, 1, 1, a * 0.5f); }
         glowTex.SetPixels(pixels); glowTex.Apply();
         glowRenderer.sprite = Sprite.Create(glowTex, new Rect(0, 0, gs, gs), Vector2.one * 0.5f, 16);
         glowObj.SetActive(false);

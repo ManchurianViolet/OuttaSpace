@@ -1,0 +1,303 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e9620f8c34305754d8cc9a7e49e852d9, type: 3}
+  m_Name: GameTable_en
+  m_EditorClassIdentifier: Unity.Localization::UnityEngine.Localization.Tables.StringTable
+  m_LocaleId:
+    m_Code: en
+  m_SharedData: {fileID: 11400000, guid: 564c73971a5d01e468b82390470a4be1, type: 2}
+  m_Metadata:
+    m_Items: []
+  m_TableData:
+  - m_Id: 75248013312
+    m_Localized: Heading to {0}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75315122176
+    m_Localized: Arrived at {0}!
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75315122177
+    m_Localized: 'Next: {0} ({1})'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75315122178
+    m_Localized: 'ETA: {0}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75319316480
+    m_Localized: "Depart to {0} \u25B6"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75319316481
+    m_Localized: Final destination
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75319316482
+    m_Localized: Exploration complete
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75319316483
+    m_Localized: Thrust
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75319316484
+    m_Localized: Increase base travel speed
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75319316485
+    m_Localized: Booster Tank
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75319316486
+    m_Localized: Increase max booster fuel
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75319316487
+    m_Localized: Booster Power
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75319316488
+    m_Localized: Increase boost speed multiplier
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75319316489
+    m_Localized: Change Cat
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75319316490
+    m_Localized: Not available in demo
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75319316491
+    m_Localized: Moon
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75319316492
+    m_Localized: Venus
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75319316493
+    m_Localized: Mars
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75319316494
+    m_Localized: Jupiter
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75319316495
+    m_Localized: Saturn
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75319316496
+    m_Localized: Uranus
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75319316497
+    m_Localized: Neptune
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75319316498
+    m_Localized: Pluto
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75319316499
+    m_Localized: Proxima Centauri
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75319316500
+    m_Localized: Alpha Centauri A
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75319316501
+    m_Localized: Barnard's Star
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75319316502
+    m_Localized: Sirius
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75319316503
+    m_Localized: Epsilon Eridani
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75319316504
+    m_Localized: Tau Ceti
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75319316505
+    m_Localized: Vega
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75319316506
+    m_Localized: Arcturus
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75319316507
+    m_Localized: Betelgeuse
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75319316508
+    m_Localized: Moon
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75319316509
+    m_Localized: Terrestrial
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75319316510
+    m_Localized: Gas Giant
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75319316511
+    m_Localized: Ice Giant
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75319316512
+    m_Localized: Dwarf Planet
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75319316513
+    m_Localized: Red Dwarf
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75319316514
+    m_Localized: G-type Star
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75319316515
+    m_Localized: K-type Star
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75319316516
+    m_Localized: A-type Star
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75319316517
+    m_Localized: Binary Star
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75319316518
+    m_Localized: Red Giant
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75319316519
+    m_Localized: Red Supergiant
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75319316520
+    m_Localized: Earth's only natural satellite
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75323510784
+    m_Localized: Morning star, hottest planet
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75323510785
+    m_Localized: The Red Planet, humanity's next goal
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75323510786
+    m_Localized: Largest planet in the solar system
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75323510787
+    m_Localized: Famous for its beautiful rings
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75323510788
+    m_Localized: Rotates on its side
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75323510789
+    m_Localized: Outermost planet of the solar system
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75323510790
+    m_Localized: Dwarf planet in the Kuiper Belt
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75323510791
+    m_Localized: Nearest star to the Sun
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75323510792
+    m_Localized: Sun-like binary star
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75323510793
+    m_Localized: Fastest-moving star
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75323510794
+    m_Localized: Brightest star in the night sky
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75323510795
+    m_Localized: Confirmed exoplanet host
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75323510796
+    m_Localized: Earth-like planet candidate
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75323510797
+    m_Localized: Brightest star in Lyra
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75323510798
+    m_Localized: Part of the Spring Triangle
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75323510799
+    m_Localized: Soon to go supernova
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75323510800
+    m_Localized: "\u2605 Arrived at {0}! +{1} CR"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75323510801
+    m_Localized: '{0}s'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75323510802
+    m_Localized: '{0}m'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75323510803
+    m_Localized: '{0}h'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75323510804
+    m_Localized: '{0}d'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75323510805
+    m_Localized: '{0} km/s'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75323510806
+    m_Localized: '{0}k km/s'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75323510807
+    m_Localized: '{0}% c'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75323510808
+    m_Localized: '{0}c'
+    m_Metadata:
+      m_Items: []
+  references:
+    version: 2
+    RefIds: []
