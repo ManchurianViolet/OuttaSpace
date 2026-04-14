@@ -37,11 +37,26 @@ public static class StarDatabase
     public static string FormatKM(double km)
     {
         if (km < 0) km = 0;
-        if (km < 10000)            return km.ToString("F0") + " km";
-        if (km < 100000000)        return (km / 10000).ToString("F0") + "만 km";
-        if (km < 1000000000000)    return (km / 100000000).ToString("F1") + "억 km";
-        if (km < 1000000000000000) return (km / 1000000000000).ToString("F2") + "조 km";
-        return (km / 1000000000000000).ToString("F2") + "경 km";
+
+        bool isKo = Loc.Get("hud_heading_to").Contains("향하는중");
+
+        if (isKo)
+        {
+            if (km < 10000) return km.ToString("F0") + " km";
+            if (km < 100000000) return (km / 10000).ToString("F0") + "만 km";
+            if (km < 1000000000000) return (km / 100000000).ToString("F1") + "억 km";
+            if (km < 1000000000000000) return (km / 1000000000000).ToString("F2") + "조 km";
+            return (km / 1000000000000000).ToString("F2") + "경 km";
+        }
+        else
+        {
+            if (km < 1000) return km.ToString("F0") + " km";
+            if (km < 1000000) return (km / 1000).ToString("F1") + "K km";
+            if (km < 1000000000) return (km / 1000000).ToString("F1") + "M km";
+            if (km < 1000000000000) return (km / 1000000000).ToString("F1") + "B km";
+            if (km < 1000000000000000) return (km / 1000000000000).ToString("F2") + "T km";
+            return (km / 1000000000000000).ToString("F2") + "Q km";
+        }
     }
 
     static Color HexColor(string hex)
