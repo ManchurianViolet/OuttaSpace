@@ -9,7 +9,7 @@ public class HUDController : MonoBehaviour
     public TextMeshProUGUI speedText;
 
     [Header("Bottom Info")]
-    public TextMeshProUGUI destinationText;  // "달로 향하는중..." 이 한 줄로 통합
+    public TextMeshProUGUI destinationText;
     public Image progressBar;
     public TextMeshProUGUI progressPercentText;
 
@@ -18,9 +18,13 @@ public class HUDController : MonoBehaviour
     public TextMeshProUGUI notificationText;
     private float notifTimer;
 
-    // 애니메이션 점 (. → .. → ...)
+    // 점 애니메이션
     private float dotTimer;
     private int dotCount = 1;
+
+    // 부스트 표시용 색상
+    private Color normalSpeedColor = HexColor("#5DCA5D");
+    private Color boostSpeedColor = HexColor("#44AAFF");
 
     void Start()
     {
@@ -38,15 +42,13 @@ public class HUDController : MonoBehaviour
     {
         UpdateHUD();
 
-        // 점 애니메이션: 0.5초마다 전환
         dotTimer += Time.deltaTime;
         if (dotTimer >= 0.5f)
         {
             dotTimer = 0f;
-            dotCount = (dotCount % 3) + 1; // 1 → 2 → 3 → 1
+            dotCount = (dotCount % 3) + 1;
         }
 
-        // 알림 타이머
         if (notificationPanel != null && notificationPanel.activeSelf)
         {
             notifTimer -= Time.deltaTime;
@@ -60,16 +62,25 @@ public class HUDController : MonoBehaviour
         var gm = GameManager.Instance;
         if (gm == null) return;
 
-        // 크레딧
         if (creditsText != null)
             creditsText.text = GameManager.FormatNumber(gm.credits);
 
-        // 속도
+        // 속도: 부스트 반영된 실제 속도 표시
         if (speedText != null)
-            speedText.text = GameManager.FormatSpeed(gm.GetTotalSpeed());
+        {
+            double effectiveSpeed = gm.GetEffectiveSpeed();
+            bool boosting = BoosterSystem.Instance != null && BoosterSystem.Instance.isBoosting;
 
-        // 목적지 텍스트: "달로 향하는중..."
+            if (boosting)
+                speedText.text = "⚡ " + GameManager.FormatSpeed(effectiveSpeed);
+            else
+                speedText.text = GameManager.FormatSpeed(effectiveSpeed);
+
+            speedText.color = boosting ? boostSpeedColor : normalSpeedColor;
+        }
+
         StarData star = StarDatabase.Stars[gm.currentStarIndex];
+
         if (destinationText != null)
         {
             if (gm.isDocked)
@@ -83,13 +94,13 @@ public class HUDController : MonoBehaviour
             }
         }
 
-        // 진행바
         float progress = star.distanceKM > 0
             ? Mathf.Clamp01((float)(gm.distance / star.distanceKM))
             : 0f;
 
         if (progressBar != null)
             progressBar.fillAmount = progress;
+
         if (progressPercentText != null)
         {
             string distStr = StarDatabase.FormatKM(gm.distance);
@@ -104,6 +115,12 @@ public class HUDController : MonoBehaviour
         notificationText.text = message;
         notificationPanel.SetActive(true);
         notifTimer = 3f;
+    }
+
+    static Color HexColor(string hex)
+    {
+        ColorUtility.TryParseHtmlString(hex, out Color c);
+        return c;
     }
 
     void OnDestroy()

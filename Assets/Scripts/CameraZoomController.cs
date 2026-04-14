@@ -14,6 +14,9 @@ public class CameraZoomController : MonoBehaviour
     public float zoomSpeed = 1.5f;
     public float smoothSpeed = 8f;  // 부드러운 전환 속도
 
+    [Header("Zoom Target")]
+    public Transform zoomTarget; // Inspector에서 Ship 오브젝트 드래그
+
     private Camera cam;
     private float targetZoom;
 
@@ -27,20 +30,30 @@ public class CameraZoomController : MonoBehaviour
 
     void Update()
     {
-        // 정박 중이면 줌 비활성화
         if (GameManager.Instance != null && GameManager.Instance.isDocked)
             return;
 
-        // 마우스 휠 입력
         float scroll = Input.GetAxis("Mouse ScrollWheel");
         if (scroll != 0f)
         {
+            float prevSize = cam.orthographicSize;
             targetZoom -= scroll * zoomSpeed * targetZoom * 0.5f;
             targetZoom = Mathf.Clamp(targetZoom, minZoom, maxZoom);
         }
 
-        // 부드러운 줌 전환
+        float oldSize = cam.orthographicSize;
         cam.orthographicSize = Mathf.Lerp(cam.orthographicSize, targetZoom, Time.deltaTime * smoothSpeed);
+
+        // 고양이 기준으로 줌
+        if (zoomTarget != null && oldSize != cam.orthographicSize)
+        {
+            float ratio = cam.orthographicSize / oldSize;
+            Vector3 catPos = zoomTarget.position;
+            Vector3 camPos = cam.transform.position;
+            camPos.x = catPos.x + (camPos.x - catPos.x) * ratio;
+            camPos.y = catPos.y + (camPos.y - catPos.y) * ratio;
+            cam.transform.position = camPos;
+        }
     }
 
     /// <summary>

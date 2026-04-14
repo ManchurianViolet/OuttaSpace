@@ -38,7 +38,6 @@ public class GameManager : MonoBehaviour
         DontDestroyOnLoad(gameObject);
         Application.targetFrameRate = 30;
         LoadGame();
-        // 오프라인 진행 없음 — 종료 시점 그대로 복원
     }
 
     void Update()
@@ -60,7 +59,6 @@ public class GameManager : MonoBehaviour
             return;
         }
 
-        // 스페이스바로 출발 (정박 UI 완성 전 임시)
         if (isDocked && Input.GetKeyDown(KeyCode.Space))
         {
             DepartToNextStar();
@@ -75,7 +73,6 @@ public class GameManager : MonoBehaviour
             ProcessTick();
         }
 
-        // 30초마다 자동 저장
         saveTimer += Time.deltaTime;
         if (saveTimer >= 30f)
         {
@@ -87,16 +84,24 @@ public class GameManager : MonoBehaviour
     void OnApplicationFocus(bool hasFocus)
     {
         Application.targetFrameRate = hasFocus ? 30 : 10;
-        if (!hasFocus) SaveGame(); // 포커스 잃으면 저장
+        if (!hasFocus) SaveGame();
     }
 
     void ProcessTick()
     {
         if (isDocked) return;
 
-        double spd = GetTotalSpeed();
-        double distGain = spd * tickRate;
-        double creditGain = spd * 0.00001 * tickRate;
+        double baseSpeed = GetTotalSpeed();
+
+        // 부스터 배율 적용
+        float boostMult = 1f;
+        if (BoosterSystem.Instance != null)
+            boostMult = BoosterSystem.Instance.GetSpeedMultiplier();
+
+        double effectiveSpeed = baseSpeed * boostMult;
+
+        double distGain = effectiveSpeed * tickRate;
+        double creditGain = effectiveSpeed * 0.00001 * tickRate;
 
         distance += distGain;
         totalDistance += distGain;
@@ -136,12 +141,24 @@ public class GameManager : MonoBehaviour
 
     public double GetTotalSpeed()
     {
-        double spd = 5000;
+        double spd = 100;
         spd += GetUpgradeContribution(UpgradeType.Engine);
         spd += GetUpgradeContribution(UpgradeType.Fuel);
         spd += GetUpgradeContribution(UpgradeType.Nav);
         spd += GetUpgradeContribution(UpgradeType.Warp);
         return spd;
+    }
+
+    /// <summary>
+    /// UI 표시용: 부스터 포함 현재 실제 속도
+    /// </summary>
+    public double GetEffectiveSpeed()
+    {
+        double baseSpeed = GetTotalSpeed();
+        float boostMult = 1f;
+        if (BoosterSystem.Instance != null)
+            boostMult = BoosterSystem.Instance.GetSpeedMultiplier();
+        return baseSpeed * boostMult;
     }
 
     public double GetUpgradeContribution(UpgradeType type)
@@ -206,6 +223,9 @@ public class GameManager : MonoBehaviour
         PlayerPrefs.SetInt("NavLevel", navLevel);
         PlayerPrefs.SetInt("WarpLevel", warpLevel);
         PlayerPrefs.SetInt("IsDocked", isDocked ? 1 : 0);
+        // 부스터 연료도 저장
+        if (BoosterSystem.Instance != null)
+            PlayerPrefs.SetFloat("BoosterFuel", BoosterSystem.Instance.fuel);
         PlayerPrefs.Save();
     }
 
@@ -227,6 +247,13 @@ public class GameManager : MonoBehaviour
         if (!string.IsNullOrEmpty(arrivedStr))
             foreach (string s in arrivedStr.Split(','))
                 if (int.TryParse(s, out int idx)) arrivedStars.Add(idx);
+    }
+
+    // Start에서 부스터 연료 복원 (BoosterSystem이 초기화된 후)
+    void Start()
+    {
+        if (BoosterSystem.Instance != null)
+            BoosterSystem.Instance.fuel = PlayerPrefs.GetFloat("BoosterFuel", 0f);
     }
 
     void OnApplicationQuit() => SaveGame();

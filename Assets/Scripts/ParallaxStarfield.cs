@@ -72,14 +72,17 @@ public class ParallaxStarfield : MonoBehaviour
         float speedMultiplier = 1f;
         if (GameManager.Instance != null && !GameManager.Instance.isDocked)
         {
-            // km/s를 시각적 속도로 변환 (100 km/s → 0.7, 1000 km/s → 2.5)
-            float gameSpeed = (float)GameManager.Instance.GetTotalSpeed();
-            speedMultiplier = Mathf.Min(Mathf.Log10(Mathf.Max(gameSpeed, 1f)) * 0.8f + 0.3f, 10f);
+            // 부스트 포함된 실제 속도 사용
+            float gameSpeed = (float)GameManager.Instance.GetEffectiveSpeed();
+            speedMultiplier = Mathf.Min(Mathf.Log10(Mathf.Max(gameSpeed, 1f)) * 1.3f + 0.3f, 10f);
         }
         else if (GameManager.Instance != null && GameManager.Instance.isDocked)
         {
             speedMultiplier = 0.05f;
         }
+
+        // 부스트 중이면 별 색상 살짝 파랗게
+        bool boosting = BoosterSystem.Instance != null && BoosterSystem.Instance.isBoosting;
 
         for (int i = 0; i < starObjects.Count; i++)
         {
@@ -108,8 +111,17 @@ public class ParallaxStarfield : MonoBehaviour
 
             SpriteRenderer sr = go.GetComponent<SpriteRenderer>();
             float twinkle = layerAlphas[star.layer] *
-                (0.7f + 0.3f * Mathf.Sin(Time.time * 2f + star.twinkleOffset));
-            sr.color = new Color(0.75f, 0.82f, 1f, twinkle);
+                (0.3f + 0.7f * Mathf.Sin(Time.time * 4f + star.twinkleOffset));
+
+            if (boosting)
+            {
+                // 부스트: 별이 파랗고 밝게
+                sr.color = new Color(0.6f, 0.75f, 1f, twinkle * 1.3f);
+            }
+            else
+            {
+                sr.color = new Color(0.75f, 0.82f, 1f, twinkle);
+            }
         }
     }
 
