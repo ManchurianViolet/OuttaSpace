@@ -7,6 +7,11 @@ public class ShipController : MonoBehaviour
     public float bobAmplitude = 0.15f;
     public float bobSpeed = 1.2f;
 
+    [Header("Boost Surge")]
+    public float surgeDistance = 0.5f;
+    public float surgeSpeed = 4f;
+    private float currentSurge;
+
     [Header("Engine Flame")]
     public ParticleSystem engineFlame;
 
@@ -25,12 +30,17 @@ public class ShipController : MonoBehaviour
 
     void Update()
     {
+        bool boosting = BoosterSystem.Instance != null && BoosterSystem.Instance.isBoosting;
+
+        // ë¶€ìŠ¤íŠ¸ ì¤‘ì´ë©´ ì•ìœ¼ë¡œ ë°€ë ¸ë‹¤ê°€, ëë‚˜ë©´ ë³µê·€
+        float targetSurge = boosting ? surgeDistance : 0f;
+        currentSurge = Mathf.Lerp(currentSurge, targetSurge, surgeSpeed * Time.deltaTime);
+
         float bob = Mathf.Sin(Time.time * bobSpeed) * bobAmplitude;
-        transform.localPosition = basePosition + Vector3.up * bob;
+        transform.localPosition = basePosition + Vector3.up * bob + Vector3.right * currentSurge;
 
         if (engineFlame != null && GameManager.Instance != null)
         {
-            bool boosting = BoosterSystem.Instance != null && BoosterSystem.Instance.isBoosting;
             float speed = (float)GameManager.Instance.GetTotalSpeed();
             float normalized = Mathf.Clamp01(Mathf.Log10(Mathf.Max(speed, 1f)) / 5f);
 
@@ -44,26 +54,25 @@ public class ShipController : MonoBehaviour
                 main.startSpeed = 4f;
                 main.startSize = 0.3f;
 
-                // ½ÃÀÛ»öµµ ÆÄ¶û~ÇÏ´Ã»ö ·£´ı
+                // í•˜ëŠ˜ìƒ‰~íŒŒë€ ê·¸ë¼ë°ì´ì…˜
                 main.startColor = new ParticleSystem.MinMaxGradient(
                     new Color(0.15f, 0.55f, 1f, 0.95f),
                     new Color(0.45f, 0.9f, 1f, 0.95f)
                 );
 
-                // ¼ö¸í µ¿¾È »öµµ ÆÄ¶û °è¿­·Î
                 Gradient boostGrad = new Gradient();
                 boostGrad.SetKeys(
                     new GradientColorKey[]
                     {
-                new GradientColorKey(new Color(0.7f, 0.95f, 1f), 0f),   // ¹àÀº ÇÏ´Ã»ö
-                new GradientColorKey(new Color(0.3f, 0.7f, 1f), 0.5f),  // ÆÄ¶û
-                new GradientColorKey(new Color(0.1f, 0.35f, 1f), 1f)    // ÁøÇÑ ÆÄ¶û
+                        new GradientColorKey(new Color(0.7f, 0.95f, 1f), 0f),
+                        new GradientColorKey(new Color(0.3f, 0.7f, 1f), 0.5f),
+                        new GradientColorKey(new Color(0.1f, 0.35f, 1f), 1f)
                     },
                     new GradientAlphaKey[]
                     {
-                new GradientAlphaKey(0.9f, 0f),
-                new GradientAlphaKey(0.5f, 0.5f),
-                new GradientAlphaKey(0f, 1f)
+                        new GradientAlphaKey(0.9f, 0f),
+                        new GradientAlphaKey(0.5f, 0.5f),
+                        new GradientAlphaKey(0f, 1f)
                     }
                 );
 
@@ -85,15 +94,15 @@ public class ShipController : MonoBehaviour
                 normalGrad.SetKeys(
                     new GradientColorKey[]
                     {
-                new GradientColorKey(new Color(1f, 0.7f, 0.2f), 0f),
-                new GradientColorKey(new Color(1f, 0.3f, 0.1f), 0.5f),
-                new GradientColorKey(new Color(0.8f, 0.1f, 0f), 1f)
+                        new GradientColorKey(new Color(1f, 0.7f, 0.2f), 0f),
+                        new GradientColorKey(new Color(1f, 0.3f, 0.1f), 0.5f),
+                        new GradientColorKey(new Color(0.8f, 0.1f, 0f), 1f)
                     },
                     new GradientAlphaKey[]
                     {
-                new GradientAlphaKey(0.8f, 0f),
-                new GradientAlphaKey(0.5f, 0.5f),
-                new GradientAlphaKey(0f, 1f)
+                        new GradientAlphaKey(0.8f, 0f),
+                        new GradientAlphaKey(0.5f, 0.5f),
+                        new GradientAlphaKey(0f, 1f)
                     }
                 );
 
@@ -107,6 +116,7 @@ public class ShipController : MonoBehaviour
     {
         basePosition = newPos;
         transform.localPosition = newPos;
+        currentSurge = 0f;
     }
 
     void CreateEngineParticle()
@@ -141,17 +151,15 @@ public class ShipController : MonoBehaviour
         );
         colorOverLife.color = grad;
 
-        // ¹æÇâ: ¿ŞÂÊÀ¸·Î Á÷¼± ¹ß»ç
         var shape = engineFlame.shape;
         shape.shapeType = ParticleSystemShapeType.Cone;
-        shape.angle = 8f;               // 15 ¡æ 8 (Á¼°Ô ÁıÁß)
-        shape.radius = 0.02f;           // 0.05 ¡æ 0.02
-        shape.rotation = new Vector3(0, 0, 90); // ¿ŞÂÊ ¹æÇâ
+        shape.angle = 8f;
+        shape.radius = 0.02f;
+        shape.rotation = new Vector3(0, 0, 90);
 
-        // ¿ŞÂÊÀ¸·Î Ãß°¡ ¼Óµµ (ÇÙ½É!)
         var velocity = engineFlame.velocityOverLifetime;
         velocity.enabled = true;
-        velocity.x = -3f;               // ¿ŞÂÊÀ¸·Î ¹Ğ±â
+        velocity.x = -3f;
         velocity.y = 0f;
         velocity.z = 0f;
 
