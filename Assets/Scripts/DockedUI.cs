@@ -6,11 +6,9 @@ public class DockedUI : MonoBehaviour
 {
     [Header("Star Info")]
     public TextMeshProUGUI starNameText;
-    public TextMeshProUGUI rewardText;
     public TextMeshProUGUI creditsText;
 
-    [Header("Speed Info")]
-    public TextMeshProUGUI currentSpeedText;
+    [Header("Next Destination")]
     public TextMeshProUGUI nextDestText;
     public TextMeshProUGUI etaText;
 
@@ -20,41 +18,56 @@ public class DockedUI : MonoBehaviour
 
     void OnEnable()
     {
-        Refresh();
+        starNameText.text = Loc.Get("loading_location");
+
+        if (WindowStateManager.Instance != null)
+            WindowStateManager.Instance.OnStateChanged += OnWindowStateChanged;
         if (departButton != null)
             departButton.onClick.AddListener(OnDepartClicked);
         if (GameManager.Instance != null)
             GameManager.Instance.OnStatsChanged += Refresh;
+        Refresh();
     }
 
     void OnDisable()
     {
+        if (WindowStateManager.Instance != null)
+            WindowStateManager.Instance.OnStateChanged -= OnWindowStateChanged;
         if (departButton != null)
             departButton.onClick.RemoveListener(OnDepartClicked);
         if (GameManager.Instance != null)
             GameManager.Instance.OnStatsChanged -= Refresh;
     }
 
+    void OnWindowStateChanged(WindowStateManager.WindowState state)
+    {
+        if (state == WindowStateManager.WindowState.Docked)
+        {
+            Refresh(); // 👈 여기서 다시 갱신
+        }
+    }
+
+    void Update()
+    {
+        if (creditsText != null && GameManager.Instance != null)
+            creditsText.text = GameManager.FormatNumber(GameManager.Instance.credits) + " CR";
+    }
+
     void Refresh()
     {
         var gm = GameManager.Instance;
-        var wsm = WindowStateManager.Instance;
         if (gm == null) return;
 
-        if (wsm != null && wsm.dockedStar != null)
+        StarData star = GetDockedStar(gm);
+
+        if (star != null)
         {
-            StarData star = wsm.dockedStar;
             if (starNameText != null)
                 starNameText.text = Loc.Get(star.nameKey);
-            if (rewardText != null)
-                rewardText.text = Loc.Get(star.typeKey) + " · " + Loc.Get(star.descKey);
         }
 
         if (creditsText != null)
             creditsText.text = GameManager.FormatNumber(gm.credits) + " CR";
-
-        if (currentSpeedText != null)
-            currentSpeedText.text = GameManager.FormatSpeed(gm.GetTotalSpeed());
 
         int nextIdx = gm.currentStarIndex + 1;
         bool hasNext = nextIdx < StarDatabase.Stars.Length;
@@ -86,6 +99,22 @@ public class DockedUI : MonoBehaviour
 
         if (departButton != null)
             departButton.interactable = hasNext;
+    }
+
+    StarData GetDockedStar(GameManager gm)
+    {
+        var wsm = WindowStateManager.Instance;
+        if (wsm != null && wsm.dockedStar != null)
+            return wsm.dockedStar;
+
+        if (gm.arrivedStars.Count > 0)
+        {
+            int lastIdx = gm.arrivedStars[gm.arrivedStars.Count - 1];
+            if (lastIdx >= 0 && lastIdx < StarDatabase.Stars.Length)
+                return StarDatabase.Stars[lastIdx];
+        }
+
+        return null;
     }
 
     void OnDepartClicked()

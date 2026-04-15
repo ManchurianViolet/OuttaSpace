@@ -45,7 +45,7 @@ public class UpgradeButton : MonoBehaviour
         bool isDemoLocked = (upgradeType == UpgradeType.CatSwap);
 
         if (nameText != null)
-            nameText.text = $"{data.icon} {Loc.Get(data.nameKey)}";
+            nameText.text = $"{Loc.Get(data.nameKey)}";
         if (levelText != null)
             levelText.text = isDemoLocked ? "" : $"Lv.{level}";
         if (descText != null)
@@ -66,8 +66,38 @@ public class UpgradeButton : MonoBehaviour
 
         if (buyButton != null)
             buyButton.interactable = canAfford && !isDemoLocked;
+        // 배경은 항상 흰색 유지
         if (buttonBackground != null)
-            buttonBackground.color = isDemoLocked ? disabledColor : (canAfford ? affordableColor : unaffordableColor);
+            buttonBackground.color = isDemoLocked ? disabledColor : Color.white;
+
+        // 못 사면 글자만 반투명
+        float textAlpha = (canAfford || isDemoLocked) ? 1f : 0.75f;
+
+        if (nameText != null)
+        {
+            Color c = nameText.color;
+            c.a = isDemoLocked ? 0.2f : textAlpha;
+            nameText.color = c;
+        }
+        if (levelText != null)
+        {
+            Color c = levelText.color;
+            c.a = textAlpha;
+            levelText.color = c;
+        }
+        if (descText != null)
+        {
+            Color c = descText.color;
+            c.a = isDemoLocked ? 0.2f : textAlpha;
+            descText.color = c;
+        }
+        if (costText != null)
+        {
+            costText.text = isDemoLocked ? "LOCKED" : $"{GameManager.FormatNumber(cost)} CR";
+            Color c = costText.color;
+            c.a = isDemoLocked ? 0.2f : textAlpha;
+            costText.color = c;
+        }
     }
 
     void OnBuyClicked()

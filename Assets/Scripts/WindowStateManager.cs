@@ -30,8 +30,8 @@ public class WindowStateManager : MonoBehaviour
     public Vector3 shipTravelPos = new Vector3(-3f, 0, 0);
 
     [Header("Transition Settings")]
-    public float arrivalTransitionTime = 1.5f;    // 우주선 이동+페이드아웃 시간
-    public float dockedFadeInTime = 0.8f;          // 정박 UI 페이드인 시간
+    public float arrivalTransitionTime = 1.5f;
+    public float dockedFadeInTime = 0.8f;
 
     [Header("State")]
     public WindowState currentState = WindowState.Traveling;
@@ -86,7 +86,6 @@ public class WindowStateManager : MonoBehaviour
             shipRenderer = shipObject.GetComponent<SpriteRenderer>();
         }
 
-        // DockedUI에 CanvasGroup 확보 (페이드인용)
         if (dockedUI != null)
         {
             dockedCanvasGroup = dockedUI.GetComponent<CanvasGroup>();
@@ -122,10 +121,12 @@ public class WindowStateManager : MonoBehaviour
     {
         if (GameManager.Instance != null && GameManager.Instance.isDocked)
         {
+            // 도착한 항성 복원
             var arrived = GameManager.Instance.arrivedStars;
             if (arrived.Count > 0)
                 dockedStar = StarDatabase.Stars[arrived[arrived.Count - 1]];
-            SetDockedImmediate(); // 로드 시에는 트랜지션 없이 바로
+
+            SetDockedImmediate();
         }
         else
         {
@@ -135,8 +136,6 @@ public class WindowStateManager : MonoBehaviour
         if (GameManager.Instance != null)
             GameManager.Instance.OnStarArrived += OnStarArrived;
     }
-
-    // ============ 이벤트 ============
 
     void OnStarArrived(StarData star)
     {
@@ -158,28 +157,19 @@ public class WindowStateManager : MonoBehaviour
     {
         currentState = WindowState.Transitioning;
 
-        // 목적지 행성의 위치 (DestinationVisual의 arrivedX 근처)
         Vector3 targetPos = new Vector3(3f, 0, 0);
-
-        // 우주선 현재 위치
         Vector3 startPos = shipObject != null ? shipObject.transform.localPosition : shipTravelPos;
-
-        // 엔진 불 서서히 줄이기
         float elapsed = 0f;
 
         while (elapsed < arrivalTransitionTime)
         {
             elapsed += Time.deltaTime;
             float t = Mathf.Clamp01(elapsed / arrivalTransitionTime);
-
-            // 이징: 시작은 빠르고 끝에서 느려짐
             float eased = 1f - Mathf.Pow(1f - t, 2f);
 
-            // 우주선을 행성 쪽으로 이동
             if (shipObject != null)
                 shipObject.transform.localPosition = Vector3.Lerp(startPos, targetPos, eased);
 
-            // 우주선 페이드아웃 (후반 60%에서)
             if (shipRenderer != null && t > 0.4f)
             {
                 float fadeT = Mathf.InverseLerp(0.4f, 1f, t);
@@ -188,7 +178,6 @@ public class WindowStateManager : MonoBehaviour
                 shipRenderer.color = c;
             }
 
-            // 엔진 파티클 줄이기
             if (shipFlame != null)
             {
                 var emission = shipFlame.emission;
@@ -198,7 +187,6 @@ public class WindowStateManager : MonoBehaviour
             yield return null;
         }
 
-        // 우주선 완전 투명
         if (shipRenderer != null)
         {
             Color c = shipRenderer.color;
@@ -206,13 +194,10 @@ public class WindowStateManager : MonoBehaviour
             shipRenderer.color = c;
         }
 
-        // 잠깐 대기
         yield return new WaitForSeconds(0.3f);
 
-        // 정박 모드로 전환 + 페이드인
         SetDockedImmediate();
 
-        // DockedUI 페이드인
         if (dockedCanvasGroup != null)
         {
             dockedCanvasGroup.alpha = 0f;
@@ -236,7 +221,6 @@ public class WindowStateManager : MonoBehaviour
         if (travelingUI != null) travelingUI.SetActive(true);
         if (dockedUI != null) dockedUI.SetActive(false);
 
-        // 우주선 복원: 위치, 투명도, 엔진
         if (shipObject != null)
         {
             shipObject.SetActive(true);
@@ -259,8 +243,6 @@ public class WindowStateManager : MonoBehaviour
         if (shipFlame != null) shipFlame.Play();
         if (starfield != null) starfield.enabled = true;
         if (terrain != null) terrain.Hide();
-
-        // DestinationVisual 다시 활성화
         if (destinationVisual != null)
             destinationVisual.gameObject.SetActive(true);
 
@@ -277,12 +259,10 @@ public class WindowStateManager : MonoBehaviour
         if (travelingUI != null) travelingUI.SetActive(false);
         if (dockedUI != null) dockedUI.SetActive(true);
 
-        // 우주선: 지면에 착륙, 엔진 끄기
         if (shipObject != null)
         {
             shipObject.SetActive(true);
             shipObject.transform.localPosition = shipDockedPos;
-            // 투명도 복원 (트랜지션에서 투명해졌으므로)
             if (shipRenderer != null)
             {
                 Color c = shipRenderer.color;
@@ -296,12 +276,11 @@ public class WindowStateManager : MonoBehaviour
         if (starfield != null) starfield.enabled = false;
         if (terrain != null && dockedStar != null)
             terrain.GenerateTerrain(dockedStar);
-
-        // ★ 정박 시 DestinationVisual 숨기기 (행성이 떠있는 문제 해결)
         if (destinationVisual != null)
             destinationVisual.gameObject.SetActive(false);
 
-        ResizeWindow(stationWidth, stationHeight, anchorBottomRight: false);
+        // 정박 창: 화면 우하단 기준으로 배치 (재시작 시에도 일관된 위치)
+        ResizeWindow(stationWidth, stationHeight, anchorBottomRight: true);
 
         if (dockedStar != null)
         {
@@ -328,11 +307,11 @@ public class WindowStateManager : MonoBehaviour
         }
         else
         {
-            GetWindowRect(hWnd, out RECT rect);
-            x = rect.right - w;
-            y = rect.bottom - h;
-            x = Mathf.Max(x, 8);
-            y = Mathf.Max(y, 8);
+            // 화면 중앙
+            int screenW = GetSystemMetrics(0);
+            int screenH = GetSystemMetrics(1);
+            x = (screenW - w) / 2;
+            y = (screenH - h) / 2;
         }
         IntPtr insertAfter = alwaysOnTop ? HWND_TOPMOST : HWND_NOTOPMOST;
         SetWindowPos(hWnd, insertAfter, x, y, w, h, SWP_SHOWWINDOW);

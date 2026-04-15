@@ -15,6 +15,10 @@ MonoBehaviour:
   m_TableCollectionName: GameTable
   m_TableCollectionNameGuidString: 564c73971a5d01e468b82390470a4be1
   m_Entries:
+  - m_Id: 75323510809
+    m_Key: loading_location
+    m_Metadata:
+      m_Items: []
   - m_Id: 75248013312
     m_Key: hud_heading_to
     m_Metadata:
@@ -189,74 +193,6 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 75319316519
     m_Key: type_red_supergiant
-    m_Metadata:
-      m_Items: []
-  - m_Id: 75319316520
-    m_Key: desc_moon
-    m_Metadata:
-      m_Items: []
-  - m_Id: 75323510784
-    m_Key: desc_venus
-    m_Metadata:
-      m_Items: []
-  - m_Id: 75323510785
-    m_Key: desc_mars
-    m_Metadata:
-      m_Items: []
-  - m_Id: 75323510786
-    m_Key: desc_jupiter
-    m_Metadata:
-      m_Items: []
-  - m_Id: 75323510787
-    m_Key: desc_saturn
-    m_Metadata:
-      m_Items: []
-  - m_Id: 75323510788
-    m_Key: desc_uranus
-    m_Metadata:
-      m_Items: []
-  - m_Id: 75323510789
-    m_Key: desc_neptune
-    m_Metadata:
-      m_Items: []
-  - m_Id: 75323510790
-    m_Key: desc_pluto
-    m_Metadata:
-      m_Items: []
-  - m_Id: 75323510791
-    m_Key: desc_proxima
-    m_Metadata:
-      m_Items: []
-  - m_Id: 75323510792
-    m_Key: desc_alpha
-    m_Metadata:
-      m_Items: []
-  - m_Id: 75323510793
-    m_Key: desc_barnard
-    m_Metadata:
-      m_Items: []
-  - m_Id: 75323510794
-    m_Key: desc_sirius
-    m_Metadata:
-      m_Items: []
-  - m_Id: 75323510795
-    m_Key: desc_epsilon
-    m_Metadata:
-      m_Items: []
-  - m_Id: 75323510796
-    m_Key: desc_tau
-    m_Metadata:
-      m_Items: []
-  - m_Id: 75323510797
-    m_Key: desc_vega
-    m_Metadata:
-      m_Items: []
-  - m_Id: 75323510798
-    m_Key: desc_arcturus
-    m_Metadata:
-      m_Items: []
-  - m_Id: 75323510799
-    m_Key: desc_betelgeuse
     m_Metadata:
       m_Items: []
   - m_Id: 75323510800

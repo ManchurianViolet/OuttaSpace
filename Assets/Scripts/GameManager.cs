@@ -42,7 +42,6 @@ public class GameManager : MonoBehaviour
 
     void Start()
     {
-        // 부스터 연료 복원
         if (BoosterSystem.Instance != null)
             BoosterSystem.Instance.fuel = PlayerPrefs.GetFloat("BoosterFuel", 0f);
     }
@@ -123,12 +122,10 @@ public class GameManager : MonoBehaviour
     {
         StarData star = StarDatabase.Stars[index];
         arrivedStars.Add(index);
-        credits += star.reward;
-        totalCredits += star.reward;
         isDocked = true;
 
         OnStarArrived?.Invoke(star);
-        OnNotification?.Invoke(Loc.Get("notif_arrived", Loc.Get(star.nameKey), star.reward));
+        OnNotification?.Invoke(Loc.Get("notif_arrived", Loc.Get(star.nameKey)));
         SaveGame();
     }
 
@@ -145,7 +142,7 @@ public class GameManager : MonoBehaviour
 
     public double GetTotalSpeed()
     {
-        double spd = 100;
+        double spd = 3000;
         spd += GetUpgradeContribution(UpgradeType.Speed);
         return spd;
     }
@@ -159,13 +156,11 @@ public class GameManager : MonoBehaviour
         return baseSpeed * boostMult;
     }
 
-    /// <summary>부스터 용량 배율 (1 + 업그레이드 기여)</summary>
     public float GetBoosterCapacityMultiplier()
     {
         return 1f + (float)GetUpgradeContribution(UpgradeType.BoosterCapacity);
     }
 
-    /// <summary>부스터 속도 배율 (3 + 업그레이드 기여)</summary>
     public float GetBoosterSpeedMultiplier()
     {
         return 3f + (float)GetUpgradeContribution(UpgradeType.BoosterSpeed);
@@ -204,7 +199,7 @@ public class GameManager : MonoBehaviour
 
     public bool BuyUpgrade(UpgradeType type)
     {
-        if (type == UpgradeType.CatSwap) return false; // 데모 비활성화
+        if (type == UpgradeType.CatSwap) return false;
 
         double cost = GetUpgradeCost(type);
         if (credits < cost) return false;
@@ -275,11 +270,24 @@ public class GameManager : MonoBehaviour
 
     public static string FormatSpeed(double kmPerSec)
     {
-        double c = 299792.458;
-        if (kmPerSec >= c) return Loc.Get("speed_c", (kmPerSec / c).ToString("F2"));
-        if (kmPerSec >= c * 0.01) return Loc.Get("speed_pctc", (kmPerSec / c * 100).ToString("F1"));
-        if (kmPerSec >= 1000) return Loc.Get("speed_tkms", (kmPerSec / 1000).ToString("F1"));
-        return Loc.Get("speed_kms", kmPerSec.ToString("F0"));
+        if (kmPerSec < 0) kmPerSec = 0;
+
+        bool isKo = Loc.Get("hud_heading_to").Contains("향하는중");
+
+        if (isKo)
+        {
+            if (kmPerSec < 10000) return kmPerSec.ToString("F0") + " km/s";
+            if (kmPerSec < 100000000) return (kmPerSec / 10000).ToString("F0") + "만 km/s";
+            if (kmPerSec < 1000000000000) return (kmPerSec / 100000000).ToString("F1") + "억 km/s";
+            return (kmPerSec / 1000000000000).ToString("F2") + "조 km/s";
+        }
+        else
+        {
+            if (kmPerSec < 1000) return kmPerSec.ToString("F0") + " km/s";
+            if (kmPerSec < 1000000) return (kmPerSec / 1000).ToString("F1") + "K km/s";
+            if (kmPerSec < 1000000000) return (kmPerSec / 1000000).ToString("F1") + "M km/s";
+            return (kmPerSec / 1000000000).ToString("F2") + "B km/s";
+        }
     }
 
     public static string FormatTime(double sec)
