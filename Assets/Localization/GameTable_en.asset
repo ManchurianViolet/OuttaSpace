@@ -35,7 +35,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 75319316480
-    m_Localized: "Depart to {0} \u25B6"
+    m_Localized: Depart to {0}
     m_Metadata:
       m_Items: []
   - m_Id: 75319316481
@@ -47,11 +47,11 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 75319316483
-    m_Localized: Thrust
+    m_Localized: Base speed
     m_Metadata:
       m_Items: []
   - m_Id: 75319316484
-    m_Localized: Increase base travel speed
+    m_Localized: Base speed
     m_Metadata:
       m_Items: []
   - m_Id: 75319316485
