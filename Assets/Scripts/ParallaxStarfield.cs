@@ -8,10 +8,14 @@ public class ParallaxStarfield : MonoBehaviour
     public int layerCount = 3;
     public float[] layerSpeeds = { 0.3f, 0.8f, 1.5f };
     public float[] layerAlphas = { 0.25f, 0.5f, 0.85f };
-    public float[] layerSizes = { 0.02f, 0.03f, 0.05f };
+    public float[] layerSizes = { 0.04f, 0.06f, 0.1f };
 
     [Header("Coverage")]
     public float extraPadding = 4f;
+
+    [Header("Boost Stretch")]
+    public float boostStretchX = 4f;     // 부스트 시 가로 배율
+    public float boostSquishY = 0.3f;    // 부스트 시 세로 압축
 
     private List<Star> stars = new List<Star>();
     private List<GameObject> starObjects = new List<GameObject>();
@@ -72,17 +76,18 @@ public class ParallaxStarfield : MonoBehaviour
         float speedMultiplier = 1f;
         if (GameManager.Instance != null && !GameManager.Instance.isDocked)
         {
-            // 부스트 포함된 실제 속도 사용
             float gameSpeed = (float)GameManager.Instance.GetEffectiveSpeed();
-            speedMultiplier = Mathf.Min(Mathf.Log10(Mathf.Max(gameSpeed, 1f)) * 1.3f + 0.3f, 10f);
+            speedMultiplier = Mathf.Min(Mathf.Log10(Mathf.Max(gameSpeed, 1f)) * 0.8f + 0.3f, 20f);
         }
         else if (GameManager.Instance != null && GameManager.Instance.isDocked)
         {
             speedMultiplier = 0.05f;
         }
 
-        // 부스트 중이면 별 색상 살짝 파랗게
         bool boosting = BoosterSystem.Instance != null && BoosterSystem.Instance.isBoosting;
+        // 부스트 스트레치 부드럽게 전환
+        float targetStretchX = boosting ? boostStretchX : 1f;
+        float targetSquishY = boosting ? boostSquishY : 1f;
 
         for (int i = 0; i < starObjects.Count; i++)
         {
@@ -107,21 +112,22 @@ public class ParallaxStarfield : MonoBehaviour
 
             float zoomScale = cam.orthographicSize / 4f;
             float baseSize = layerSizes[star.layer];
-            go.transform.localScale = Vector3.one * baseSize * Mathf.Max(zoomScale * 0.7f, 1f);
+            float sz = baseSize * Mathf.Max(zoomScale * 0.7f, 1f);
+
+            // 스트레치 보간 (부드럽게 전환)
+            Vector3 currentScale = go.transform.localScale;
+            float stretchX = Mathf.Lerp(currentScale.x, sz * targetStretchX, Time.deltaTime * 8f);
+            float stretchY = Mathf.Lerp(currentScale.y, sz * targetSquishY, Time.deltaTime * 8f);
+            go.transform.localScale = new Vector3(stretchX, stretchY, 1f);
 
             SpriteRenderer sr = go.GetComponent<SpriteRenderer>();
             float twinkle = layerAlphas[star.layer] *
                 (0.3f + 0.7f * Mathf.Sin(Time.time * 4f + star.twinkleOffset));
 
             if (boosting)
-            {
-                // 부스트: 별이 파랗고 밝게
                 sr.color = new Color(0.6f, 0.75f, 1f, twinkle * 1.3f);
-            }
             else
-            {
                 sr.color = new Color(0.75f, 0.82f, 1f, twinkle);
-            }
         }
     }
 

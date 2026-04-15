@@ -1265,7 +1265,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 09c31021a765f7042b7dc54ab1379171, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ParallaxStarfield
-  starCount: 140
+  starCount: 160
   layerCount: 3
   layerSpeeds:
   - 0.3
@@ -1276,10 +1276,12 @@ MonoBehaviour:
   - 0.5
   - 0.85
   layerSizes:
-  - 0.03
   - 0.04
-  - 0.07
+  - 0.05
+  - 0.08
   extraPadding: 4
+  boostStretchX: 4
+  boostSquishY: 0.3
 --- !u!4 &526797563
 Transform:
   m_ObjectHideFlags: 0
@@ -1860,7 +1862,6 @@ MonoBehaviour:
   stationWidth: 700
   stationHeight: 500
   alwaysOnTop: 1
-  startAtBottomRight: 1
   travelingUI: {fileID: 1526252257}
   dockedUI: {fileID: 1313655736}
   shipObject: {fileID: 973707804}
@@ -3066,6 +3067,88 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1736750518
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1736750522}
+  - component: {fileID: 1736750521}
+  - component: {fileID: 1736750520}
+  - component: {fileID: 1736750519}
+  m_Layer: 0
+  m_Name: sTEAMmANAGER
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1736750519
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1736750518}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ea8aadd14f7af3c4586321b7106200cf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::FriendSyncManager
+  syncInterval: 2
+  dataExpireTime: 10
+  nearbyRangeKM: 50000
+--- !u!114 &1736750520
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1736750518}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1a21b7c865e8b9145bdf1e71ffe9ac6b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::FriendCatDisplay
+  playerShip: {fileID: 973707808}
+  maxVisualDistance: 6
+  maxGameDistance: 50000
+  yOffset: 0.5
+  nameYOffset: 0.8
+  friendSortingOrder: 9
+  updateInterval: 0.5
+  friendCatScale: 0.8
+  friendCatAlpha: 0.7
+--- !u!114 &1736750521
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1736750518}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ef4bffeda13d7a748973ff9204401c07, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SteamManager
+--- !u!4 &1736750522
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1736750518}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 357.79474, y: 133.46028, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -4644,3 +4727,4 @@ SceneRoots:
   - {fileID: 385276029}
   - {fileID: 25932103}
   - {fileID: 1869437429}
+  - {fileID: 1736750522}

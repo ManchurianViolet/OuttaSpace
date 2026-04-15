@@ -15,7 +15,6 @@ public class WindowStateManager : MonoBehaviour
     public int stationWidth = 700;
     public int stationHeight = 500;
     public bool alwaysOnTop = true;
-    public bool startAtBottomRight = true;
 
     [Header("Scene References")]
     public GameObject travelingUI;
@@ -52,10 +51,12 @@ public class WindowStateManager : MonoBehaviour
     [DllImport("user32.dll")] static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int X, int Y, int cx, int cy, uint uFlags);
     [DllImport("user32.dll")] static extern bool GetWindowRect(IntPtr hWnd, out RECT lpRect);
     [DllImport("user32.dll")] static extern int GetSystemMetrics(int nIndex);
+    [DllImport("user32.dll")] static extern bool GetCursorPos(out POINT lpPoint);
     [DllImport("dwmapi.dll")] static extern int DwmExtendFrameIntoClientArea(IntPtr hWnd, ref MARGINS margins);
 
     struct MARGINS { public int left, right, top, bottom; }
     struct RECT { public int left, top, right, bottom; }
+    struct POINT { public int x, y; }
 
     const int GWL_EXSTYLE = -20;
     const int GWL_STYLE = -16;
@@ -67,11 +68,18 @@ public class WindowStateManager : MonoBehaviour
     const uint WS_EX_LAYERED = 0x00080000;
     const uint WS_EX_APPWINDOW = 0x00040000;
     const uint SWP_SHOWWINDOW = 0x0040;
+    const uint SWP_NOSIZE = 0x0001;
+    const uint SWP_NOZORDER = 0x0004;
 
     static readonly IntPtr HWND_TOPMOST = new IntPtr(-1);
     static readonly IntPtr HWND_NOTOPMOST = new IntPtr(-2);
 
     private IntPtr hWnd;
+
+    // 드래그 이동
+    private bool isDragging;
+    private POINT dragStartCursor;
+    private RECT dragStartWindow;
 #endif
 
     void Awake()
@@ -121,11 +129,9 @@ public class WindowStateManager : MonoBehaviour
     {
         if (GameManager.Instance != null && GameManager.Instance.isDocked)
         {
-            // 도착한 항성 복원
             var arrived = GameManager.Instance.arrivedStars;
             if (arrived.Count > 0)
                 dockedStar = StarDatabase.Stars[arrived[arrived.Count - 1]];
-
             SetDockedImmediate();
         }
         else
@@ -136,6 +142,51 @@ public class WindowStateManager : MonoBehaviour
         if (GameManager.Instance != null)
             GameManager.Instance.OnStarArrived += OnStarArrived;
     }
+
+    void Update()
+    {
+#if UNITY_STANDALONE_WIN && !UNITY_EDITOR
+        HandleDrag();
+#endif
+    }
+
+    // ============ 드래그 이동 ============
+
+#if UNITY_STANDALONE_WIN && !UNITY_EDITOR
+    void HandleDrag()
+    {
+        if (Input.GetMouseButtonDown(0))
+        {
+            isDragging = true;
+            GetCursorPos(out dragStartCursor);
+            GetWindowRect(hWnd, out dragStartWindow);
+        }
+        else if (Input.GetMouseButton(0) && isDragging)
+        {
+            POINT currentCursor;
+            GetCursorPos(out currentCursor);
+
+            int dx = currentCursor.x - dragStartCursor.x;
+            int dy = currentCursor.y - dragStartCursor.y;
+
+            // 약간만 움직여야 드래그로 인식 (클릭과 구분)
+            if (Mathf.Abs(dx) > 3 || Mathf.Abs(dy) > 3)
+            {
+                int newX = dragStartWindow.left + dx;
+                int newY = dragStartWindow.top + dy;
+
+                IntPtr insertAfter = alwaysOnTop ? HWND_TOPMOST : HWND_NOTOPMOST;
+                SetWindowPos(hWnd, insertAfter, newX, newY, 0, 0, SWP_NOSIZE | SWP_SHOWWINDOW);
+            }
+        }
+        else if (Input.GetMouseButtonUp(0))
+        {
+            isDragging = false;
+        }
+    }
+#endif
+
+    // ============ 이벤트 ============
 
     void OnStarArrived(StarData star)
     {
@@ -246,6 +297,10 @@ public class WindowStateManager : MonoBehaviour
         if (destinationVisual != null)
             destinationVisual.gameObject.SetActive(true);
 
+        // 부스터 게이지 켜기
+        if (BoosterSystem.Instance != null)
+            BoosterSystem.Instance.gameObject.SetActive(true);
+
         ResizeWindow(widgetWidth, widgetHeight, anchorBottomRight: true);
         Camera.main.backgroundColor = HexColor("#06060F");
 
@@ -279,7 +334,10 @@ public class WindowStateManager : MonoBehaviour
         if (destinationVisual != null)
             destinationVisual.gameObject.SetActive(false);
 
-        // 정박 창: 화면 우하단 기준으로 배치 (재시작 시에도 일관된 위치)
+        // 부스터 게이지 끄기
+        if (BoosterSystem.Instance != null)
+            BoosterSystem.Instance.gameObject.SetActive(false);
+
         ResizeWindow(stationWidth, stationHeight, anchorBottomRight: true);
 
         if (dockedStar != null)
@@ -307,7 +365,6 @@ public class WindowStateManager : MonoBehaviour
         }
         else
         {
-            // 화면 중앙
             int screenW = GetSystemMetrics(0);
             int screenH = GetSystemMetrics(1);
             x = (screenW - w) / 2;
