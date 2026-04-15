@@ -2840,7 +2840,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: -12}
+  m_AnchoredPosition: {x: 0, y: -24}
   m_SizeDelta: {x: 0, y: 35}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1389555788
@@ -3188,6 +3188,9 @@ MonoBehaviour:
   borderWidth: 1
   pixelsPerUnit: 8
   sortingOrder: 20
+  shakePerKey: 0.04
+  maxShake: 0.12
+  shakeDecay: 5
   autoFillPerSecond: 0.02
   keyPressFill: 0.03
   baseBoostMultiplier: 3

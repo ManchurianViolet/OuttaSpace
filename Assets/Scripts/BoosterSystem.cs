@@ -11,6 +11,12 @@ public class BoosterSystem : MonoBehaviour
     public int pixelsPerUnit = 8;
     public int sortingOrder = 20;
 
+    [Header("Shake")]
+    public float shakePerKey = 0.04f;
+    public float maxShake = 0.12f;
+    public float shakeDecay = 5f;
+    private float currentShake;
+
     [Header("Fill Rates")]
     public float autoFillPerSecond = 0.02f;
     public float keyPressFill = 0.03f;
@@ -113,6 +119,18 @@ public class BoosterSystem : MonoBehaviour
         if (cam == null) return;
         Vector3 screenPos = new Vector3(10f, Screen.height / 2f, 10f);
         transform.position = cam.ScreenToWorldPoint(screenPos);
+        Vector3 basePos = cam.ScreenToWorldPoint(screenPos);
+        // 흔들림 적용
+        if (currentShake > 0.001f)
+        {
+            float x = Random.Range(-currentShake, currentShake);
+            float y = Random.Range(-currentShake, currentShake);
+            basePos += new Vector3(x, y, 0);
+            currentShake = Mathf.Lerp(currentShake, 0, shakeDecay * Time.deltaTime);
+        }
+
+        transform.position = basePos;
+
         float zoomScale = cam.orthographicSize / 5f;
         transform.localScale = Vector3.one * zoomScale;
     }
@@ -134,6 +152,9 @@ public class BoosterSystem : MonoBehaviour
                 fullWaitTimer = boostActivateDelay;
             }
         }
+        // 흔들림 누적 부분
+        if (GameManager.Instance != null && !GameManager.Instance.isDocked && !isBoosting)
+            currentShake = Mathf.Min(currentShake + shakePerKey, maxShake);
     }
 
     void OnMouseClick()
@@ -203,7 +224,7 @@ public class BoosterSystem : MonoBehaviour
                     if (isBoosting)
                     {
                         float flash = 0.5f + 0.5f * Mathf.Sin(Time.time * 10f);
-                        pixels[y * totalW + x] = Color.Lerp(borderColor, HexColor("#4488ff"), flash);
+                        pixels[y * totalW + x] = Color.Lerp(borderColor, HexColor("#ff2222"), flash);
                     }
                     else if (isFullWaiting)
                     {
