@@ -65,13 +65,40 @@ public static class Loc
 
     public static string Get(string key)
     {
+        if (string.IsNullOrEmpty(key))
+            return "";
         if (LocalizationSettings.InitializationOperation.IsDone)
         {
-            string result = LocalizationSettings.StringDatabase
-                .GetLocalizedString(tableName, key);
-
-            if (!string.IsNullOrEmpty(result) && !result.Contains("No translation"))
-                return result;
+            try
+            {
+                var table = LocalizationSettings.StringDatabase.GetTable(tableName);
+                if (table == null)
+                {
+                    UnityEngine.Debug.LogError($"[Loc] Table '{tableName}' is null. Selected locale: {LocalizationSettings.SelectedLocale?.Identifier.Code}");
+                }
+                else
+                {
+                    var entry = table.GetEntry(key);
+                    if (entry == null)
+                    {
+                        UnityEngine.Debug.LogError($"[Loc] Entry '{key}' not found");
+                    }
+                    else
+                    {
+                        string val = entry.GetLocalizedString();
+                        if (!string.IsNullOrEmpty(val))
+                            return val;
+                    }
+                }
+            }
+            catch (System.Exception e)
+            {
+                UnityEngine.Debug.LogError($"[Loc] Exception: {e.Message}");
+            }
+        }
+        else
+        {
+            UnityEngine.Debug.Log("[Loc] InitializationOperation not done yet");
         }
 
         if (fallback.ContainsKey(key))

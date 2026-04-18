@@ -708,7 +708,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 2, y: 372}
+  m_AnchoredPosition: {x: 2, y: 335}
   m_SizeDelta: {x: 200, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &213500281
@@ -1915,7 +1915,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 243.1, y: -128.3}
+  m_AnchoredPosition: {x: 243.1, y: -118.5}
   m_SizeDelta: {x: 200, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1099829786
@@ -2973,7 +2973,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1526252258
 RectTransform:
   m_ObjectHideFlags: 0
@@ -3609,6 +3609,10 @@ PrefabInstance:
       value: 27.15
       objectReference: {fileID: 0}
     - target: {fileID: 3557245413516133822, guid: 48417a7d7abc0d146a0a37ed2e700057, type: 3}
+      propertyPath: m_fontSizeMin
+      value: 15
+      objectReference: {fileID: 0}
+    - target: {fileID: 3557245413516133822, guid: 48417a7d7abc0d146a0a37ed2e700057, type: 3}
       propertyPath: m_fontSizeBase
       value: 23.96
       objectReference: {fileID: 0}
@@ -4038,6 +4042,10 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8164033530062531943, guid: 6f0aa294953ab5041ad9d9709c875b86, type: 3}
+      propertyPath: m_fontSizeMin
+      value: 15
+      objectReference: {fileID: 0}
+    - target: {fileID: 8164033530062531943, guid: 6f0aa294953ab5041ad9d9709c875b86, type: 3}
       propertyPath: m_fontSizeBase
       value: 23.96
       objectReference: {fileID: 0}
@@ -4282,6 +4290,10 @@ PrefabInstance:
       value: 27.15
       objectReference: {fileID: 0}
     - target: {fileID: 6903200945704732161, guid: 169ef159d7aa7034c898a81c3d785439, type: 3}
+      propertyPath: m_fontSizeMin
+      value: 15
+      objectReference: {fileID: 0}
+    - target: {fileID: 6903200945704732161, guid: 169ef159d7aa7034c898a81c3d785439, type: 3}
       propertyPath: m_fontSizeBase
       value: 23.96
       objectReference: {fileID: 0}
@@ -4518,6 +4530,10 @@ PrefabInstance:
     - target: {fileID: 2986638172311769569, guid: b151d36e88eca38489172e25aeaf5f5d, type: 3}
       propertyPath: m_fontSize
       value: 27.15
+      objectReference: {fileID: 0}
+    - target: {fileID: 2986638172311769569, guid: b151d36e88eca38489172e25aeaf5f5d, type: 3}
+      propertyPath: m_fontSizeMin
+      value: 15
       objectReference: {fileID: 0}
     - target: {fileID: 2986638172311769569, guid: b151d36e88eca38489172e25aeaf5f5d, type: 3}
       propertyPath: m_fontSizeBase

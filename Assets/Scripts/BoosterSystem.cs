@@ -39,7 +39,7 @@ public class BoosterSystem : MonoBehaviour
     private int lastDrawnFuelPixel = -1;
     private bool lastDrawnBoostState;
 
-    private readonly Color borderColor = HexColor("#1a1a2e");
+    private readonly Color borderColor = HexColor("#ffffff");  // 흰색
     private readonly Color emptyColor = HexColor("#1a1a28");
 
     void Awake()

@@ -60,7 +60,7 @@ public class DockedUI : MonoBehaviour
 
         StarData star = GetDockedStar(gm);
 
-        if (star != null)
+        if (star != null && !string.IsNullOrEmpty(star.nameKey))
         {
             if (starNameText != null)
                 starNameText.text = Loc.Get(star.nameKey);

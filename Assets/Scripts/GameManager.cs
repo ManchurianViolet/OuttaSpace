@@ -1,5 +1,6 @@
 using UnityEngine;
 using System;
+using UnityEngine.Localization.Settings;
 using System.Collections.Generic;
 
 public class GameManager : MonoBehaviour
@@ -48,6 +49,11 @@ public class GameManager : MonoBehaviour
 
     void Update()
     {
+        if (Input.GetKeyDown(KeyCode.F1))
+            SetLanguage("ko");
+        if (Input.GetKeyDown(KeyCode.F2))
+            SetLanguage("en");
+
         if (Input.GetKeyDown(KeyCode.Escape))
         {
             SaveGame();
@@ -86,7 +92,22 @@ public class GameManager : MonoBehaviour
             SaveGame();
         }
     }
+    void SetLanguage(string code)
+    {
+        var locales = LocalizationSettings.AvailableLocales.Locales;
+        foreach (var locale in locales)
+        {
+            if (locale.Identifier.Code == code)
+            {
+                LocalizationSettings.SelectedLocale = locale;
+                Debug.Log($"언어 변경: {code}");
 
+                // UI 강제 갱신
+                OnStatsChanged?.Invoke();
+                return;
+            }
+        }
+    }
     void OnApplicationFocus(bool hasFocus)
     {
         Application.targetFrameRate = hasFocus ? 30 : 10;
@@ -108,8 +129,6 @@ public class GameManager : MonoBehaviour
 
         distance += distGain;
         totalDistance += distGain;
-        credits += creditGain;
-        totalCredits += creditGain;
 
         StarData current = StarDatabase.Stars[currentStarIndex];
         if (distance >= current.distanceKM && !arrivedStars.Contains(currentStarIndex))
