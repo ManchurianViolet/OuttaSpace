@@ -214,6 +214,10 @@ public class BoosterSystem : MonoBehaviour
 
         Color[] pixels = new Color[totalW * totalH];
 
+        int segmentHeight = 3;
+        int gapHeight = 1;
+        int cellSize = segmentHeight + gapHeight;
+
         for (int y = 0; y < totalH; y++)
         {
             for (int x = 0; x < totalW; x++)
@@ -239,22 +243,28 @@ public class BoosterSystem : MonoBehaviour
                 }
 
                 int innerY = y - borderWidth;
+                int segmentIndex = innerY / cellSize;
+                bool isGap = (innerY % cellSize) >= segmentHeight;
                 float fillLine = fuel * gaugeHeight;
 
-                if (innerY < fillLine)
+                if (isGap)
+                {
+                    pixels[y * totalW + x] = emptyColor;
+                }
+                else if (innerY < fillLine)
                 {
                     float t = (float)innerY / gaugeHeight;
                     Color fillColor;
                     if (t < 0.4f)
-                        fillColor = Color.Lerp(HexColor("#cc8800"), HexColor("#ffcc00"), t / 0.4f);
+                        fillColor = HexColor("#ffcc00");
                     else if (t < 0.7f)
-                        fillColor = Color.Lerp(HexColor("#ffcc00"), HexColor("#ff6600"), (t - 0.4f) / 0.3f);
+                        fillColor = HexColor("#ff6600");
                     else
-                        fillColor = Color.Lerp(HexColor("#ff6600"), HexColor("#3388ff"), (t - 0.7f) / 0.3f);
+                        fillColor = HexColor("#3388ff");
 
                     if (isBoosting)
                     {
-                        float pulse = 0.7f + 0.3f * Mathf.Sin(Time.time * 8f + innerY * 0.5f);
+                        float pulse = 0.7f + 0.3f * Mathf.Sin(Time.time * 8f + segmentIndex * 1.5f);
                         fillColor *= pulse;
                         fillColor.a = 1f;
                     }
