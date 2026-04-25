@@ -123,7 +123,7 @@ public class ShipController : MonoBehaviour
     {
         GameObject particleObj = new GameObject("EngineFlame");
         particleObj.transform.SetParent(transform);
-        particleObj.transform.localPosition = new Vector3(-0.5f, 0, 0);
+        particleObj.transform.localPosition = new Vector3(-2.6f, -0.45f, 0);
 
         engineFlame = particleObj.AddComponent<ParticleSystem>();
         var main = engineFlame.main;
