@@ -165,7 +165,10 @@ public class GameManager : MonoBehaviour
         spd += GetUpgradeContribution(UpgradeType.Speed);
         return spd;
     }
-
+    public void NotifyStatsChanged()
+    {
+        OnStatsChanged?.Invoke();
+    }
     public double GetEffectiveSpeed()
     {
         double baseSpeed = GetTotalSpeed();

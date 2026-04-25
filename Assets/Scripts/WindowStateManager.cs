@@ -7,7 +7,7 @@ public class WindowStateManager : MonoBehaviour
 {
     public static WindowStateManager Instance { get; private set; }
 
-    public enum WindowState { Traveling, Transitioning, Docked }
+    public enum WindowState { Traveling, Transitioning, Docked, TravelingExpanded }
 
     [Header("Window Sizes")]
     public int widgetWidth = 360;
@@ -31,6 +31,7 @@ public class WindowStateManager : MonoBehaviour
     [Header("Transition Settings")]
     public float arrivalTransitionTime = 1.5f;
     public float dockedFadeInTime = 0.8f;
+    public float shipFadeTime = 0.3f;
 
     [Header("State")]
     public WindowState currentState = WindowState.Traveling;
@@ -69,14 +70,12 @@ public class WindowStateManager : MonoBehaviour
     const uint WS_EX_APPWINDOW = 0x00040000;
     const uint SWP_SHOWWINDOW = 0x0040;
     const uint SWP_NOSIZE = 0x0001;
-    const uint SWP_NOZORDER = 0x0004;
 
     static readonly IntPtr HWND_TOPMOST = new IntPtr(-1);
     static readonly IntPtr HWND_NOTOPMOST = new IntPtr(-2);
 
     private IntPtr hWnd;
 
-    // 드래그 이동
     private bool isDragging;
     private POINT dragStartCursor;
     private RECT dragStartWindow;
@@ -150,8 +149,6 @@ public class WindowStateManager : MonoBehaviour
 #endif
     }
 
-    // ============ 드래그 이동 ============
-
 #if UNITY_STANDALONE_WIN && !UNITY_EDITOR
     void HandleDrag()
     {
@@ -169,7 +166,6 @@ public class WindowStateManager : MonoBehaviour
             int dx = currentCursor.x - dragStartCursor.x;
             int dy = currentCursor.y - dragStartCursor.y;
 
-            // 약간만 움직여야 드래그로 인식 (클릭과 구분)
             if (Mathf.Abs(dx) > 3 || Mathf.Abs(dy) > 3)
             {
                 int newX = dragStartWindow.left + dx;
@@ -186,8 +182,6 @@ public class WindowStateManager : MonoBehaviour
     }
 #endif
 
-    // ============ 이벤트 ============
-
     void OnStarArrived(StarData star)
     {
         dockedStar = star;
@@ -200,6 +194,62 @@ public class WindowStateManager : MonoBehaviour
         if (GameManager.Instance != null)
             GameManager.Instance.DepartToNextStar();
         SetTraveling();
+    }
+
+    // ============ 도감 열기/닫기 (항해 중에만 사용) ============
+
+    /// <summary>
+    /// 항해 중 도감 열기: 창 확장 + 고양이 페이드아웃 + 별 배경 유지
+    /// </summary>
+    public void ExpandForCollection()
+    {
+        if (currentState != WindowState.Traveling) return;
+
+        currentState = WindowState.TravelingExpanded;
+        ResizeWindow(stationWidth, stationHeight, anchorBottomRight: true);
+
+        StartCoroutine(FadeShip(fadeOut: true));
+        OnStateChanged?.Invoke(currentState);
+    }
+
+    /// <summary>
+    /// 항해 중 도감 닫기: 창 축소 + 고양이 페이드인 (새 스프라이트로)
+    /// </summary>
+    public void CollapseFromCollection()
+    {
+        if (currentState != WindowState.TravelingExpanded) return;
+
+        currentState = WindowState.Traveling;
+        ResizeWindow(widgetWidth, widgetHeight, anchorBottomRight: true);
+
+        // 고양이 스프라이트 재적용 (교체됐을 수 있음)
+        if (CatManager.Instance != null)
+            CatManager.Instance.ApplyCurrentCat();
+
+        StartCoroutine(FadeShip(fadeOut: false));
+        OnStateChanged?.Invoke(currentState);
+    }
+
+    IEnumerator FadeShip(bool fadeOut)
+    {
+        if (shipRenderer == null) yield break;
+
+        float startA = shipRenderer.color.a;
+        float endA = fadeOut ? 0f : 1f;
+        float t = 0f;
+
+        while (t < shipFadeTime)
+        {
+            t += Time.deltaTime;
+            Color c = shipRenderer.color;
+            c.a = Mathf.Lerp(startA, endA, t / shipFadeTime);
+            shipRenderer.color = c;
+            yield return null;
+        }
+
+        Color final = shipRenderer.color;
+        final.a = endA;
+        shipRenderer.color = final;
     }
 
     // ============ 도착 트랜지션 ============
@@ -263,8 +313,6 @@ public class WindowStateManager : MonoBehaviour
         }
     }
 
-    // ============ 상태 전환 ============
-
     void SetTraveling()
     {
         currentState = WindowState.Traveling;
@@ -297,7 +345,6 @@ public class WindowStateManager : MonoBehaviour
         if (destinationVisual != null)
             destinationVisual.gameObject.SetActive(true);
 
-        // 부스터 게이지 켜기
         if (BoosterSystem.Instance != null)
             BoosterSystem.Instance.gameObject.SetActive(true);
 
@@ -334,7 +381,6 @@ public class WindowStateManager : MonoBehaviour
         if (destinationVisual != null)
             destinationVisual.gameObject.SetActive(false);
 
-        // 부스터 게이지 끄기
         if (BoosterSystem.Instance != null)
             BoosterSystem.Instance.gameObject.SetActive(false);
 
@@ -349,8 +395,6 @@ public class WindowStateManager : MonoBehaviour
 
         OnStateChanged?.Invoke(currentState);
     }
-
-    // ============ 창 관리 ============
 
     void ResizeWindow(int w, int h, bool anchorBottomRight)
     {
