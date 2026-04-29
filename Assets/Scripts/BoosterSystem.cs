@@ -55,7 +55,6 @@ public class BoosterSystem : MonoBehaviour
         if (GlobalInputHook.Instance != null)
         {
             GlobalInputHook.Instance.OnGlobalKeyPress += OnKeyPress;
-            GlobalInputHook.Instance.OnGlobalMouseClick += OnMouseClick;
         }
     }
 
@@ -155,16 +154,6 @@ public class BoosterSystem : MonoBehaviour
         // 흔들림 누적 부분
         if (GameManager.Instance != null && !GameManager.Instance.isDocked && !isBoosting)
             currentShake = Mathf.Min(currentShake + shakePerKey, maxShake);
-    }
-
-    void OnMouseClick()
-    {
-        // 클릭 재화는 정박/항해/부스트 상관없이 항상
-        if (GameManager.Instance != null)
-        {
-            GameManager.Instance.credits += 1;
-            GameManager.Instance.totalCredits += 1;
-        }
     }
 
     // ============ 속도 배율 ============
@@ -296,7 +285,6 @@ public class BoosterSystem : MonoBehaviour
         if (GlobalInputHook.Instance != null)
         {
             GlobalInputHook.Instance.OnGlobalKeyPress -= OnKeyPress;
-            GlobalInputHook.Instance.OnGlobalMouseClick -= OnMouseClick;
         }
     }
 }

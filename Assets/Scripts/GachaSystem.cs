@@ -3,29 +3,31 @@ using UnityEngine.UI;
 using TMPro;
 using System.Collections;
 
-/// <summary>
-/// 고양이 가챠. 정박 화면의 가챠 버튼에서 호출.
-/// 슬롯머신 애니메이션 → 결과 표시 → 도감 추가 or 환급.
-/// 
-/// GachaPanel에 붙이기.
-/// </summary>
 public class GachaSystem : MonoBehaviour
 {
     public static GachaSystem Instance { get; private set; }
 
-    [Header("UI References")]
-    public GameObject gachaPanel;           // 가챠 애니메이션 패널
-    public Image slotMachineImage;          // 돌아가는 고양이 이미지
-    public TextMeshProUGUI resultNameText;  // 결과 고양이 이름
-    public TextMeshProUGUI resultStatusText; // "이미 보유" / "신규!" 등
-    public Image resultBorder;               // 레어도 테두리
-    public Button confirmButton;             // 결과 확인 버튼
-    public GameObject resultUI;              // 결과 화면 (슬롯 끝난 후)
+    [Header("Panel")]
+    public GameObject gachaPanel;
+
+    [Header("Slot Reel")]
+    public RectTransform slotMask;
+    public Image[] slotSlots;
+    public float slotHeight = 160f;
+
+    [Header("UI")]
+    public TextMeshProUGUI resultNameText;
+    public Button drawButton;
+    public TextMeshProUGUI drawButtonText;
+    public Button closeButton;
 
     [Header("Animation")]
-    public float totalDuration = 5f;        // 전체 애니메이션 길이
-    public float startInterval = 0.03f;     // 시작 교체 간격 (빠름)
-    public float endInterval = 0.4f;        // 끝 교체 간격 (느림)
+    public float totalDuration = 5f;
+    public int totalCycles = 25;
+
+    [Header("Button Visual")]
+    public Color buttonNormalColor = Color.white;
+    public Color buttonRollingColor = new Color(0.4f, 0.4f, 0.4f, 1f);
 
     private bool isRolling;
 
@@ -37,14 +39,50 @@ public class GachaSystem : MonoBehaviour
 
     void Start()
     {
-        if (gachaPanel != null) gachaPanel.SetActive(false);
-        if (confirmButton != null)
-            confirmButton.onClick.AddListener(OnConfirm);
+        if (drawButton != null)
+            drawButton.onClick.AddListener(OnDrawClicked);
+        if (closeButton != null)
+            closeButton.onClick.AddListener(ClosePanel);
+
+        UpdateButtonText();
+        if (resultNameText != null)
+            resultNameText.text = "";
     }
 
-    /// <summary>
-    /// 가챠 시도. 조건 안 되면 false.
-    /// </summary>
+    void OnEnable() => UpdateButtonText();
+
+    void Update()
+    {
+        if (!isRolling)
+            UpdateButtonText();
+    }
+
+    void UpdateButtonText()
+    {
+        if (drawButtonText != null)
+            drawButtonText.text = Loc.Get("gacha_pull_cost", CatDatabase.GACHA_COST);
+
+        if (drawButton != null && !isRolling)
+        {
+            bool canAfford = GameManager.Instance != null
+                && GameManager.Instance.credits >= CatDatabase.GACHA_COST;
+            drawButton.interactable = canAfford;
+        }
+    }
+
+    public void OpenPanel()
+    {
+        if (gachaPanel != null) gachaPanel.SetActive(true);
+    }
+
+    public void ClosePanel()
+    {
+        if (isRolling) return;
+        if (gachaPanel != null) gachaPanel.SetActive(false);
+    }
+
+    void OnDrawClicked() => TryGacha();
+
     public bool TryGacha()
     {
         if (isRolling) return false;
@@ -53,6 +91,7 @@ public class GachaSystem : MonoBehaviour
 
         GameManager.Instance.credits -= CatDatabase.GACHA_COST;
         GameManager.Instance.NotifyStatsChanged();
+
         StartCoroutine(GachaRoll());
         return true;
     }
@@ -61,69 +100,146 @@ public class GachaSystem : MonoBehaviour
     {
         isRolling = true;
 
-        if (gachaPanel != null) gachaPanel.SetActive(true);
-        if (resultUI != null) resultUI.SetActive(false);
+        if (drawButton != null)
+        {
+            drawButton.interactable = false;
+            var bg = drawButton.GetComponent<Image>();
+            if (bg != null) bg.color = buttonRollingColor;
+        }
 
-        int finalId = CatDatabase.Instance.RollGachaId();
+        if (resultNameText != null)
+            resultNameText.text = "";
 
-        // 슬롯머신: 빠르게 → 느리게
+        int finalCatId = CatDatabase.Instance.RollGachaId();
+        int n = slotSlots.Length;
+
+        // 초기 배치
+        for (int i = 0; i < n; i++)
+        {
+            if (slotSlots[i] == null) continue;
+            int randomId = Random.Range(0, CatDatabase.TOTAL_COUNT);
+            CatData rd = CatDatabase.Instance.Get(randomId);
+            if (rd != null && rd.sprite != null)
+                slotSlots[i].sprite = rd.sprite;
+            slotSlots[i].rectTransform.anchoredPosition = new Vector2(0, slotHeight * i);
+        }
+
+        // 총 이동 거리 = totalCycles * slotHeight
+        float totalDistance = slotHeight * totalCycles;
+        int cycleCount = 0;
+        int finalCycleIndex = totalCycles - n + 1;
+
         float elapsed = 0f;
-        float nextSwap = 0f;
+        float prevScrolled = 0f;
 
         while (elapsed < totalDuration)
         {
-            if (elapsed >= nextSwap)
-            {
-                // 랜덤 고양이 표시
-                int randomId = Random.Range(0, CatDatabase.TOTAL_COUNT);
-                CatData data = CatDatabase.Instance.Get(randomId);
-                if (slotMachineImage != null && data != null && data.sprite != null)
-                    slotMachineImage.sprite = data.sprite;
+            float t = elapsed / totalDuration;
 
-                // 간격 점점 늘어남 (이징)
-                float t = elapsed / totalDuration;
-                float eased = t * t;
-                float interval = Mathf.Lerp(startInterval, endInterval, eased);
-                nextSwap = elapsed + interval;
+            // 진짜 이징: 누적 거리를 시간 함수로 직접 계산
+            // easeOutCubic: 처음 빠르고 끝에서 매우 느림
+            float eased = 1f - Mathf.Pow(1f - t, 3f);
+            float currentScrolled = totalDistance * eased;
+            float deltaScroll = currentScrolled - prevScrolled;
+            prevScrolled = currentScrolled;
+
+            // 모든 슬롯 아래로
+            for (int i = 0; i < n; i++)
+            {
+                if (slotSlots[i] == null) continue;
+                Vector2 pos = slotSlots[i].rectTransform.anchoredPosition;
+                pos.y -= deltaScroll;
+                slotSlots[i].rectTransform.anchoredPosition = pos;
+            }
+
+            // 화면 아래로 빠진 슬롯 → 위로 재진입
+            for (int i = 0; i < n; i++)
+            {
+                if (slotSlots[i] == null) continue;
+
+                if (slotSlots[i].rectTransform.anchoredPosition.y <= -slotHeight)
+                {
+                    // 가장 위 슬롯 찾기
+                    float maxY = float.MinValue;
+                    for (int j = 0; j < n; j++)
+                    {
+                        if (slotSlots[j] == null || j == i) continue;
+                        float yj = slotSlots[j].rectTransform.anchoredPosition.y;
+                        if (yj > maxY) maxY = yj;
+                    }
+
+                    Vector2 newPos = slotSlots[i].rectTransform.anchoredPosition;
+                    newPos.y = maxY + slotHeight;
+                    slotSlots[i].rectTransform.anchoredPosition = newPos;
+
+                    cycleCount++;
+
+                    int catIdToShow;
+                    if (cycleCount == finalCycleIndex)
+                        catIdToShow = finalCatId;
+                    else
+                        catIdToShow = Random.Range(0, CatDatabase.TOTAL_COUNT);
+
+                    CatData d = CatDatabase.Instance.Get(catIdToShow);
+                    if (d != null && d.sprite != null)
+                        slotSlots[i].sprite = d.sprite;
+                }
             }
 
             elapsed += Time.deltaTime;
             yield return null;
         }
 
-        // 최종 결과
-        CatData finalData = CatDatabase.Instance.Get(finalId);
-        if (slotMachineImage != null && finalData != null)
-            slotMachineImage.sprite = finalData.sprite;
-
-        // 결과 표시
-        bool isNew = CatManager.Instance.AddFromGacha(finalId);
-
-        if (resultUI != null) resultUI.SetActive(true);
-        if (resultNameText != null)
-            resultNameText.text = Loc.Get(finalData.nameKey);
-        if (resultStatusText != null)
+        // 마지막 스냅: 가장 중앙에 가까운 슬롯을 y=0으로
+        Image centerSlot = null;
+        float minDist = float.MaxValue;
+        foreach (var s in slotSlots)
         {
-            if (isNew)
-                resultStatusText.text = Loc.Get("gacha_new");
-            else
-                resultStatusText.text = Loc.Get("gacha_already_owned", CatDatabase.GACHA_REFUND);
+            if (s == null) continue;
+            float d = Mathf.Abs(s.rectTransform.anchoredPosition.y);
+            if (d < minDist)
+            {
+                minDist = d;
+                centerSlot = s;
+            }
         }
-        if (resultBorder != null)
-            resultBorder.color = CatDatabase.GetRarityColor(finalData.rarity);
 
-        // 중복이면 환급
-        if (!isNew)
+        if (centerSlot != null)
+        {
+            CatData fdata = CatDatabase.Instance.Get(finalCatId);
+            if (fdata != null && fdata.sprite != null)
+                centerSlot.sprite = fdata.sprite;
+
+            int slotIndex = System.Array.IndexOf(slotSlots, centerSlot);
+            for (int i = 0; i < n; i++)
+            {
+                if (slotSlots[i] == null) continue;
+                int rel = (i - slotIndex + n) % n;
+                slotSlots[i].rectTransform.anchoredPosition = new Vector2(0, slotHeight * rel);
+            }
+        }
+
+        // 도감 추가
+        bool isNew = CatManager.Instance.AddFromGacha(finalCatId);
+        if (!isNew && CatDatabase.GACHA_REFUND > 0)
         {
             GameManager.Instance.credits += CatDatabase.GACHA_REFUND;
             GameManager.Instance.NotifyStatsChanged();
         }
 
-        isRolling = false;
-    }
+        CatData fd = CatDatabase.Instance.Get(finalCatId);
+        if (resultNameText != null && fd != null)
+        {
+            resultNameText.text = Loc.Get(fd.nameKey);
+            resultNameText.color = CatDatabase.GetRarityColor(fd.rarity);
+        }
 
-    void OnConfirm()
-    {
-        if (gachaPanel != null) gachaPanel.SetActive(false);
+        if (drawButton != null)
+        {
+            var bg = drawButton.GetComponent<Image>();
+            if (bg != null) bg.color = buttonNormalColor;
+        }
+
+        isRolling = false;
     }
 }

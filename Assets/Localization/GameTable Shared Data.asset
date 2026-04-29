@@ -231,6 +231,178 @@ MonoBehaviour:
     m_Key: speed_c
     m_Metadata:
       m_Items: []
+  - m_Id: 75323510810
+    m_Key: rarity_common
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75323510811
+    m_Key: rarity_rare
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75323510812
+    m_Key: rarity_legendary
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75323510813
+    m_Key: gacha_pull_cost
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75323510820
+    m_Key: cat_common_01
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75323510821
+    m_Key: cat_common_02
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75323510822
+    m_Key: cat_common_03
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75323510823
+    m_Key: cat_common_04
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75323510824
+    m_Key: cat_common_05
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75323510825
+    m_Key: cat_common_06
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75323510826
+    m_Key: cat_common_07
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75323510827
+    m_Key: cat_common_08
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75323510828
+    m_Key: cat_common_09
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75323510829
+    m_Key: cat_common_10
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75323510830
+    m_Key: cat_common_11
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75323510831
+    m_Key: cat_common_12
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75323510832
+    m_Key: cat_common_13
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75323510833
+    m_Key: cat_common_14
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75323510834
+    m_Key: cat_common_15
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75323510835
+    m_Key: cat_common_16
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75323510836
+    m_Key: cat_common_17
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75323510837
+    m_Key: cat_common_18
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75323510838
+    m_Key: cat_common_19
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75323510839
+    m_Key: cat_common_20
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75323510840
+    m_Key: cat_common_21
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75323510841
+    m_Key: cat_common_22
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75323510842
+    m_Key: cat_common_23
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75323510843
+    m_Key: cat_common_24
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75323510844
+    m_Key: cat_common_25
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75323510845
+    m_Key: cat_common_26
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75323510846
+    m_Key: cat_common_27
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75323510847
+    m_Key: cat_rare_01
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75323510848
+    m_Key: cat_rare_02
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75323510849
+    m_Key: cat_rare_03
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75323510850
+    m_Key: cat_rare_04
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75323510851
+    m_Key: cat_rare_05
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75323510852
+    m_Key: cat_rare_06
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75323510853
+    m_Key: cat_rare_07
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75323510854
+    m_Key: cat_rare_08
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75323510855
+    m_Key: cat_rare_09
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75323510856
+    m_Key: cat_legendary_01
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75323510857
+    m_Key: cat_legendary_02
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75323510858
+    m_Key: cat_legendary_03
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:

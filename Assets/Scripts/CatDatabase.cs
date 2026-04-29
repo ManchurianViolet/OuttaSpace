@@ -9,13 +9,9 @@ public class CatData
     public int id;
     public string nameKey;
     public CatRarity rarity;
-    public Sprite sprite;        // 컬러 스프라이트
+    public Sprite sprite;
 }
 
-/// <summary>
-/// 고양이 데이터베이스. Inspector에서 스프라이트 배열 연결.
-/// 이 컴포넌트는 빈 GameObject에 붙여서 씬에 하나만 존재 (싱글톤).
-/// </summary>
 public class CatDatabase : MonoBehaviour
 {
     public static CatDatabase Instance { get; private set; }
@@ -29,15 +25,14 @@ public class CatDatabase : MonoBehaviour
     public const int LEGENDARY_COUNT = 3;
     public const int TOTAL_COUNT = 39;
 
-    public const int STARTER_CAT_ID = 0;  // 기본 제공 고양이
+    public const int STARTER_CAT_ID = 0;
 
-    // 가챠 확률
     public const float PROB_COMMON = 0.80f;
     public const float PROB_RARE = 0.15f;
     public const float PROB_LEGENDARY = 0.05f;
 
-    public const int GACHA_COST = 100;
-    public const int GACHA_REFUND = 50;
+    public const int GACHA_COST = 1;        // 테스트용 1
+    public const int GACHA_REFUND = 0;       // 환급도 0 (1원이라)
 
     private CatData[] catDataCache;
 
@@ -110,9 +105,6 @@ public class CatDatabase : MonoBehaviour
         return 0;
     }
 
-    /// <summary>
-    /// 가챠 결과: 확률에 따라 레어도 결정 후 해당 풀에서 랜덤 고양이 ID 반환
-    /// </summary>
     public int RollGachaId()
     {
         float roll = Random.value;

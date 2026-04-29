@@ -195,7 +195,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 75323510800
-    m_Localized: "\u2605 Arrived at {0}!"
+    m_Localized: Arrived at {0}!
     m_Metadata:
       m_Items: []
   - m_Id: 75323510801
@@ -232,6 +232,178 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 75323510809
     m_Localized: Locating...
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75323510810
+    m_Localized: Common
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75323510811
+    m_Localized: Rare
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75323510812
+    m_Localized: Legendary
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75323510813
+    m_Localized: Pull (-{0} CR)
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75323510820
+    m_Localized: Common 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75323510821
+    m_Localized: Common 2
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75323510822
+    m_Localized: Common 3
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75323510823
+    m_Localized: Common 4
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75323510824
+    m_Localized: Common 5
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75323510825
+    m_Localized: Common 6
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75323510826
+    m_Localized: Common 7
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75323510827
+    m_Localized: Common 8
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75323510828
+    m_Localized: Common 9
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75323510829
+    m_Localized: Common 10
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75323510830
+    m_Localized: Common 11
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75323510831
+    m_Localized: Common 12
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75323510832
+    m_Localized: Common 13
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75323510833
+    m_Localized: Common 14
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75323510834
+    m_Localized: Common 15
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75323510835
+    m_Localized: Common 16
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75323510836
+    m_Localized: Common 17
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75323510837
+    m_Localized: Common 18
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75323510838
+    m_Localized: Common 19
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75323510839
+    m_Localized: Common 20
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75323510840
+    m_Localized: Common 21
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75323510841
+    m_Localized: Common 22
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75323510842
+    m_Localized: Common 23
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75323510843
+    m_Localized: Common 24
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75323510844
+    m_Localized: Common 25
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75323510845
+    m_Localized: Common 26
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75323510846
+    m_Localized: Common 27
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75323510847
+    m_Localized: Rare 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75323510848
+    m_Localized: Rare 2
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75323510849
+    m_Localized: Rare 3
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75323510850
+    m_Localized: Rare 4
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75323510851
+    m_Localized: Rare 5
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75323510852
+    m_Localized: Rare 6
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75323510853
+    m_Localized: Rare 7
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75323510854
+    m_Localized: Rare 8
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75323510855
+    m_Localized: Rare 9
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75323510856
+    m_Localized: Legendary 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75323510857
+    m_Localized: Legendary 2
+    m_Metadata:
+      m_Items: []
+  - m_Id: 75323510858
+    m_Localized: Legendary 3
     m_Metadata:
       m_Items: []
   references:

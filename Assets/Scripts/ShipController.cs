@@ -52,7 +52,7 @@ public class ShipController : MonoBehaviour
             {
                 emission.rateOverTime = 60f;
                 main.startSpeed = 4f;
-                main.startSize = 0.3f;
+                main.startSize = 0.17f;
 
                 // 하늘색~파란 그라데이션
                 main.startColor = new ParticleSystem.MinMaxGradient(
@@ -123,13 +123,13 @@ public class ShipController : MonoBehaviour
     {
         GameObject particleObj = new GameObject("EngineFlame");
         particleObj.transform.SetParent(transform);
-        particleObj.transform.localPosition = new Vector3(-2.6f, -0.45f, 0);
+        particleObj.transform.localPosition = new Vector3(-3.1f, -0.45f, 0);
 
         engineFlame = particleObj.AddComponent<ParticleSystem>();
         var main = engineFlame.main;
         main.startLifetime = 0.3f;
         main.startSpeed = 5f;
-        main.startSize = 0.08f;
+        main.startSize = 0.05f;
         main.maxParticles = 50;
         main.simulationSpace = ParticleSystemSimulationSpace.World;
         main.gravityModifier = 0;
