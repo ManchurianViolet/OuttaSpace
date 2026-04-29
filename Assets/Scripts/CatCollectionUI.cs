@@ -26,9 +26,6 @@ public class CatCollectionUI : MonoBehaviour
     [Header("Close Button")]
     public Button closeButton;
 
-    [Header("Rainbow Border")]
-    public float rainbowSpeed = 0.5f;
-
     private int currentPage = 0;     // 0~4
     private const int SLOTS_PER_PAGE = 9;
 
@@ -78,16 +75,13 @@ public class CatCollectionUI : MonoBehaviour
 
     void Update()
     {
-        // 현재 사용 중 슬롯에 무지개 테두리 효과
-        float hue = (Time.time * rainbowSpeed) % 1f;
-        Color rainbow = Color.HSVToRGB(hue, 0.8f, 1f);
-
+        // 현재 사용 중 고양이 슬롯에 표시 (배경 검정 + bobbing은 슬롯 자체가 처리)
         int cm = (CatManager.Instance != null) ? CatManager.Instance.currentCatId : -1;
         for (int i = 0; i < slots.Length; i++)
         {
             int catId = currentPage * SLOTS_PER_PAGE + i;
             if (slots[i] != null)
-                slots[i].SetRainbowActive(catId == cm, rainbow);
+                slots[i].SetCurrent(catId == cm);
         }
     }
 
@@ -157,7 +151,7 @@ public class CatCollectionUI : MonoBehaviour
                 displaySprite = GetSilhouette(data.sprite);
             }
 
-            slots[i].Setup(catId, displaySprite, owned, data.rarity);
+            slots[i].Setup(catId, displaySprite, owned);
         }
     }
 
