@@ -18,9 +18,7 @@ public class GameManager : MonoBehaviour
 
     [Header("Upgrade Levels")]
     public int speedLevel;
-    public int boosterCapLevel;
     public int boosterSpdLevel;
-    public int catSwapLevel;
 
     [Header("Settings")]
     public float tickRate = 0.05f;
@@ -178,11 +176,6 @@ public class GameManager : MonoBehaviour
         return baseSpeed * boostMult;
     }
 
-    public float GetBoosterCapacityMultiplier()
-    {
-        return 1f + (float)GetUpgradeContribution(UpgradeType.BoosterCapacity);
-    }
-
     public float GetBoosterSpeedMultiplier()
     {
         return 3f + (float)GetUpgradeContribution(UpgradeType.BoosterSpeed);
@@ -201,9 +194,7 @@ public class GameManager : MonoBehaviour
         return type switch
         {
             UpgradeType.Speed => speedLevel,
-            UpgradeType.BoosterCapacity => boosterCapLevel,
             UpgradeType.BoosterSpeed => boosterSpdLevel,
-            UpgradeType.CatSwap => catSwapLevel,
             _ => 0
         };
     }
@@ -221,15 +212,12 @@ public class GameManager : MonoBehaviour
 
     public bool BuyUpgrade(UpgradeType type)
     {
-        if (type == UpgradeType.CatSwap) return false;
-
         double cost = GetUpgradeCost(type);
         if (credits < cost) return false;
         credits -= cost;
         switch (type)
         {
             case UpgradeType.Speed: speedLevel++; break;
-            case UpgradeType.BoosterCapacity: boosterCapLevel++; break;
             case UpgradeType.BoosterSpeed: boosterSpdLevel++; break;
         }
         OnStatsChanged?.Invoke();
@@ -247,9 +235,7 @@ public class GameManager : MonoBehaviour
         PlayerPrefs.SetInt("CurrentStar", currentStarIndex);
         PlayerPrefs.SetString("ArrivedStars", string.Join(",", arrivedStars));
         PlayerPrefs.SetInt("SpeedLevel", speedLevel);
-        PlayerPrefs.SetInt("BoosterCapLevel", boosterCapLevel);
         PlayerPrefs.SetInt("BoosterSpdLevel", boosterSpdLevel);
-        PlayerPrefs.SetInt("CatSwapLevel", catSwapLevel);
         PlayerPrefs.SetInt("IsDocked", isDocked ? 1 : 0);
         if (BoosterSystem.Instance != null)
             PlayerPrefs.SetFloat("BoosterFuel", BoosterSystem.Instance.fuel);
@@ -264,9 +250,7 @@ public class GameManager : MonoBehaviour
         totalDistance = double.Parse(PlayerPrefs.GetString("TotalDistance", "0"));
         currentStarIndex = PlayerPrefs.GetInt("CurrentStar", 0);
         speedLevel = PlayerPrefs.GetInt("SpeedLevel", 0);
-        boosterCapLevel = PlayerPrefs.GetInt("BoosterCapLevel", 0);
         boosterSpdLevel = PlayerPrefs.GetInt("BoosterSpdLevel", 0);
-        catSwapLevel = PlayerPrefs.GetInt("CatSwapLevel", 0);
         isDocked = PlayerPrefs.GetInt("IsDocked", 0) == 1;
 
         string arrivedStr = PlayerPrefs.GetString("ArrivedStars", "");

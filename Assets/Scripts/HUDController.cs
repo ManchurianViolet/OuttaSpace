@@ -67,7 +67,7 @@ public class HUDController : MonoBehaviour
         {
             double effectiveSpeed = gm.GetEffectiveSpeed();
             bool boosting = BoosterSystem.Instance != null && BoosterSystem.Instance.isBoosting;
-            speedText.text = (boosting ? "⚡ " : "") + GameManager.FormatSpeed(effectiveSpeed);
+            speedText.text = GameManager.FormatSpeed(effectiveSpeed);
             speedText.color = boosting ? boostSpeedColor : normalSpeedColor;
         }
 

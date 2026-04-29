@@ -58,6 +58,8 @@ public class CatCollectionUI : MonoBehaviour
             CatManager.Instance.OnCatsChanged += OnCatsChanged;
             CatManager.Instance.OnCatChanged += OnCurrentChanged;
         }
+        if (GameManager.Instance != null)
+            GameManager.Instance.OnStatsChanged += OnLanguageChanged;
     }
 
     void OnDisable()
@@ -71,6 +73,8 @@ public class CatCollectionUI : MonoBehaviour
             CatManager.Instance.OnCatsChanged -= OnCatsChanged;
             CatManager.Instance.OnCatChanged -= OnCurrentChanged;
         }
+        if (GameManager.Instance != null)
+            GameManager.Instance.OnStatsChanged -= OnLanguageChanged;
     }
 
     void Update()
@@ -104,6 +108,7 @@ public class CatCollectionUI : MonoBehaviour
     }
 
     void OnCatsChanged() => RefreshPage();
+    void OnLanguageChanged() => UpdateNav();
     void OnCurrentChanged(int id) => RefreshPage();
 
     void UpdateNav()
