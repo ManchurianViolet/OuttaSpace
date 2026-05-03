@@ -403,6 +403,30 @@ MonoBehaviour:
     m_Key: cat_legendary_03
     m_Metadata:
       m_Items: []
+  - m_Id: 6976204232237056
+    m_Key: status_sailing
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976205578608640
+    m_Key: status_online
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976206794956800
+    m_Key: status_offline
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976428535226368
+    m_Key: friend_heading_to
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976430187782144
+    m_Key: friend_resting_on
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976431865503744
+    m_Key: far_from_earth
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:

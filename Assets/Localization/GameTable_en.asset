@@ -406,6 +406,30 @@ MonoBehaviour:
     m_Localized: Legendary 3
     m_Metadata:
       m_Items: []
+  - m_Id: 6976204232237056
+    m_Localized: Sailing
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976205578608640
+    m_Localized: Online
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976206794956800
+    m_Localized: Offline
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976428535226368
+    m_Localized: Heading to {0} ({1}%)
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976430187782144
+    m_Localized: Resting on {0}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976431865503744
+    m_Localized: far from earth
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

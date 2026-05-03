@@ -69,6 +69,14 @@ public static class Loc
             ["rarity_rare"] = "희귀",
             ["rarity_legendary"] = "전설",
             ["gacha_pull_cost"] = "뽑기 (-{0} CR)",
+
+            // 친구창
+            ["status_sailing"] = "항해중",
+            ["status_online"] = "온라인",
+            ["status_offline"] = "오프라인",
+            ["friend_heading_to"] = "{0}(으)로 가는 중 ({1}%)",
+            ["friend_resting_on"] = "{0}에 정박 중",
+            ["far_from_earth"] = "지구로부터",
         };
 
         // 고양이 이름 자동 생성

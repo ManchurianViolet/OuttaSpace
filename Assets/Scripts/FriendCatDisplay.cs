@@ -4,31 +4,48 @@ using TMPro;
 
 /// <summary>
 /// 근처 친구의 고양이를 화면에 표시.
-/// 거리 차이에 따라 앞뒤로 배치, 속도 차이에 따라 이동.
-/// 이름 라벨도 표시.
+/// 룰: 같은 구간 + 현재 별 거리의 절반 이내 (FriendSyncManager.nearbyDistanceRatio).
+/// 최대 5명까지 표시 (초과 시 거리차 가장 작은 5명).
+/// X는 거리차로, Y는 5개 슬롯 중 하나 (충돌 없이 배정).
+/// 한번 받은 슬롯은 화면 떠날 때까지 유지.
 /// 
-/// 빈 GameObject에 붙이기.
+/// 빈 GameObject에 붙이기. Inspector에서 playerShip 연결 필수.
 /// </summary>
 public class FriendCatDisplay : MonoBehaviour
 {
-    [Header("References")]
-    public Transform playerShip;      // 내 고양이 (위치 기준)
+    public const int MAX_VISIBLE = 5;
 
-    [Header("Display Settings")]
-    public float maxVisualDistance = 6f;   // 화면상 최대 X 오프셋 (유닛)
-    public double maxGameDistance = 50000; // 이 거리(km)가 maxVisualDistance에 매핑
-    public float yOffset = 0.5f;          // 플레이어 위아래로 살짝 비껴서 표시
+    [Header("References")]
+    public Transform playerShip;          // 본인 ship Transform
+
+    [Header("Display")]
+    public float maxVisualDistance = 6f;  // 화면상 최대 X 오프셋 (월드 유닛)
     public float nameYOffset = 0.8f;      // 이름 라벨 위치 (고양이 위)
-    public int friendSortingOrder = 9;    // 플레이어(10)보다 뒤에
-    public float updateInterval = 0.5f;   // 표시 갱신 주기
+    public int friendSortingOrder = 9;    // 본인(10)보다 뒤
+    public float updateInterval = 0.5f;   // 친구 목록 갱신 주기 (초)
+
+    [Header("Y Slots (5 slots)")]
+    [Tooltip("5개 Y 슬롯의 월드 Y 오프셋. 위에서 아래 순서.")]
+    public float[] ySlotOffsets = new float[] { 1.2f, 0.6f, 0.0f, -0.6f, -1.2f };
 
     [Header("Friend Cat Appearance")]
-    public float friendCatScale = 0.8f;   // 플레이어보다 약간 작게
-    public float friendCatAlpha = 0.7f;   // 약간 투명
+    [Tooltip("본인 ship의 scale에 곱할 비율. 본인보다 살짝 작게 보이려면 0.85~0.95.")]
+    public float friendCatScaleRatio = 0.9f;
+    [Tooltip("화면에 들어왔을 때 최대 알파")]
+    public float friendCatMaxAlpha = 0.85f;
+    [Tooltip("화면 끝(임계 거리)에서의 최소 알파")]
+    public float friendCatMinAlpha = 0.35f;
 
-    // 활성 친구 고양이 오브젝트
+    [Header("Smoothing")]
+    public float lerpSpeed = 5f;
+    [Tooltip("친구 데이터가 끊겨도 이 시간 동안 페이드아웃하며 유지 (펄스 방지)")]
+    public float graceTime = 3f;
+
     private Dictionary<ulong, FriendCatObject> activeFriendCats = new Dictionary<ulong, FriendCatObject>();
     private float updateTimer;
+
+    // 슬롯 점유: index = 슬롯 번호, value = 점유 중인 steamId (0 = 비어있음)
+    private ulong[] slotOwners;
 
     class FriendCatObject
     {
@@ -37,7 +54,15 @@ public class FriendCatDisplay : MonoBehaviour
         public TextMeshPro nameLabel;
         public float targetX;
         public float targetAlpha;
-        public bool alive;           // 이번 프레임에 갱신됐는지
+        public int slotIndex;        // 점유 중인 Y 슬롯
+        public float lastSeenTime;
+        public bool seenThisTick;
+        public int cachedCatId = -1;
+    }
+
+    void Awake()
+    {
+        slotOwners = new ulong[MAX_VISIBLE];
     }
 
     void Update()
@@ -47,60 +72,78 @@ public class FriendCatDisplay : MonoBehaviour
         updateTimer = 0f;
 
         if (FriendSyncManager.Instance == null) return;
-        if (GameManager.Instance == null || GameManager.Instance.isDocked) 
+        if (GameManager.Instance == null || GameManager.Instance.isDocked)
         {
-            // 정박 중이면 모든 친구 고양이 숨기기
             HideAll();
             return;
         }
 
-        // 모든 친구 alive = false
         foreach (var kvp in activeFriendCats)
-            kvp.Value.alive = false;
+            kvp.Value.seenThisTick = false;
 
-        // 근처 친구 가져오기
+        // 근처 친구 가져와서 거리차 작은 순으로 5명만
         List<FriendData> nearby = FriendSyncManager.Instance.GetNearbyFriends();
-
         double myDistance = GameManager.Instance.distance;
+        nearby.Sort((a, b) =>
+        {
+            double da = System.Math.Abs(a.distanceKM - myDistance);
+            double db = System.Math.Abs(b.distanceKM - myDistance);
+            return da.CompareTo(db);
+        });
+        if (nearby.Count > MAX_VISIBLE)
+            nearby = nearby.GetRange(0, MAX_VISIBLE);
+
+        double thresholdKM = FriendSyncManager.Instance.GetNearbyThresholdKM();
+        if (thresholdKM <= 0) thresholdKM = 1;
 
         foreach (FriendData fd in nearby)
         {
-            // 거리 차이 → 화면 X 위치
+            // 거리차 → 화면 X (양수=앞=오른쪽, 음수=뒤=왼쪽)
             double distDiff = fd.distanceKM - myDistance;
-            // 양수 = 앞에 있음 (오른쪽), 음수 = 뒤에 있음 (왼쪽)
-            float normalizedDist = (float)(distDiff / maxGameDistance);
-            float targetX = Mathf.Clamp(normalizedDist * maxVisualDistance, -maxVisualDistance, maxVisualDistance);
+            float normalized = (float)(distDiff / thresholdKM); // -1 ~ 1
+            float targetX = Mathf.Clamp(normalized * maxVisualDistance, -maxVisualDistance, maxVisualDistance);
 
-            // 가까울수록 선명, 멀수록 투명
-            float distRatio = Mathf.Clamp01((float)(System.Math.Abs(distDiff) / maxGameDistance));
-            float alpha = Mathf.Lerp(friendCatAlpha, 0.2f, distRatio);
+            float distRatio = Mathf.Clamp01(Mathf.Abs(normalized));
+            float alpha = Mathf.Lerp(friendCatMaxAlpha, friendCatMinAlpha, distRatio);
 
-            // 이미 존재하면 업데이트, 없으면 생성
+            // 신규 친구
             if (!activeFriendCats.ContainsKey(fd.steamId))
             {
-                CreateFriendCat(fd);
+                int slot = AssignSlot(fd.steamId);
+                if (slot < 0) continue; // 이론상 안 발생 (5명 컷이라)
+                CreateFriendCat(fd, slot);
             }
 
             FriendCatObject fco = activeFriendCats[fd.steamId];
+
+            if (fco.cachedCatId != fd.catType)
+                ApplyCatSkin(fco, fd.catType);
+
             fco.targetX = targetX;
             fco.targetAlpha = alpha;
-            fco.alive = true;
+            fco.seenThisTick = true;
+            fco.lastSeenTime = Time.time;
 
-            // 이름 업데이트
             if (fco.nameLabel != null)
                 fco.nameLabel.text = fd.friendName;
         }
 
-        // alive가 false인 친구 제거
+        // graceTime 지나면 제거 + 슬롯 반납
         List<ulong> toRemove = new List<ulong>();
         foreach (var kvp in activeFriendCats)
         {
-            if (!kvp.Value.alive)
-                toRemove.Add(kvp.Key);
+            if (!kvp.Value.seenThisTick)
+            {
+                kvp.Value.targetAlpha = 0f;
+                if (Time.time - kvp.Value.lastSeenTime > graceTime)
+                    toRemove.Add(kvp.Key);
+            }
         }
         foreach (ulong id in toRemove)
         {
-            Destroy(activeFriendCats[id].root);
+            ReleaseSlot(id);
+            if (activeFriendCats[id].root != null)
+                Destroy(activeFriendCats[id].root);
             activeFriendCats.Remove(id);
         }
     }
@@ -109,87 +152,101 @@ public class FriendCatDisplay : MonoBehaviour
     {
         if (playerShip == null) return;
 
-        // 부드러운 위치/투명도 보간
+        Vector3 baseScale = playerShip.lossyScale * friendCatScaleRatio;
+
         foreach (var kvp in activeFriendCats)
         {
             FriendCatObject fco = kvp.Value;
             if (fco.root == null) continue;
 
-            // 플레이어 기준 상대 위치
+            float yOffset = GetSlotY(fco.slotIndex);
             Vector3 targetPos = playerShip.position + new Vector3(fco.targetX, yOffset, 0);
-            fco.root.transform.position = Vector3.Lerp(fco.root.transform.position, targetPos, Time.deltaTime * 3f);
+            fco.root.transform.position = Vector3.Lerp(
+                fco.root.transform.position, targetPos, Time.deltaTime * lerpSpeed);
 
-            // 투명도 보간
+            fco.root.transform.localScale = baseScale;
+
             if (fco.catRenderer != null)
             {
                 Color c = fco.catRenderer.color;
-                c.a = Mathf.Lerp(c.a, fco.targetAlpha, Time.deltaTime * 3f);
+                c.a = Mathf.Lerp(c.a, fco.targetAlpha, Time.deltaTime * lerpSpeed);
                 fco.catRenderer.color = c;
             }
-
-            // 이름 라벨도 투명도 맞추기
             if (fco.nameLabel != null)
             {
                 Color nc = fco.nameLabel.color;
-                nc.a = Mathf.Lerp(nc.a, fco.targetAlpha * 0.8f, Time.deltaTime * 3f);
+                nc.a = Mathf.Lerp(nc.a, fco.targetAlpha * 0.95f, Time.deltaTime * lerpSpeed);
                 fco.nameLabel.color = nc;
             }
         }
     }
 
-    void CreateFriendCat(FriendData fd)
+    // ============ 슬롯 관리 ============
+
+    /// <summary>
+    /// 비어있는 슬롯 중 하나를 친구에게 할당.
+    /// steamId 해시로 시작 인덱스 결정 → 같은 친구는 항상 같은 순서로 검사.
+    /// 꽉 차있으면 -1 반환.
+    /// </summary>
+    int AssignSlot(ulong steamId)
     {
-        GameObject root = new GameObject($"FriendCat_{fd.friendName}");
-        root.transform.SetParent(transform);
-
-        // 고양이 스프라이트 — 임시로 원형 마커, 나중에 catType에 따라 교체
-        // 지금은 플레이어 고양이와 같은 스프라이트를 복제해서 사용
-        SpriteRenderer sr = root.AddComponent<SpriteRenderer>();
-        sr.sortingOrder = friendSortingOrder;
-
-        // 플레이어 고양이 스프라이트 복사
-        if (playerShip != null)
+        int startIdx = (int)(steamId % (ulong)MAX_VISIBLE);
+        for (int i = 0; i < MAX_VISIBLE; i++)
         {
-            SpriteRenderer playerSR = playerShip.GetComponent<SpriteRenderer>();
-            if (playerSR != null && playerSR.sprite != null)
+            int idx = (startIdx + i) % MAX_VISIBLE;
+            if (slotOwners[idx] == 0)
             {
-                sr.sprite = playerSR.sprite;
+                slotOwners[idx] = steamId;
+                return idx;
             }
         }
+        return -1;
+    }
 
-        // 스프라이트가 없으면 간단한 마커 생성
-        if (sr.sprite == null)
+    void ReleaseSlot(ulong steamId)
+    {
+        for (int i = 0; i < MAX_VISIBLE; i++)
         {
-            Texture2D marker = new Texture2D(8, 8);
-            marker.filterMode = FilterMode.Point;
-            Color[] px = new Color[64];
-            for (int i = 0; i < 64; i++) px[i] = new Color(1f, 0.8f, 0.3f, 0.7f);
-            marker.SetPixels(px);
-            marker.Apply();
-            sr.sprite = Sprite.Create(marker, new Rect(0, 0, 8, 8), Vector2.one * 0.5f, 16);
+            if (slotOwners[i] == steamId)
+            {
+                slotOwners[i] = 0;
+                break;
+            }
         }
+    }
 
-        // 친구 고양이는 약간 작고 투명하게
-        root.transform.localScale = Vector3.one * friendCatScale;
-        Color color = sr.color;
-        color.a = 0f; // 페이드인 시작
-        sr.color = color;
+    float GetSlotY(int slotIndex)
+    {
+        if (ySlotOffsets == null || ySlotOffsets.Length == 0) return 0;
+        if (slotIndex < 0 || slotIndex >= ySlotOffsets.Length) return 0;
+        return ySlotOffsets[slotIndex];
+    }
 
-        // 이름 라벨
+    // ============ 생성 ============
+
+    void CreateFriendCat(FriendData fd, int slotIndex)
+    {
+        GameObject root = new GameObject($"FriendCat_{fd.friendName}");
+        root.transform.SetParent(transform, worldPositionStays: false);
+
+        SpriteRenderer sr = root.AddComponent<SpriteRenderer>();
+        sr.sortingOrder = friendSortingOrder;
+        sr.color = new Color(1f, 1f, 1f, 0f);
+
+        // 이름 라벨 (초록)
         GameObject labelObj = new GameObject("NameLabel");
-        labelObj.transform.SetParent(root.transform);
+        labelObj.transform.SetParent(root.transform, worldPositionStays: false);
         labelObj.transform.localPosition = new Vector3(0, nameYOffset, 0);
 
         TextMeshPro tmp = labelObj.AddComponent<TextMeshPro>();
         tmp.text = fd.friendName;
         tmp.fontSize = 2;
         tmp.alignment = TextAlignmentOptions.Center;
-        tmp.color = new Color(1f, 1f, 1f, 0f); // 페이드인 시작
+        tmp.color = new Color(0.36f, 0.79f, 0.36f, 0f);
         tmp.sortingOrder = friendSortingOrder + 1;
 
-        // RectTransform 크기 조절
         RectTransform rt = labelObj.GetComponent<RectTransform>();
-        rt.sizeDelta = new Vector2(4f, 1f);
+        if (rt != null) rt.sizeDelta = new Vector2(4f, 1f);
 
         FriendCatObject fco = new FriendCatObject
         {
@@ -197,11 +254,37 @@ public class FriendCatDisplay : MonoBehaviour
             catRenderer = sr,
             nameLabel = tmp,
             targetX = 0,
-            targetAlpha = friendCatAlpha,
-            alive = true
+            targetAlpha = friendCatMaxAlpha,
+            slotIndex = slotIndex,
+            lastSeenTime = Time.time,
+            seenThisTick = true,
+            cachedCatId = -1,
         };
 
         activeFriendCats[fd.steamId] = fco;
+        ApplyCatSkin(fco, fd.catType);
+    }
+
+    void ApplyCatSkin(FriendCatObject fco, int catId)
+    {
+        if (fco.catRenderer == null) return;
+
+        Sprite sprite = null;
+        if (CatDatabase.Instance != null)
+        {
+            int safeId = Mathf.Clamp(catId, 0, CatDatabase.TOTAL_COUNT - 1);
+            CatData cd = CatDatabase.Instance.Get(safeId);
+            if (cd != null) sprite = cd.sprite;
+        }
+
+        if (sprite == null && playerShip != null)
+        {
+            SpriteRenderer playerSR = playerShip.GetComponent<SpriteRenderer>();
+            if (playerSR != null) sprite = playerSR.sprite;
+        }
+
+        fco.catRenderer.sprite = sprite;
+        fco.cachedCatId = catId;
     }
 
     void HideAll()
@@ -209,8 +292,11 @@ public class FriendCatDisplay : MonoBehaviour
         foreach (var kvp in activeFriendCats)
         {
             if (kvp.Value.root != null)
-                kvp.Value.root.SetActive(false);
+                Destroy(kvp.Value.root);
         }
+        activeFriendCats.Clear();
+        for (int i = 0; i < slotOwners.Length; i++)
+            slotOwners[i] = 0;
     }
 
     void OnDestroy()

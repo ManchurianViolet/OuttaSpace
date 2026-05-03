@@ -55,6 +55,20 @@ public static class StarDatabase
             return (km / 1000000000000).ToString("F2") + "T km";
         }
     }
+
+    /// <summary>
+    /// 지구(시작점)부터의 누적 거리.
+    /// starIndex = 현재 향하는/도착한 별의 index, currentDistance = 그 별까지의 진행거리
+    /// 친구창에서 거리순 정렬 + "지구로부터" 표시에 사용.
+    /// </summary>
+    public static double GetCumulativeDistance(int starIndex, double currentDistance)
+    {
+        double sum = 0;
+        for (int i = 0; i < starIndex && i < Stars.Length; i++)
+            sum += Stars[i].distanceKM;
+        return sum + currentDistance;
+    }
+
     static Color HexColor(string hex)
     {
         ColorUtility.TryParseHtmlString(hex, out Color c);
