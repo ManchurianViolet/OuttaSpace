@@ -368,6 +368,7 @@ MonoBehaviour:
   buttonType: 2
   collectionPanel: {fileID: 1402257280}
   friendsPanel: {fileID: 0}
+  settingsPanel: {fileID: 0}
 --- !u!114 &65820240
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -388,7 +389,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: d59a9028056a06d4ab05b73e52f310cf, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 9af5783c517ba17499fa2b4f7dafa705, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -2152,6 +2153,7 @@ MonoBehaviour:
   buttonType: 3
   collectionPanel: {fileID: 0}
   friendsPanel: {fileID: 234860982}
+  settingsPanel: {fileID: 0}
 --- !u!114 &416456981
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3029,6 +3031,7 @@ MonoBehaviour:
   buttonType: 0
   collectionPanel: {fileID: 0}
   friendsPanel: {fileID: 0}
+  settingsPanel: {fileID: 0}
 --- !u!114 &731485615
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3049,7 +3052,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 48aaa55d4b091c94da883a9f99b02b8a, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 53c199efb9b5eca40881a44629ef643f, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -6540,8 +6543,8 @@ RectTransform:
   m_GameObject: {fileID: 1665758173}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
+  m_LocalScale: {x: 1.45, y: 1.45, z: 1.45}
+  m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 204573074}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -6565,6 +6568,7 @@ MonoBehaviour:
   buttonType: 1
   collectionPanel: {fileID: 0}
   friendsPanel: {fileID: 0}
+  settingsPanel: {fileID: 0}
 --- !u!114 &1665758176
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6585,7 +6589,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: a7ad6ad1555ea2c46ac36fd76674f805, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 03b9ab6d039d0fc4f996e5ef84dc372f, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -6883,7 +6887,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::FriendSyncManager
   syncInterval: 2
   dataExpireTime: 10
-  nearbyRangeKM: 50000
+  nearbyDistanceRatio: 0.5
 --- !u!114 &1736750520
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6898,13 +6902,20 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::FriendCatDisplay
   playerShip: {fileID: 973707808}
   maxVisualDistance: 6
-  maxGameDistance: 50000
-  yOffset: 0.5
   nameYOffset: 0.8
   friendSortingOrder: 9
   updateInterval: 0.5
-  friendCatScale: 0.8
-  friendCatAlpha: 0.7
+  ySlotOffsets:
+  - 1.2
+  - 0.6
+  - 0
+  - -0.6
+  - -1.2
+  friendCatScaleRatio: 0.9
+  friendCatMaxAlpha: 0.85
+  friendCatMinAlpha: 0.35
+  lerpSpeed: 5
+  graceTime: 3
 --- !u!114 &1736750521
 MonoBehaviour:
   m_ObjectHideFlags: 0
