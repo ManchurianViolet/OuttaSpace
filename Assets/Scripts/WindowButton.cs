@@ -4,12 +4,12 @@ using UnityEngine.UI;
 using System.Runtime.InteropServices;
 
 /// <summary>
-/// 창 컨트롤 버튼 핸들러. 최소화/종료/도감/친구창.
+/// 창 컨트롤 버튼 핸들러. 최소화/종료/도감/친구창/설정.
 /// 각 버튼 GameObject에 붙이고 Button Type을 Inspector에서 선택.
 /// </summary>
 public class WindowButton : MonoBehaviour
 {
-    public enum ButtonType { Minimize, Close, Collection, Friends }
+    public enum ButtonType { Minimize, Close, Collection, Friends, Settings }
 
     public ButtonType buttonType;
 
@@ -18,6 +18,9 @@ public class WindowButton : MonoBehaviour
 
     [Header("Friends Panel (Friends button only)")]
     public GameObject friendsPanel;
+
+    [Header("Settings Panel (Settings button only)")]
+    public GameObject settingsPanel;
 
     private Button button;
 
@@ -47,10 +50,13 @@ public class WindowButton : MonoBehaviour
                 Application.Quit();
                 break;
             case ButtonType.Collection:
-                OpenCollection();
+                if (collectionPanel != null) collectionPanel.SetActive(true);
                 break;
             case ButtonType.Friends:
-                OpenFriends();
+                if (friendsPanel != null) friendsPanel.SetActive(true);
+                break;
+            case ButtonType.Settings:
+                if (settingsPanel != null) settingsPanel.SetActive(true);
                 break;
         }
     }
@@ -61,18 +67,6 @@ public class WindowButton : MonoBehaviour
         IntPtr hWnd = GetActiveWindow();
         ShowWindow(hWnd, SW_MINIMIZE);
 #endif
-    }
-
-    void OpenCollection()
-    {
-        if (collectionPanel != null)
-            collectionPanel.SetActive(true);
-    }
-
-    void OpenFriends()
-    {
-        if (friendsPanel != null)
-            friendsPanel.SetActive(true);
     }
 
     void OnDestroy()

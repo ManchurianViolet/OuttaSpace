@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: d57f7103329967041a72063b6165d2d6
+guid: 9af5783c517ba17499fa2b4f7dafa705
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 9158891535813409432
-    second: abse_0
+      213: -6635800493156562629
+    second: catt-20260505-222536-frame0_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -37,7 +37,7 @@ TextureImporter:
   maxTextureSize: 2048
   textureSettings:
     serializedVersion: 2
-    filterMode: 0
+    filterMode: 1
     aniso: 1
     mipBias: 0
     wrapU: 1
@@ -48,10 +48,10 @@ TextureImporter:
   compressionQuality: 50
   spriteMode: 1
   spriteExtrude: 1
-  spriteMeshType: 1
+  spriteMeshType: 0
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spritePixelsToUnits: 100
+  spritePixelsToUnits: 64
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
@@ -100,13 +100,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: abse_0
+      name: catt-20260505-222536-frame0_0
       rect:
         serializedVersion: 2
-        x: 0
+        x: 6
         y: 9
-        width: 640
-        height: 282
+        width: 52
+        height: 48
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -115,8 +115,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 89a7d70735bea1f70800000000000000
-      internalID: 9158891535813409432
+      spriteID: b398a050c96e8e3a0800000000000000
+      internalID: -6635800493156562629
       vertices: []
       indices: 
       edges: []
@@ -135,7 +135,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      abse_0: 9158891535813409432
+      catt-20260505-222536-frame0_0: -6635800493156562629
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

@@ -9,12 +9,19 @@ public class WindowStateManager : MonoBehaviour
 
     public enum WindowState { Traveling, Transitioning, Docked, TravelingExpanded }
 
-    [Header("Window Sizes")]
-    public int widgetWidth = 360;
-    public int widgetHeight = 240;
-    public int stationWidth = 700;
-    public int stationHeight = 500;
+    // 사이즈 기본값 (Inspector 값은 fallback. 실제 사용 값은 PlayerPrefs에서)
+    [Header("Window Sizes (Defaults)")]
+    public int widgetWidth = 384;
+    public int widgetHeight = 256;
+    public int stationWidth = 768;
+    public int stationHeight = 512;
     public bool alwaysOnTop = true;
+
+    // 런타임에 사용되는 실제 사이즈
+    public int CurrentWidgetW { get; private set; }
+    public int CurrentWidgetH { get; private set; }
+    public int CurrentStationW { get; private set; }
+    public int CurrentStationH { get; private set; }
 
     [Header("Scene References")]
     public GameObject travelingUI;
@@ -44,6 +51,12 @@ public class WindowStateManager : MonoBehaviour
     private ParticleSystem shipFlame;
     private SpriteRenderer shipRenderer;
     private CanvasGroup dockedCanvasGroup;
+
+    // PlayerPrefs 키
+    const string PREF_WIDGET_W = "WindowWidgetW";
+    const string PREF_WIDGET_H = "WindowWidgetH";
+    const string PREF_STATION_W = "WindowStationW";
+    const string PREF_STATION_H = "WindowStationH";
 
 #if UNITY_STANDALONE_WIN && !UNITY_EDITOR
     [DllImport("user32.dll")] static extern IntPtr GetActiveWindow();
@@ -86,6 +99,8 @@ public class WindowStateManager : MonoBehaviour
         if (Instance != null) { Destroy(gameObject); return; }
         Instance = this;
 
+        LoadSizesFromPrefs();
+
         if (shipObject != null)
         {
             shipController = shipObject.GetComponent<ShipController>();
@@ -106,6 +121,46 @@ public class WindowStateManager : MonoBehaviour
 #endif
 
         Application.runInBackground = true;
+    }
+
+    void LoadSizesFromPrefs()
+    {
+        CurrentWidgetW = PlayerPrefs.GetInt(PREF_WIDGET_W, widgetWidth);
+        CurrentWidgetH = PlayerPrefs.GetInt(PREF_WIDGET_H, widgetHeight);
+        CurrentStationW = PlayerPrefs.GetInt(PREF_STATION_W, stationWidth);
+        CurrentStationH = PlayerPrefs.GetInt(PREF_STATION_H, stationHeight);
+    }
+
+    /// <summary>
+    /// SettingsManager에서 호출. 사이즈 변경 + 즉시 PlayerPrefs 저장 + 현재 모드에 맞게 창 갱신.
+    /// </summary>
+    public void SetWidgetSize(int w, int h)
+    {
+        CurrentWidgetW = w;
+        CurrentWidgetH = h;
+        PlayerPrefs.SetInt(PREF_WIDGET_W, w);
+        PlayerPrefs.SetInt(PREF_WIDGET_H, h);
+        PlayerPrefs.Save();
+
+        // 현재가 항해 모드면 즉시 적용
+        if (currentState == WindowState.Traveling)
+            ResizeWindow(CurrentWidgetW, CurrentWidgetH, anchorBottomRight: true);
+    }
+
+    /// <summary>
+    /// SettingsManager에서 호출. 기능모드(정박/도감/친구창/설정 확장 시) 사이즈 변경.
+    /// </summary>
+    public void SetStationSize(int w, int h)
+    {
+        CurrentStationW = w;
+        CurrentStationH = h;
+        PlayerPrefs.SetInt(PREF_STATION_W, w);
+        PlayerPrefs.SetInt(PREF_STATION_H, h);
+        PlayerPrefs.Save();
+
+        // 현재가 정박/확장 모드면 즉시 적용
+        if (currentState == WindowState.Docked || currentState == WindowState.TravelingExpanded)
+            ResizeWindow(CurrentStationW, CurrentStationH, anchorBottomRight: true);
     }
 
 #if UNITY_STANDALONE_WIN && !UNITY_EDITOR
@@ -196,33 +251,29 @@ public class WindowStateManager : MonoBehaviour
         SetTraveling();
     }
 
-    // ============ 도감 열기/닫기 (항해 중에만 사용) ============
+    // ============ 도감/친구창/설정 확장 ============
 
     /// <summary>
-    /// 항해 중 도감 열기: 창 확장 + 고양이 페이드아웃 + 별 배경 유지
+    /// 항해 중 도감/친구창/설정세부 열기: 창 확장 + 고양이 페이드아웃 + 별 배경 유지
     /// </summary>
     public void ExpandForCollection()
     {
         if (currentState != WindowState.Traveling) return;
 
         currentState = WindowState.TravelingExpanded;
-        ResizeWindow(stationWidth, stationHeight, anchorBottomRight: true);
+        ResizeWindow(CurrentStationW, CurrentStationH, anchorBottomRight: true);
 
         StartCoroutine(FadeShip(fadeOut: true));
         OnStateChanged?.Invoke(currentState);
     }
 
-    /// <summary>
-    /// 항해 중 도감 닫기: 창 축소 + 고양이 페이드인 (새 스프라이트로)
-    /// </summary>
     public void CollapseFromCollection()
     {
         if (currentState != WindowState.TravelingExpanded) return;
 
         currentState = WindowState.Traveling;
-        ResizeWindow(widgetWidth, widgetHeight, anchorBottomRight: true);
+        ResizeWindow(CurrentWidgetW, CurrentWidgetH, anchorBottomRight: true);
 
-        // 고양이 스프라이트 재적용 (교체됐을 수 있음)
         if (CatManager.Instance != null)
             CatManager.Instance.ApplyCurrentCat();
 
@@ -348,7 +399,7 @@ public class WindowStateManager : MonoBehaviour
         if (BoosterSystem.Instance != null)
             BoosterSystem.Instance.gameObject.SetActive(true);
 
-        ResizeWindow(widgetWidth, widgetHeight, anchorBottomRight: true);
+        ResizeWindow(CurrentWidgetW, CurrentWidgetH, anchorBottomRight: true);
         Camera.main.backgroundColor = HexColor("#06060F");
 
         OnStateChanged?.Invoke(currentState);
@@ -384,7 +435,7 @@ public class WindowStateManager : MonoBehaviour
         if (BoosterSystem.Instance != null)
             BoosterSystem.Instance.gameObject.SetActive(false);
 
-        ResizeWindow(stationWidth, stationHeight, anchorBottomRight: true);
+        ResizeWindow(CurrentStationW, CurrentStationH, anchorBottomRight: true);
 
         if (dockedStar != null)
         {
