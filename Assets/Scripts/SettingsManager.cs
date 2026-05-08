@@ -65,13 +65,13 @@ public class SettingsManager : MonoBehaviour
     void BuildDefaultPresets()
     {
         sizePresets = new List<SizePreset>
-        {
-            new SizePreset { width = 384,  height = 256,  label = "1× (384×256)" },
-            new SizePreset { width = 768,  height = 512,  label = "2× (768×512)" },
-            new SizePreset { width = 1152, height = 768,  label = "3× (1152×768)" },
-            new SizePreset { width = 1536, height = 1024, label = "4× (1536×1024)" },
-            new SizePreset { width = 1920, height = 1280, label = "5× (1920×1280)" },
-        };
+{
+    new SizePreset { width = 384,  height = 256,  label = "1x (384x256)" },
+    new SizePreset { width = 768,  height = 512,  label = "2x (768x512)" },
+    new SizePreset { width = 1152, height = 768,  label = "3x (1152x768)" },
+    new SizePreset { width = 1536, height = 1024, label = "4x (1536x1024)" },
+    new SizePreset { width = 1920, height = 1280, label = "5x (1920x1280)" },
+};
     }
 
     // ============ 언어 ============
