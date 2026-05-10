@@ -137,7 +137,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &1935410
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -154,6 +154,9 @@ MonoBehaviour:
   sizeButton: {fileID: 850682670}
   creditsButton: {fileID: 1010632058}
   closeButton: {fileID: 788144696}
+  languageButtonLabel: {fileID: 295775269}
+  sizeButtonLabel: {fileID: 1302332632}
+  creditsButtonLabel: {fileID: 1268284029}
   languagePanel: {fileID: 1807951265}
   sizePanel: {fileID: 689396093}
   creditsPanel: {fileID: 804963808}
@@ -1525,7 +1528,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 25
+  m_fontSize: 18
   m_fontSizeBase: 35.93
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -4358,6 +4361,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 486ef884f19ff50459cb7a510a2bef0c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SizeSettingsUI
+  titleLabel: {fileID: 1054138261}
+  widgetLabel: {fileID: 1116537180}
+  stationLabel: {fileID: 1305918034}
   widgetDropdown: {fileID: 67387133}
   stationDropdown: {fileID: 856062288}
   closeButton: {fileID: 1268814475}
@@ -4917,33 +4923,33 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CatDatabase
   catSprites:
   - {fileID: 21300000, guid: 61d9f70adc466cd4eb4898a275108800, type: 3}
-  - {fileID: 21300000, guid: 61d9f70adc466cd4eb4898a275108800, type: 3}
-  - {fileID: 21300000, guid: 61d9f70adc466cd4eb4898a275108800, type: 3}
-  - {fileID: 21300000, guid: 61d9f70adc466cd4eb4898a275108800, type: 3}
-  - {fileID: 21300000, guid: 61d9f70adc466cd4eb4898a275108800, type: 3}
-  - {fileID: 21300000, guid: 61d9f70adc466cd4eb4898a275108800, type: 3}
-  - {fileID: 21300000, guid: 61d9f70adc466cd4eb4898a275108800, type: 3}
-  - {fileID: 21300000, guid: 61d9f70adc466cd4eb4898a275108800, type: 3}
-  - {fileID: 21300000, guid: 61d9f70adc466cd4eb4898a275108800, type: 3}
-  - {fileID: 21300000, guid: 61d9f70adc466cd4eb4898a275108800, type: 3}
-  - {fileID: 21300000, guid: 61d9f70adc466cd4eb4898a275108800, type: 3}
-  - {fileID: 21300000, guid: 61d9f70adc466cd4eb4898a275108800, type: 3}
-  - {fileID: 21300000, guid: 61d9f70adc466cd4eb4898a275108800, type: 3}
-  - {fileID: 21300000, guid: 61d9f70adc466cd4eb4898a275108800, type: 3}
-  - {fileID: 21300000, guid: 61d9f70adc466cd4eb4898a275108800, type: 3}
-  - {fileID: 21300000, guid: 61d9f70adc466cd4eb4898a275108800, type: 3}
-  - {fileID: 21300000, guid: 61d9f70adc466cd4eb4898a275108800, type: 3}
-  - {fileID: 21300000, guid: 61d9f70adc466cd4eb4898a275108800, type: 3}
-  - {fileID: 21300000, guid: 61d9f70adc466cd4eb4898a275108800, type: 3}
-  - {fileID: 21300000, guid: 61d9f70adc466cd4eb4898a275108800, type: 3}
-  - {fileID: 21300000, guid: 61d9f70adc466cd4eb4898a275108800, type: 3}
-  - {fileID: 21300000, guid: 61d9f70adc466cd4eb4898a275108800, type: 3}
-  - {fileID: 21300000, guid: 61d9f70adc466cd4eb4898a275108800, type: 3}
-  - {fileID: 21300000, guid: 61d9f70adc466cd4eb4898a275108800, type: 3}
-  - {fileID: 21300000, guid: 61d9f70adc466cd4eb4898a275108800, type: 3}
-  - {fileID: 21300000, guid: 61d9f70adc466cd4eb4898a275108800, type: 3}
-  - {fileID: 21300000, guid: 61d9f70adc466cd4eb4898a275108800, type: 3}
   - {fileID: 21300000, guid: 92934320f9cedd34dbe9f5f4da70f140, type: 3}
+  - {fileID: 21300000, guid: f30684d8617dfd5409dbd7fdfcfa90c0, type: 3}
+  - {fileID: 21300000, guid: 445f19bd60f3c2344856a8a49aa2d8f9, type: 3}
+  - {fileID: 21300000, guid: 0ef57397f2cb6a147895938b9164de88, type: 3}
+  - {fileID: 21300000, guid: 3860fda3e3fd12546b10d908d1d228fe, type: 3}
+  - {fileID: 21300000, guid: edcdc9171a4ebbd4390e0ee7a07ddb95, type: 3}
+  - {fileID: 21300000, guid: 4cd2ba7323d3e524f877719e528fb2d0, type: 3}
+  - {fileID: 21300000, guid: 7ca79cafc12c8464bb9429f7f2a46892, type: 3}
+  - {fileID: 21300000, guid: 480a0a70e19242a448426209f2249f65, type: 3}
+  - {fileID: 21300000, guid: 95ddf6be50a35244fa29ae7396bc7f96, type: 3}
+  - {fileID: 21300000, guid: fd86707e1a61f8d4ea8eca92c4476487, type: 3}
+  - {fileID: 21300000, guid: 85e0f4d11e7ccfc49a267f401d392df8, type: 3}
+  - {fileID: 21300000, guid: 61d9f70adc466cd4eb4898a275108800, type: 3}
+  - {fileID: 21300000, guid: 61d9f70adc466cd4eb4898a275108800, type: 3}
+  - {fileID: 21300000, guid: 61d9f70adc466cd4eb4898a275108800, type: 3}
+  - {fileID: 21300000, guid: 61d9f70adc466cd4eb4898a275108800, type: 3}
+  - {fileID: 21300000, guid: 61d9f70adc466cd4eb4898a275108800, type: 3}
+  - {fileID: 21300000, guid: 61d9f70adc466cd4eb4898a275108800, type: 3}
+  - {fileID: 21300000, guid: 61d9f70adc466cd4eb4898a275108800, type: 3}
+  - {fileID: 21300000, guid: 61d9f70adc466cd4eb4898a275108800, type: 3}
+  - {fileID: 21300000, guid: 61d9f70adc466cd4eb4898a275108800, type: 3}
+  - {fileID: 21300000, guid: 61d9f70adc466cd4eb4898a275108800, type: 3}
+  - {fileID: 21300000, guid: 61d9f70adc466cd4eb4898a275108800, type: 3}
+  - {fileID: 21300000, guid: 61d9f70adc466cd4eb4898a275108800, type: 3}
+  - {fileID: 21300000, guid: 61d9f70adc466cd4eb4898a275108800, type: 3}
+  - {fileID: 21300000, guid: 61d9f70adc466cd4eb4898a275108800, type: 3}
+  - {fileID: 21300000, guid: c870541bb3483bb46be05a9f1e303926, type: 3}
   - {fileID: 21300000, guid: 92934320f9cedd34dbe9f5f4da70f140, type: 3}
   - {fileID: 21300000, guid: 92934320f9cedd34dbe9f5f4da70f140, type: 3}
   - {fileID: 21300000, guid: f30684d8617dfd5409dbd7fdfcfa90c0, type: 3}
@@ -5402,6 +5408,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 52c67de610ab82641b31bbd6b6f027e8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CreditsUI
+  titleLabel: {fileID: 1693370216}
   closeButton: {fileID: 1766052401}
   settingsPanelToReopen: {fileID: 1935410}
 --- !u!114 &804963811
@@ -11514,7 +11521,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::SettingsManager
   languageFonts:
   - localeCode: ko
-    fontAsset: {fileID: 11400000, guid: a6133a8a686bbd64eb9b1b972e2a00e5, type: 2}
+    fontAsset: {fileID: 11400000, guid: 579822c044e70bb4fb7715219d843c07, type: 2}
   - localeCode: en
     fontAsset: {fileID: 11400000, guid: 9a14a8a1184c5f14fbce3338ea4d7a35, type: 2}
   sizePresets: []
@@ -12664,6 +12671,10 @@ MonoBehaviour:
   friendCatScaleRatio: 0.9
   friendCatMaxAlpha: 0.85
   friendCatMinAlpha: 0.35
+  nameFontSize: 4
+  nameLabelSize: {x: 8, y: 2}
+  counterScaleNameLabel: 1
+  nameColor: {r: 0.36, g: 0.79, b: 0.36, a: 1}
   lerpSpeed: 5
   graceTime: 3
 --- !u!114 &1736750521
@@ -12974,6 +12985,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 437ae7df77ab86f41849071d8e064d6b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LanguageSettingsUI
+  titleLabel: {fileID: 346547427}
   languageDropdown: {fileID: 1297309339}
   closeButton: {fileID: 1033702925}
   settingsPanelToReopen: {fileID: 1935410}

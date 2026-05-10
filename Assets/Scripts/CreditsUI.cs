@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 /// <summary>
 /// 크레딧 세부 패널. 일단 placeholder.
@@ -7,6 +8,7 @@ using UnityEngine.UI;
 public class CreditsUI : MonoBehaviour
 {
     [Header("References")]
+    public TextMeshProUGUI titleLabel;
     public Button closeButton;
 
     [Header("Reopen After Close")]
@@ -19,12 +21,26 @@ public class CreditsUI : MonoBehaviour
 
         if (closeButton != null)
             closeButton.onClick.AddListener(OnClose);
+
+        if (SettingsManager.Instance != null)
+            SettingsManager.Instance.OnLanguageChanged += RefreshTexts;
+
+        RefreshTexts();
     }
 
     void OnDisable()
     {
         if (closeButton != null)
             closeButton.onClick.RemoveListener(OnClose);
+
+        if (SettingsManager.Instance != null)
+            SettingsManager.Instance.OnLanguageChanged -= RefreshTexts;
+    }
+
+    void RefreshTexts()
+    {
+        if (titleLabel != null)
+            titleLabel.text = Loc.Get("settings_credits_title");
     }
 
     void OnClose()

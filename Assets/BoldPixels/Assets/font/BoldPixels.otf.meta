@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 19b9bfe81b147ba4f91b639e7c1b07d9
+guid: 31f6b0c23b9d27542800ac92116452eb
 TrueTypeFontImporter:
   externalObjects: {}
   serializedVersion: 4
@@ -19,10 +19,3 @@ TrueTypeFontImporter:
   userData: 
   assetBundleName: 
   assetBundleVariant: 
-AssetOrigin:
-  serializedVersion: 1
-  productId: 332078
-  packageName: BoldPixels
-  packageVersion: 1.5.0
-  assetPath: Assets/BoldPixels/Assets/font/BoldPixels.otf
-  uploadId: 785910

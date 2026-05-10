@@ -10,8 +10,11 @@ using System.Collections.Generic;
 public class SizeSettingsUI : MonoBehaviour
 {
     [Header("References")]
-    public TMP_Dropdown widgetDropdown;     // 항해모드
-    public TMP_Dropdown stationDropdown;    // 기능모드
+    public TextMeshProUGUI titleLabel;
+    public TextMeshProUGUI widgetLabel;
+    public TextMeshProUGUI stationLabel;
+    public TMP_Dropdown widgetDropdown;
+    public TMP_Dropdown stationDropdown;
     public Button closeButton;
 
     [Header("Reopen After Close")]
@@ -23,6 +26,7 @@ public class SizeSettingsUI : MonoBehaviour
         if (wsm != null) wsm.ExpandForCollection();
 
         BuildDropdowns();
+        RefreshTexts();
 
         if (widgetDropdown != null)
             widgetDropdown.onValueChanged.AddListener(OnWidgetChanged);
@@ -30,6 +34,9 @@ public class SizeSettingsUI : MonoBehaviour
             stationDropdown.onValueChanged.AddListener(OnStationChanged);
         if (closeButton != null)
             closeButton.onClick.AddListener(OnClose);
+
+        if (SettingsManager.Instance != null)
+            SettingsManager.Instance.OnLanguageChanged += RefreshTexts;
     }
 
     void OnDisable()
@@ -40,6 +47,16 @@ public class SizeSettingsUI : MonoBehaviour
             stationDropdown.onValueChanged.RemoveListener(OnStationChanged);
         if (closeButton != null)
             closeButton.onClick.RemoveListener(OnClose);
+
+        if (SettingsManager.Instance != null)
+            SettingsManager.Instance.OnLanguageChanged -= RefreshTexts;
+    }
+
+    void RefreshTexts()
+    {
+        if (titleLabel != null)   titleLabel.text   = Loc.Get("settings_size_title");
+        if (widgetLabel != null)  widgetLabel.text  = Loc.Get("settings_widget_label");
+        if (stationLabel != null) stationLabel.text = Loc.Get("settings_station_label");
     }
 
     void BuildDropdowns()
@@ -47,13 +64,12 @@ public class SizeSettingsUI : MonoBehaviour
         var sm = SettingsManager.Instance;
         if (sm == null) return;
 
-        var labels = new List<TMP_Dropdown.OptionData>();
-        foreach (var p in sm.sizePresets)
-            labels.Add(new TMP_Dropdown.OptionData(p.label));
-
         if (widgetDropdown != null)
         {
             widgetDropdown.ClearOptions();
+            var labels = new List<TMP_Dropdown.OptionData>();
+            foreach (var p in sm.sizePresets)
+                labels.Add(new TMP_Dropdown.OptionData(p.label));
             widgetDropdown.AddOptions(labels);
             widgetDropdown.SetValueWithoutNotify(sm.FindPresetIndexForWidget());
             widgetDropdown.RefreshShownValue();
@@ -62,7 +78,6 @@ public class SizeSettingsUI : MonoBehaviour
         if (stationDropdown != null)
         {
             stationDropdown.ClearOptions();
-            // 새 List 만들어서 넣기 (같은 참조 쓰면 옵션 공유 이슈 방지)
             var labels2 = new List<TMP_Dropdown.OptionData>();
             foreach (var p in sm.sizePresets)
                 labels2.Add(new TMP_Dropdown.OptionData(p.label));

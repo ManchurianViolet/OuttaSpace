@@ -77,6 +77,16 @@ public static class Loc
             ["friend_heading_to"] = "{0}(으)로 가는 중 ({1}%)",
             ["friend_resting_on"] = "{0}에 정박 중",
             ["far_from_earth"] = "지구로부터",
+
+            // 설정
+            ["settings_language"] = "언어",
+            ["settings_size"] = "크기",
+            ["settings_credits"] = "크레딧",
+            ["settings_language_title"] = "언어 설정",
+            ["settings_size_title"] = "크기 설정",
+            ["settings_credits_title"] = "크레딧",
+            ["settings_widget_label"] = "항해 모드 크기",
+            ["settings_station_label"] = "기능 모드 크기",
         };
 
         // 고양이 이름 자동 생성

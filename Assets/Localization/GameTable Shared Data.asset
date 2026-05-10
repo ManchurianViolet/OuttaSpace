@@ -427,6 +427,38 @@ MonoBehaviour:
     m_Key: far_from_earth
     m_Metadata:
       m_Items: []
+  - m_Id: 6976500000000001
+    m_Key: settings_language
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000002
+    m_Key: settings_size
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000003
+    m_Key: settings_credits
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000004
+    m_Key: settings_language_title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000005
+    m_Key: settings_size_title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000006
+    m_Key: settings_credits_title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000007
+    m_Key: settings_widget_label
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000008
+    m_Key: settings_station_label
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:

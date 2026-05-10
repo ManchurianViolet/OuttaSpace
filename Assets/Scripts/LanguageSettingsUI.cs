@@ -10,6 +10,7 @@ using UnityEngine.Localization.Settings;
 public class LanguageSettingsUI : MonoBehaviour
 {
     [Header("References")]
+    public TextMeshProUGUI titleLabel;
     public TMP_Dropdown languageDropdown;
     public Button closeButton;
 
@@ -24,11 +25,15 @@ public class LanguageSettingsUI : MonoBehaviour
         if (wsm != null) wsm.ExpandForCollection();
 
         BuildDropdown();
+        RefreshTexts();
 
         if (languageDropdown != null)
             languageDropdown.onValueChanged.AddListener(OnLanguageSelected);
         if (closeButton != null)
             closeButton.onClick.AddListener(OnClose);
+
+        if (SettingsManager.Instance != null)
+            SettingsManager.Instance.OnLanguageChanged += RefreshTexts;
     }
 
     void OnDisable()
@@ -37,6 +42,15 @@ public class LanguageSettingsUI : MonoBehaviour
             languageDropdown.onValueChanged.RemoveListener(OnLanguageSelected);
         if (closeButton != null)
             closeButton.onClick.RemoveListener(OnClose);
+
+        if (SettingsManager.Instance != null)
+            SettingsManager.Instance.OnLanguageChanged -= RefreshTexts;
+    }
+
+    void RefreshTexts()
+    {
+        if (titleLabel != null)
+            titleLabel.text = Loc.Get("settings_language_title");
     }
 
     void BuildDropdown()
@@ -56,7 +70,6 @@ public class LanguageSettingsUI : MonoBehaviour
         {
             string code = loc.Identifier.Code;
             string display = loc.LocaleName;
-            // 보기 좋게: "ko" → "한국어", "en" → "English" 식으로 LocaleName 사용
             options.Add(new TMP_Dropdown.OptionData(display));
             localeCodes.Add(code);
             if (code == currentCode) currentIndex = i;

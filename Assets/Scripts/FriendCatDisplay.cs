@@ -8,43 +8,45 @@ using TMPro;
 /// 최대 5명까지 표시 (초과 시 거리차 가장 작은 5명).
 /// X는 거리차로, Y는 5개 슬롯 중 하나 (충돌 없이 배정).
 /// 한번 받은 슬롯은 화면 떠날 때까지 유지.
-/// 
-/// 빈 GameObject에 붙이기. Inspector에서 playerShip 연결 필수.
 /// </summary>
 public class FriendCatDisplay : MonoBehaviour
 {
     public const int MAX_VISIBLE = 5;
 
     [Header("References")]
-    public Transform playerShip;          // 본인 ship Transform
+    public Transform playerShip;
 
     [Header("Display")]
-    public float maxVisualDistance = 6f;  // 화면상 최대 X 오프셋 (월드 유닛)
-    public float nameYOffset = 0.8f;      // 이름 라벨 위치 (고양이 위)
-    public int friendSortingOrder = 9;    // 본인(10)보다 뒤
-    public float updateInterval = 0.5f;   // 친구 목록 갱신 주기 (초)
+    public float maxVisualDistance = 6f;
+    public float nameYOffset = 0.8f;
+    public int friendSortingOrder = 9;
+    public float updateInterval = 0.5f;
 
     [Header("Y Slots (5 slots)")]
-    [Tooltip("5개 Y 슬롯의 월드 Y 오프셋. 위에서 아래 순서.")]
     public float[] ySlotOffsets = new float[] { 1.2f, 0.6f, 0.0f, -0.6f, -1.2f };
 
     [Header("Friend Cat Appearance")]
-    [Tooltip("본인 ship의 scale에 곱할 비율. 본인보다 살짝 작게 보이려면 0.85~0.95.")]
+    [Tooltip("본인 ship의 scale에 곱할 비율.")]
     public float friendCatScaleRatio = 0.9f;
-    [Tooltip("화면에 들어왔을 때 최대 알파")]
     public float friendCatMaxAlpha = 0.85f;
-    [Tooltip("화면 끝(임계 거리)에서의 최소 알파")]
     public float friendCatMinAlpha = 0.35f;
+
+    [Header("Name Label")]
+    [Tooltip("이름 라벨 폰트 크기 (월드 단위). 기본 6.")]
+    public float nameFontSize = 6f;
+    [Tooltip("이름 라벨 RectTransform 크기 (가로/세로).")]
+    public Vector2 nameLabelSize = new Vector2(8f, 2f);
+    [Tooltip("이름 라벨이 친구 스케일 영향 받지 않도록 보정 (true 권장).")]
+    public bool counterScaleNameLabel = true;
+    public Color nameColor = new Color(0.36f, 0.79f, 0.36f); // 초록
 
     [Header("Smoothing")]
     public float lerpSpeed = 5f;
-    [Tooltip("친구 데이터가 끊겨도 이 시간 동안 페이드아웃하며 유지 (펄스 방지)")]
     public float graceTime = 3f;
 
     private Dictionary<ulong, FriendCatObject> activeFriendCats = new Dictionary<ulong, FriendCatObject>();
     private float updateTimer;
 
-    // 슬롯 점유: index = 슬롯 번호, value = 점유 중인 steamId (0 = 비어있음)
     private ulong[] slotOwners;
 
     class FriendCatObject
@@ -52,9 +54,10 @@ public class FriendCatDisplay : MonoBehaviour
         public GameObject root;
         public SpriteRenderer catRenderer;
         public TextMeshPro nameLabel;
+        public Transform nameLabelTransform;
         public float targetX;
         public float targetAlpha;
-        public int slotIndex;        // 점유 중인 Y 슬롯
+        public int slotIndex;
         public float lastSeenTime;
         public bool seenThisTick;
         public int cachedCatId = -1;
@@ -81,7 +84,6 @@ public class FriendCatDisplay : MonoBehaviour
         foreach (var kvp in activeFriendCats)
             kvp.Value.seenThisTick = false;
 
-        // 근처 친구 가져와서 거리차 작은 순으로 5명만
         List<FriendData> nearby = FriendSyncManager.Instance.GetNearbyFriends();
         double myDistance = GameManager.Instance.distance;
         nearby.Sort((a, b) =>
@@ -98,19 +100,17 @@ public class FriendCatDisplay : MonoBehaviour
 
         foreach (FriendData fd in nearby)
         {
-            // 거리차 → 화면 X (양수=앞=오른쪽, 음수=뒤=왼쪽)
             double distDiff = fd.distanceKM - myDistance;
-            float normalized = (float)(distDiff / thresholdKM); // -1 ~ 1
+            float normalized = (float)(distDiff / thresholdKM);
             float targetX = Mathf.Clamp(normalized * maxVisualDistance, -maxVisualDistance, maxVisualDistance);
 
             float distRatio = Mathf.Clamp01(Mathf.Abs(normalized));
             float alpha = Mathf.Lerp(friendCatMaxAlpha, friendCatMinAlpha, distRatio);
 
-            // 신규 친구
             if (!activeFriendCats.ContainsKey(fd.steamId))
             {
                 int slot = AssignSlot(fd.steamId);
-                if (slot < 0) continue; // 이론상 안 발생 (5명 컷이라)
+                if (slot < 0) continue;
                 CreateFriendCat(fd, slot);
             }
 
@@ -128,7 +128,6 @@ public class FriendCatDisplay : MonoBehaviour
                 fco.nameLabel.text = fd.friendName;
         }
 
-        // graceTime 지나면 제거 + 슬롯 반납
         List<ulong> toRemove = new List<ulong>();
         foreach (var kvp in activeFriendCats)
         {
@@ -166,6 +165,15 @@ public class FriendCatDisplay : MonoBehaviour
 
             fco.root.transform.localScale = baseScale;
 
+            // 이름 라벨이 친구 스케일 영향 안 받게 보정
+            if (counterScaleNameLabel && fco.nameLabelTransform != null)
+            {
+                float sx = baseScale.x != 0 ? 1f / baseScale.x : 1f;
+                float sy = baseScale.y != 0 ? 1f / baseScale.y : 1f;
+                fco.nameLabelTransform.localScale = new Vector3(sx, sy, 1f);
+                fco.nameLabelTransform.localPosition = new Vector3(0, nameYOffset * sy, 0);
+            }
+
             if (fco.catRenderer != null)
             {
                 Color c = fco.catRenderer.color;
@@ -183,11 +191,6 @@ public class FriendCatDisplay : MonoBehaviour
 
     // ============ 슬롯 관리 ============
 
-    /// <summary>
-    /// 비어있는 슬롯 중 하나를 친구에게 할당.
-    /// steamId 해시로 시작 인덱스 결정 → 같은 친구는 항상 같은 순서로 검사.
-    /// 꽉 차있으면 -1 반환.
-    /// </summary>
     int AssignSlot(ulong steamId)
     {
         int startIdx = (int)(steamId % (ulong)MAX_VISIBLE);
@@ -233,26 +236,29 @@ public class FriendCatDisplay : MonoBehaviour
         sr.sortingOrder = friendSortingOrder;
         sr.color = new Color(1f, 1f, 1f, 0f);
 
-        // 이름 라벨 (초록)
+        // 이름 라벨
         GameObject labelObj = new GameObject("NameLabel");
         labelObj.transform.SetParent(root.transform, worldPositionStays: false);
         labelObj.transform.localPosition = new Vector3(0, nameYOffset, 0);
 
         TextMeshPro tmp = labelObj.AddComponent<TextMeshPro>();
         tmp.text = fd.friendName;
-        tmp.fontSize = 2;
+        tmp.fontSize = nameFontSize;
         tmp.alignment = TextAlignmentOptions.Center;
-        tmp.color = new Color(0.36f, 0.79f, 0.36f, 0f);
+        Color startColor = nameColor;
+        startColor.a = 0f;
+        tmp.color = startColor;
         tmp.sortingOrder = friendSortingOrder + 1;
 
         RectTransform rt = labelObj.GetComponent<RectTransform>();
-        if (rt != null) rt.sizeDelta = new Vector2(4f, 1f);
+        if (rt != null) rt.sizeDelta = nameLabelSize;
 
         FriendCatObject fco = new FriendCatObject
         {
             root = root,
             catRenderer = sr,
             nameLabel = tmp,
+            nameLabelTransform = labelObj.transform,
             targetX = 0,
             targetAlpha = friendCatMaxAlpha,
             slotIndex = slotIndex,
