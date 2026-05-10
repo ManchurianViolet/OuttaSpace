@@ -9,7 +9,6 @@ public class WindowStateManager : MonoBehaviour
 
     public enum WindowState { Traveling, Transitioning, Docked, TravelingExpanded }
 
-    // 사이즈 기본값 (Inspector 값은 fallback. 실제 사용 값은 PlayerPrefs에서)
     [Header("Window Sizes (Defaults)")]
     public int widgetWidth = 384;
     public int widgetHeight = 256;
@@ -17,7 +16,6 @@ public class WindowStateManager : MonoBehaviour
     public int stationHeight = 512;
     public bool alwaysOnTop = true;
 
-    // 런타임에 사용되는 실제 사이즈
     public int CurrentWidgetW { get; private set; }
     public int CurrentWidgetH { get; private set; }
     public int CurrentStationW { get; private set; }
@@ -52,7 +50,6 @@ public class WindowStateManager : MonoBehaviour
     private SpriteRenderer shipRenderer;
     private CanvasGroup dockedCanvasGroup;
 
-    // PlayerPrefs 키
     const string PREF_WIDGET_W = "WindowWidgetW";
     const string PREF_WIDGET_H = "WindowWidgetH";
     const string PREF_STATION_W = "WindowStationW";
@@ -131,9 +128,6 @@ public class WindowStateManager : MonoBehaviour
         CurrentStationH = PlayerPrefs.GetInt(PREF_STATION_H, stationHeight);
     }
 
-    /// <summary>
-    /// SettingsManager에서 호출. 사이즈 변경 + 즉시 PlayerPrefs 저장 + 현재 모드에 맞게 창 갱신.
-    /// </summary>
     public void SetWidgetSize(int w, int h)
     {
         CurrentWidgetW = w;
@@ -142,14 +136,10 @@ public class WindowStateManager : MonoBehaviour
         PlayerPrefs.SetInt(PREF_WIDGET_H, h);
         PlayerPrefs.Save();
 
-        // 현재가 항해 모드면 즉시 적용
         if (currentState == WindowState.Traveling)
             ResizeWindow(CurrentWidgetW, CurrentWidgetH, anchorBottomRight: true);
     }
 
-    /// <summary>
-    /// SettingsManager에서 호출. 기능모드(정박/도감/친구창/설정 확장 시) 사이즈 변경.
-    /// </summary>
     public void SetStationSize(int w, int h)
     {
         CurrentStationW = w;
@@ -158,7 +148,6 @@ public class WindowStateManager : MonoBehaviour
         PlayerPrefs.SetInt(PREF_STATION_H, h);
         PlayerPrefs.Save();
 
-        // 현재가 정박/확장 모드면 즉시 적용
         if (currentState == WindowState.Docked || currentState == WindowState.TravelingExpanded)
             ResizeWindow(CurrentStationW, CurrentStationH, anchorBottomRight: true);
     }
@@ -209,6 +198,11 @@ public class WindowStateManager : MonoBehaviour
     {
         if (Input.GetMouseButtonDown(0))
         {
+            // UI 위에서 클릭 시작한 경우는 드래그 무시 (드롭다운, 버튼, 패널 등)
+            if (UnityEngine.EventSystems.EventSystem.current != null &&
+                UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject())
+                return;
+
             isDragging = true;
             GetCursorPos(out dragStartCursor);
             GetWindowRect(hWnd, out dragStartWindow);
@@ -253,9 +247,6 @@ public class WindowStateManager : MonoBehaviour
 
     // ============ 도감/친구창/설정 확장 ============
 
-    /// <summary>
-    /// 항해 중 도감/친구창/설정세부 열기: 창 확장 + 고양이 페이드아웃 + 별 배경 유지
-    /// </summary>
     public void ExpandForCollection()
     {
         if (currentState != WindowState.Traveling) return;
