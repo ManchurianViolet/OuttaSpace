@@ -458,6 +458,7 @@ public class WindowStateManager : MonoBehaviour
         }
         IntPtr insertAfter = alwaysOnTop ? HWND_TOPMOST : HWND_NOTOPMOST;
         SetWindowPos(hWnd, insertAfter, x, y, w, h, SWP_SHOWWINDOW);
+            Screen.SetResolution(w, h, FullScreenMode.Windowed);  // ← 이 한 줄 추가
 #else
         Screen.SetResolution(w, h, false);
 #endif
