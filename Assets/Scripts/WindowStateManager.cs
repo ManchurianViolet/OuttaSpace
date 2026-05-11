@@ -9,17 +9,20 @@ public class WindowStateManager : MonoBehaviour
 
     public enum WindowState { Traveling, Transitioning, Docked, TravelingExpanded }
 
-    [Header("Window Sizes (Defaults)")]
+    [Header("Base Sizes (1920x1080 기준)")]
     public int widgetWidth = 384;
     public int widgetHeight = 256;
     public int stationWidth = 768;
     public int stationHeight = 512;
     public bool alwaysOnTop = true;
 
+    // 모니터 크기에 따라 자동 계산된 실제 사용 크기 (외부에서 읽기만)
     public int CurrentWidgetW { get; private set; }
     public int CurrentWidgetH { get; private set; }
     public int CurrentStationW { get; private set; }
     public int CurrentStationH { get; private set; }
+
+    const int BASE_SCREEN_W = 1920;
 
     [Header("Scene References")]
     public GameObject travelingUI;
@@ -49,11 +52,6 @@ public class WindowStateManager : MonoBehaviour
     private ParticleSystem shipFlame;
     private SpriteRenderer shipRenderer;
     private CanvasGroup dockedCanvasGroup;
-
-    const string PREF_WIDGET_W = "WindowWidgetW";
-    const string PREF_WIDGET_H = "WindowWidgetH";
-    const string PREF_STATION_W = "WindowStationW";
-    const string PREF_STATION_H = "WindowStationH";
 
 #if UNITY_STANDALONE_WIN && !UNITY_EDITOR
     [DllImport("user32.dll")] static extern IntPtr GetActiveWindow();
@@ -96,7 +94,7 @@ public class WindowStateManager : MonoBehaviour
         if (Instance != null) { Destroy(gameObject); return; }
         Instance = this;
 
-        LoadSizesFromPrefs();
+        CalculateSizes();
 
         if (shipObject != null)
         {
@@ -120,51 +118,50 @@ public class WindowStateManager : MonoBehaviour
         Application.runInBackground = true;
     }
 
-    void LoadSizesFromPrefs()
+    /// <summary>
+    /// 모니터 해상도에 따라 사용 크기를 자동 계산.
+    /// 1920 모니터 기준 widget=384x256, station=768x512.
+    /// 4K(3840) → 2배, 1440p → 1.33배 식으로 비례 조정.
+    /// </summary>
+    void CalculateSizes()
     {
-        CurrentWidgetW = PlayerPrefs.GetInt(PREF_WIDGET_W, widgetWidth);
-        CurrentWidgetH = PlayerPrefs.GetInt(PREF_WIDGET_H, widgetHeight);
-        CurrentStationW = PlayerPrefs.GetInt(PREF_STATION_W, stationWidth);
-        CurrentStationH = PlayerPrefs.GetInt(PREF_STATION_H, stationHeight);
-    }
+        int monitorW;
+#if UNITY_STANDALONE_WIN && !UNITY_EDITOR
+        monitorW = GetSystemMetrics(0);
+#else
+        monitorW = Display.main != null && Display.main.systemWidth > 0
+            ? Display.main.systemWidth
+            : Screen.currentResolution.width;
+#endif
+        if (monitorW <= 0) monitorW = BASE_SCREEN_W;
 
-    public void SetWidgetSize(int w, int h)
-    {
-        CurrentWidgetW = w;
-        CurrentWidgetH = h;
-        PlayerPrefs.SetInt(PREF_WIDGET_W, w);
-        PlayerPrefs.SetInt(PREF_WIDGET_H, h);
-        PlayerPrefs.Save();
+        float scale = (float)monitorW / BASE_SCREEN_W;
+        if (scale < 0.5f) scale = 0.5f; // 너무 작은 모니터 방지
 
-        if (currentState == WindowState.Traveling)
-            ResizeWindow(CurrentWidgetW, CurrentWidgetH, anchorBottomRight: true);
-    }
-
-    public void SetStationSize(int w, int h)
-    {
-        CurrentStationW = w;
-        CurrentStationH = h;
-        PlayerPrefs.SetInt(PREF_STATION_W, w);
-        PlayerPrefs.SetInt(PREF_STATION_H, h);
-        PlayerPrefs.Save();
-
-        if (currentState == WindowState.Docked || currentState == WindowState.TravelingExpanded)
-            ResizeWindow(CurrentStationW, CurrentStationH, anchorBottomRight: true);
+        CurrentWidgetW = Mathf.RoundToInt(widgetWidth * scale);
+        CurrentWidgetH = Mathf.RoundToInt(widgetHeight * scale);
+        CurrentStationW = Mathf.RoundToInt(stationWidth * scale);
+        CurrentStationH = Mathf.RoundToInt(stationHeight * scale);
     }
 
 #if UNITY_STANDALONE_WIN && !UNITY_EDITOR
     void InitializeWindow()
     {
-        SetWindowLong(hWnd, GWL_STYLE, WS_POPUP | WS_VISIBLE | WS_MINIMIZEBOX | WS_SYSMENU);
-        uint exStyle = WS_EX_LAYERED | WS_EX_APPWINDOW;
-        if (alwaysOnTop) exStyle |= WS_EX_TOPMOST;
-        SetWindowLong(hWnd, GWL_EXSTYLE, exStyle);
+        ApplyPopupStyle();
 
         MARGINS margins = new MARGINS { left = -1, right = -1, top = -1, bottom = -1 };
         DwmExtendFrameIntoClientArea(hWnd, ref margins);
 
         Camera.main.clearFlags = CameraClearFlags.SolidColor;
         Camera.main.backgroundColor = new Color(0, 0, 0, 0);
+    }
+
+    void ApplyPopupStyle()
+    {
+        SetWindowLong(hWnd, GWL_STYLE, WS_POPUP | WS_VISIBLE | WS_MINIMIZEBOX | WS_SYSMENU);
+        uint exStyle = WS_EX_LAYERED | WS_EX_APPWINDOW;
+        if (alwaysOnTop) exStyle |= WS_EX_TOPMOST;
+        SetWindowLong(hWnd, GWL_EXSTYLE, exStyle);
     }
 #endif
 
@@ -198,7 +195,6 @@ public class WindowStateManager : MonoBehaviour
     {
         if (Input.GetMouseButtonDown(0))
         {
-            // UI 위에서 클릭 시작한 경우는 드래그 무시 (드롭다운, 버튼, 패널 등)
             if (UnityEngine.EventSystems.EventSystem.current != null &&
                 UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject())
                 return;
@@ -457,8 +453,18 @@ public class WindowStateManager : MonoBehaviour
             y = (screenH - h) / 2;
         }
         IntPtr insertAfter = alwaysOnTop ? HWND_TOPMOST : HWND_NOTOPMOST;
+
+        // 1. Unity 백버퍼를 새 크기로 강제 (블러 방지)
+        Screen.SetResolution(w, h, false);
+
+        // 2. 윈도우 위치/크기 설정
         SetWindowPos(hWnd, insertAfter, x, y, w, h, SWP_SHOWWINDOW);
-            Screen.SetResolution(w, h, FullScreenMode.Windowed);  // ← 이 한 줄 추가
+
+        // 3. popup 스타일 재적용 (Screen.SetResolution이 스타일을 리셋시킬 수 있음)
+        ApplyPopupStyle();
+
+        // 4. 카메라 aspect 리셋
+        if (Camera.main != null) Camera.main.ResetAspect();
 #else
         Screen.SetResolution(w, h, false);
 #endif
