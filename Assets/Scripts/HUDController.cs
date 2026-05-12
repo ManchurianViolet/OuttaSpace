@@ -61,7 +61,7 @@ public class HUDController : MonoBehaviour
         if (gm == null) return;
 
         if (creditsText != null)
-            creditsText.text = GameManager.FormatNumber(gm.credits) + " CR";
+            creditsText.text = GameManager.FormatCredits(gm.credits) + " CR";
 
         if (speedText != null)
         {

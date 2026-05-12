@@ -45,7 +45,7 @@ public class UpgradeButton : MonoBehaviour
         if (descText != null) descText.text = Loc.Get(data.descKey);
         if (costText != null)
         {
-            costText.text = $"{GameManager.FormatNumber(cost)} CR";
+            costText.text = $"{GameManager.FormatCredits(cost)} CR";
             costText.color = canAfford ? affordableTextColor : unaffordableTextColor;
         }
 

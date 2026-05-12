@@ -273,7 +273,11 @@ public class GameManager : MonoBehaviour
         if (n >= 1e3) return (n / 1e3).ToString("F1") + "K";
         return Math.Floor(n).ToString();
     }
-
+    public static string FormatCredits(double n)
+    {
+        if (n < 0) n = 0;
+        return Math.Floor(n).ToString("N0");
+    }
     public static string FormatSpeed(double kmPerSec)
     {
         if (kmPerSec < 0) kmPerSec = 0;

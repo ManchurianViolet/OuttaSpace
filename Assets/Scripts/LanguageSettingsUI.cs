@@ -69,7 +69,17 @@ public class LanguageSettingsUI : MonoBehaviour
         foreach (var loc in LocalizationSettings.AvailableLocales.Locales)
         {
             string code = loc.Identifier.Code;
-            string display = loc.LocaleName;
+            string display;
+            try
+            {
+                display = new System.Globalization.CultureInfo(code).NativeName;
+                int paren = display.IndexOf('(');
+                if (paren > 0) display = display.Substring(0, paren).Trim();
+            }
+            catch
+            {
+                display = loc.LocaleName;
+            }
             options.Add(new TMP_Dropdown.OptionData(display));
             localeCodes.Add(code);
             if (code == currentCode) currentIndex = i;

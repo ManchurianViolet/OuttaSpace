@@ -50,7 +50,7 @@ public class DockedUI : MonoBehaviour
     void Update()
     {
         if (creditsText != null && GameManager.Instance != null)
-            creditsText.text = GameManager.FormatNumber(GameManager.Instance.credits) + " CR";
+            creditsText.text = GameManager.FormatCredits(GameManager.Instance.credits) + " CR";
     }
 
     void Refresh()
@@ -67,7 +67,7 @@ public class DockedUI : MonoBehaviour
         }
 
         if (creditsText != null)
-            creditsText.text = GameManager.FormatNumber(gm.credits) + " CR";
+            creditsText.text = GameManager.FormatCredits(GameManager.Instance.credits) + " CR";
 
         int nextIdx = gm.currentStarIndex + 1;
         bool hasNext = nextIdx < StarDatabase.Stars.Length;

@@ -250,7 +250,6 @@ public class WindowStateManager : MonoBehaviour
         currentState = WindowState.TravelingExpanded;
         ResizeWindow(CurrentStationW, CurrentStationH, anchorBottomRight: true);
 
-        StartCoroutine(FadeShip(fadeOut: true));
         OnStateChanged?.Invoke(currentState);
     }
 
@@ -264,7 +263,6 @@ public class WindowStateManager : MonoBehaviour
         if (CatManager.Instance != null)
             CatManager.Instance.ApplyCurrentCat();
 
-        StartCoroutine(FadeShip(fadeOut: false));
         OnStateChanged?.Invoke(currentState);
     }
 
