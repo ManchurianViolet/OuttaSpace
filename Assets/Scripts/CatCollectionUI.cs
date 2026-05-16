@@ -10,7 +10,7 @@ using System.Collections;
 /// - 미보유: 검은 실루엣 (코드로 변환)
 /// - 현재 사용 중: 무지개 테두리
 /// - 클릭 시 고양이 교체 + 팝업 닫기 + 창 축소
-/// 
+///
 /// Panel에 붙이고 Inspector에서 다 연결.
 /// </summary>
 public class CatCollectionUI : MonoBehaviour
@@ -119,10 +119,26 @@ public class CatCollectionUI : MonoBehaviour
         if (pageTitleText != null)
         {
             string title;
-            if (currentPage < 3) title = Loc.Get("rarity_common");
-            else if (currentPage == 3) title = Loc.Get("rarity_rare");
-            else title = Loc.Get("rarity_legendary");
+            Color titleColor;
+
+            if (currentPage < 3)
+            {
+                title = Loc.Get("rarity_common");
+                titleColor = Color.white;
+            }
+            else if (currentPage == 3)
+            {
+                title = Loc.Get("rarity_rare");
+                titleColor = CatDatabase.GetRarityColor(CatRarity.Rare);       // 파랑
+            }
+            else
+            {
+                title = Loc.Get("rarity_legendary");
+                titleColor = CatDatabase.GetRarityColor(CatRarity.Legendary);  // 노랑(주황계)
+            }
+
             pageTitleText.text = $"{title} ({currentPage + 1}/5)";
+            pageTitleText.color = titleColor;
         }
     }
 

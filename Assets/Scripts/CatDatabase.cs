@@ -32,7 +32,6 @@ public class CatDatabase : MonoBehaviour
     public const float PROB_LEGENDARY = 0.05f;
 
     public const int GACHA_COST = 1;        // 테스트용 1
-    public const int GACHA_REFUND = 0;       // 환급도 0 (1원이라)
 
     private CatData[] catDataCache;
 

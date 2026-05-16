@@ -22,10 +22,15 @@ public class CameraZoomController : MonoBehaviour
 
     void Start()
     {
-        cam = GetComponent<Camera>();
-        if (cam == null) cam = Camera.main;
+        EnsureCamera();
         targetZoom = defaultZoom;
         cam.orthographicSize = defaultZoom;
+    }
+
+    void EnsureCamera()
+    {
+        if (cam == null) cam = GetComponent<Camera>();
+        if (cam == null) cam = Camera.main;
     }
 
     void Update()
@@ -61,14 +66,18 @@ public class CameraZoomController : MonoBehaviour
     /// </summary>
     public float GetZoomNormalized()
     {
-        return Mathf.InverseLerp(minZoom, maxZoom, cam.orthographicSize);
+        return Mathf.InverseLerp(minZoom, maxZoom, cam != null ? cam.orthographicSize : defaultZoom);
     }
 
     /// <summary>
-    /// 기본 줌으로 리셋
+    /// 기본 줌으로 즉시 리셋.
+    /// docked 상태에서는 Update가 일찍 return하므로 Lerp가 일어나지 않아
+    /// orthographicSize도 같이 강제로 설정해야 한다.
     /// </summary>
     public void ResetZoom()
     {
+        EnsureCamera();
         targetZoom = defaultZoom;
+        if (cam != null) cam.orthographicSize = defaultZoom;
     }
 }

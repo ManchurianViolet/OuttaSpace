@@ -56,6 +56,10 @@ public class CatManager : MonoBehaviour
         ApplyCurrentCat();
         OnCatChanged?.Invoke(id);
         Save();
+
+        // 등급별 base 속도가 바뀌므로 HUD 즉시 갱신
+        if (GameManager.Instance != null)
+            GameManager.Instance.NotifyStatsChanged();
     }
 
     public void ApplyCurrentCat()

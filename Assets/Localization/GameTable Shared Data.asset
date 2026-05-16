@@ -51,24 +51,8 @@ MonoBehaviour:
     m_Key: upgrade_speed
     m_Metadata:
       m_Items: []
-  - m_Id: 75319316484
-    m_Key: upgrade_speed_desc
-    m_Metadata:
-      m_Items: []
-  - m_Id: 75319316485
-    m_Key: upgrade_bcap
-    m_Metadata:
-      m_Items: []
-  - m_Id: 75319316486
-    m_Key: upgrade_bcap_desc
-    m_Metadata:
-      m_Items: []
   - m_Id: 75319316487
     m_Key: upgrade_bspd
-    m_Metadata:
-      m_Items: []
-  - m_Id: 75319316488
-    m_Key: upgrade_bspd_desc
     m_Metadata:
       m_Items: []
   - m_Id: 75319316489

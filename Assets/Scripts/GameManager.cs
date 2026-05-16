@@ -30,6 +30,14 @@ public class GameManager : MonoBehaviour
     private float tickTimer;
     private float saveTimer;
 
+    // 등급별 기본 속도 (km/s)
+    private const double BASE_SPEED_COMMON = 3000;
+    private const double BASE_SPEED_RARE = 10000;
+    private const double BASE_SPEED_LEGENDARY = 100000;
+
+    // 업그레이드 contribution을 multiplier로 변환할 때 사용하는 정규화 기준
+    private const double SPEED_NORMALIZE = 3000;
+
     void Awake()
     {
         if (Instance != null) { Destroy(gameObject); return; }
@@ -157,12 +165,36 @@ public class GameManager : MonoBehaviour
 
     // ============ SPEED ============
 
+    /// <summary>
+    /// 현재 고양이 등급의 기본 속도 (km/s).
+    /// </summary>
+    public double GetRarityBaseSpeed()
+    {
+        if (CatManager.Instance == null || CatDatabase.Instance == null)
+            return BASE_SPEED_COMMON;
+
+        CatData cat = CatDatabase.Instance.Get(CatManager.Instance.currentCatId);
+        if (cat == null) return BASE_SPEED_COMMON;
+
+        switch (cat.rarity)
+        {
+            case CatRarity.Rare:      return BASE_SPEED_RARE;
+            case CatRarity.Legendary: return BASE_SPEED_LEGENDARY;
+            default:                  return BASE_SPEED_COMMON;
+        }
+    }
+
+    /// <summary>
+    /// 최종 속도 = 등급 base × (1 + 업글 contribution / 3000)
+    /// 등급 차이가 후반에도 곱셈 비율로 유지됨.
+    /// </summary>
     public double GetTotalSpeed()
     {
-        double spd = 3000;
-        spd += GetUpgradeContribution(UpgradeType.Speed);
-        return spd;
+        double baseSpeed = GetRarityBaseSpeed();
+        double multiplier = 1.0 + GetUpgradeContribution(UpgradeType.Speed) / SPEED_NORMALIZE;
+        return baseSpeed * multiplier;
     }
+
     public void NotifyStatsChanged()
     {
         OnStatsChanged?.Invoke();
@@ -273,11 +305,13 @@ public class GameManager : MonoBehaviour
         if (n >= 1e3) return (n / 1e3).ToString("F1") + "K";
         return Math.Floor(n).ToString();
     }
+
     public static string FormatCredits(double n)
     {
         if (n < 0) n = 0;
         return Math.Floor(n).ToString("N0");
     }
+
     public static string FormatSpeed(double kmPerSec)
     {
         if (kmPerSec < 0) kmPerSec = 0;

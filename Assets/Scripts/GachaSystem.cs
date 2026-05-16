@@ -30,6 +30,8 @@ public class GachaSystem : MonoBehaviour
     public Color buttonRollingColor = new Color(0.4f, 0.4f, 0.4f, 1f);
 
     private bool isRolling;
+    private Color originalTextColor = Color.white;
+    private bool textColorCached;
 
     void Awake()
     {
@@ -105,6 +107,15 @@ public class GachaSystem : MonoBehaviour
             drawButton.interactable = false;
             var bg = drawButton.GetComponent<Image>();
             if (bg != null) bg.color = buttonRollingColor;
+        }
+        if (drawButtonText != null)
+        {
+            if (!textColorCached)
+            {
+                originalTextColor = drawButtonText.color;
+                textColorCached = true;
+            }
+            drawButtonText.color = buttonRollingColor;
         }
 
         if (resultNameText != null)
@@ -219,13 +230,8 @@ public class GachaSystem : MonoBehaviour
             }
         }
 
-        // 도감 추가
-        bool isNew = CatManager.Instance.AddFromGacha(finalCatId);
-        if (!isNew && CatDatabase.GACHA_REFUND > 0)
-        {
-            GameManager.Instance.credits += CatDatabase.GACHA_REFUND;
-            GameManager.Instance.NotifyStatsChanged();
-        }
+        // 도감 추가 (중복이어도 환급 없음)
+        CatManager.Instance.AddFromGacha(finalCatId);
 
         CatData fd = CatDatabase.Instance.Get(finalCatId);
         if (resultNameText != null && fd != null)
@@ -239,6 +245,8 @@ public class GachaSystem : MonoBehaviour
             var bg = drawButton.GetComponent<Image>();
             if (bg != null) bg.color = buttonNormalColor;
         }
+        if (drawButtonText != null && textColorCached)
+            drawButtonText.color = originalTextColor;
 
         isRolling = false;
     }

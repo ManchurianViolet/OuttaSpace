@@ -6,8 +6,9 @@ using TMPro;
 /// 근처 친구의 고양이를 화면에 표시.
 /// 룰: 같은 구간 + 현재 별 거리의 절반 이내 (FriendSyncManager.nearbyDistanceRatio).
 /// 최대 5명까지 표시 (초과 시 거리차 가장 작은 5명).
-/// X는 거리차로, Y는 5개 슬롯 중 하나 (충돌 없이 배정).
-/// 한번 받은 슬롯은 화면 떠날 때까지 유지.
+///
+/// 슬롯마다 (X, Y) base 오프셋이 다르게 배정되어 같은 거리에 있어도 부채꼴로 흩어진다.
+/// 거리 차이는 그 위에 더해져서 친구가 앞서가면 우측, 뒤처지면 본인 옆쪽으로.
 /// </summary>
 public class FriendCatDisplay : MonoBehaviour
 {
@@ -22,8 +23,12 @@ public class FriendCatDisplay : MonoBehaviour
     public int friendSortingOrder = 9;
     public float updateInterval = 0.5f;
 
-    [Header("Y Slots (5 slots)")]
+    [Header("Slot Offsets (5 slots, base position relative to player)")]
+    [Tooltip("슬롯마다 Y 오프셋. 같은 거리 친구들이 위/아래로 흩어짐.")]
     public float[] ySlotOffsets = new float[] { 1.2f, 0.6f, 0.0f, -0.6f, -1.2f };
+
+    [Tooltip("슬롯마다 X 오프셋. 본인과 같은 거리여도 X로 분산되어 겹치지 않음. 부채꼴 형태.")]
+    public float[] xSlotOffsets = new float[] { 2.0f, 2.5f, 3.0f, 2.5f, 2.0f };
 
     [Header("Friend Cat Appearance")]
     [Tooltip("본인 ship의 scale에 곱할 비율.")]
@@ -77,7 +82,7 @@ public class FriendCatDisplay : MonoBehaviour
         if (FriendSyncManager.Instance == null) return;
         if (GameManager.Instance == null || GameManager.Instance.isDocked)
         {
-            HideAll();
+            HideAllVisuals();
             return;
         }
 
@@ -102,7 +107,7 @@ public class FriendCatDisplay : MonoBehaviour
         {
             double distDiff = fd.distanceKM - myDistance;
             float normalized = (float)(distDiff / thresholdKM);
-            float targetX = Mathf.Clamp(normalized * maxVisualDistance, -maxVisualDistance, maxVisualDistance);
+            float deltaX = normalized * maxVisualDistance;
 
             float distRatio = Mathf.Clamp01(Mathf.Abs(normalized));
             float alpha = Mathf.Lerp(friendCatMaxAlpha, friendCatMinAlpha, distRatio);
@@ -116,8 +121,31 @@ public class FriendCatDisplay : MonoBehaviour
 
             FriendCatObject fco = activeFriendCats[fd.steamId];
 
+            // 정박 중 SetActive(false)됐던 객체 재활성
+            if (fco.root != null && !fco.root.activeSelf)
+            {
+                fco.root.SetActive(true);
+                if (fco.catRenderer != null)
+                {
+                    Color c = fco.catRenderer.color;
+                    c.a = 0f;
+                    fco.catRenderer.color = c;
+                }
+                if (fco.nameLabel != null)
+                {
+                    Color nc = fco.nameLabel.color;
+                    nc.a = 0f;
+                    fco.nameLabel.color = nc;
+                }
+            }
+
             if (fco.cachedCatId != fd.catType)
                 ApplyCatSkin(fco, fd.catType);
+
+            // 슬롯 baseX + 거리차 deltaX로 X 결정
+            // → 같은 거리(deltaX=0)여도 슬롯마다 X가 달라 친구들이 흩어짐
+            float baseX = GetSlotX(fco.slotIndex);
+            float targetX = Mathf.Clamp(baseX + deltaX, -maxVisualDistance, maxVisualDistance);
 
             fco.targetX = targetX;
             fco.targetAlpha = alpha;
@@ -157,6 +185,7 @@ public class FriendCatDisplay : MonoBehaviour
         {
             FriendCatObject fco = kvp.Value;
             if (fco.root == null) continue;
+            if (!fco.root.activeSelf) continue;
 
             float yOffset = GetSlotY(fco.slotIndex);
             Vector3 targetPos = playerShip.position + new Vector3(fco.targetX, yOffset, 0);
@@ -225,6 +254,13 @@ public class FriendCatDisplay : MonoBehaviour
         return ySlotOffsets[slotIndex];
     }
 
+    float GetSlotX(int slotIndex)
+    {
+        if (xSlotOffsets == null || xSlotOffsets.Length == 0) return 0;
+        if (slotIndex < 0 || slotIndex >= xSlotOffsets.Length) return 0;
+        return xSlotOffsets[slotIndex];
+    }
+
     // ============ 생성 ============
 
     void CreateFriendCat(FriendData fd, int slotIndex)
@@ -236,7 +272,6 @@ public class FriendCatDisplay : MonoBehaviour
         sr.sortingOrder = friendSortingOrder;
         sr.color = new Color(1f, 1f, 1f, 0f);
 
-        // 이름 라벨
         GameObject labelObj = new GameObject("NameLabel");
         labelObj.transform.SetParent(root.transform, worldPositionStays: false);
         labelObj.transform.localPosition = new Vector3(0, nameYOffset, 0);
@@ -293,16 +328,17 @@ public class FriendCatDisplay : MonoBehaviour
         fco.cachedCatId = catId;
     }
 
-    void HideAll()
+    /// <summary>
+    /// 정박 중에는 친구 GameObject를 Destroy하지 않고 비활성화만.
+    /// 항해 복귀 시 재활성 가능.
+    /// </summary>
+    void HideAllVisuals()
     {
         foreach (var kvp in activeFriendCats)
         {
-            if (kvp.Value.root != null)
-                Destroy(kvp.Value.root);
+            if (kvp.Value.root != null && kvp.Value.root.activeSelf)
+                kvp.Value.root.SetActive(false);
         }
-        activeFriendCats.Clear();
-        for (int i = 0; i < slotOwners.Length; i++)
-            slotOwners[i] = 0;
     }
 
     void OnDestroy()
