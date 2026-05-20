@@ -46,7 +46,14 @@ public class CatCollectionUI : MonoBehaviour
             wsm.ExpandForCollection();
         }
 
+        // 현재 사용 중인 고양이가 있는 페이지로 시작
         currentPage = 0;
+        if (CatManager.Instance != null)
+        {
+            int currentCatId = CatManager.Instance.currentCatId;
+            if (currentCatId >= 0 && currentCatId < CatDatabase.TOTAL_COUNT)
+                currentPage = currentCatId / SLOTS_PER_PAGE;
+        }
         RefreshPage();
         UpdateNav();
 

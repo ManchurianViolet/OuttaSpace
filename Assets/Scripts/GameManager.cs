@@ -78,6 +78,39 @@ public class GameManager : MonoBehaviour
             return;
         }
 
+        // 디버그: Shift+U → 모든 고양이 언락
+        if (Input.GetKeyDown(KeyCode.U) && Input.GetKey(KeyCode.LeftShift))
+        {
+            if (CatManager.Instance != null)
+            {
+                for (int i = 0; i < CatDatabase.TOTAL_COUNT; i++)
+                    CatManager.Instance.AddFromGacha(i);
+                Debug.Log($"[Debug] 모든 고양이 {CatDatabase.TOTAL_COUNT}마리 언락");
+            }
+        }
+
+        // 디버그: Shift+J → 다음 행성 30만 km 전으로 점프
+        if (Input.GetKeyDown(KeyCode.J) && Input.GetKey(KeyCode.LeftShift))
+        {
+            if (currentStarIndex < StarDatabase.Stars.Length)
+            {
+                double target = StarDatabase.Stars[currentStarIndex].distanceKM - 300000;
+                if (target < 0) target = 0;
+                distance = target;
+                NotifyStatsChanged();
+                Debug.Log($"[Debug] 다음 행성 30만 km 전으로 점프 (distance={distance})");
+            }
+        }
+
+        // 디버그: Shift+C → 크레딧 +10000
+        if (Input.GetKeyDown(KeyCode.C) && Input.GetKey(KeyCode.LeftShift))
+        {
+            credits += 10000;
+            totalCredits += 10000;
+            NotifyStatsChanged();
+            Debug.Log($"[Debug] +10000 CR (현재 {credits:N0})");
+        }
+
         if (isDocked && Input.GetKeyDown(KeyCode.Space))
         {
             DepartToNextStar();
@@ -174,9 +207,9 @@ public class GameManager : MonoBehaviour
 
         switch (cat.rarity)
         {
-            case CatRarity.Rare:      return BASE_SPEED_RARE;
+            case CatRarity.Rare: return BASE_SPEED_RARE;
             case CatRarity.Legendary: return BASE_SPEED_LEGENDARY;
-            default:                  return BASE_SPEED_COMMON;
+            default: return BASE_SPEED_COMMON;
         }
     }
 
@@ -229,7 +262,11 @@ public class GameManager : MonoBehaviour
     {
         UpgradeData data = UpgradeDatabase.Get(type);
         int level = GetUpgradeLevel(type);
-        return Math.Floor(data.baseCost * Math.Pow(data.costMult, level));
+        double cost = Math.Floor(data.baseCost * Math.Pow(data.costMult, level));
+        // 상한 적용 (0이면 무제한)
+        if (data.maxCost > 0 && cost > data.maxCost)
+            cost = data.maxCost;
+        return cost;
     }
 
     public bool CanAfford(UpgradeType type) => credits >= GetUpgradeCost(type);

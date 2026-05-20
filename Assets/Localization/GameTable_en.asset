@@ -66,10 +66,6 @@ MonoBehaviour:
     m_Localized: Moon
     m_Metadata:
       m_Items: []
-  - m_Id: 75319316492
-    m_Localized: Venus
-    m_Metadata:
-      m_Items: []
   - m_Id: 75319316493
     m_Localized: Mars
     m_Metadata:
@@ -164,10 +160,6 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 75319316516
     m_Localized: A-type Star
-    m_Metadata:
-      m_Items: []
-  - m_Id: 75319316517
-    m_Localized: Binary Star
     m_Metadata:
       m_Items: []
   - m_Id: 75319316518
@@ -448,6 +440,90 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 6976430187782145
     m_Localized: Somewhere on the way to {0}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000009
+    m_Localized: Wolf 359
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000010
+    m_Localized: Luyten 726-8
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000011
+    m_Localized: Ross 128
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000012
+    m_Localized: Procyon
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000013
+    m_Localized: 61 Cygni
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000014
+    m_Localized: Altair
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000015
+    m_Localized: Fomalhaut
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000016
+    m_Localized: Denebola
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000017
+    m_Localized: Capella
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000018
+    m_Localized: Aldebaran
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000019
+    m_Localized: Polaris
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000020
+    m_Localized: Antares
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000021
+    m_Localized: Rigel
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000022
+    m_Localized: Deneb
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000023
+    m_Localized: White Binary
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000024
+    m_Localized: Red Dwarf Binary
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000025
+    m_Localized: F-type Binary
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000026
+    m_Localized: K-type Binary
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000027
+    m_Localized: Yellow Giant
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000028
+    m_Localized: Yellow Supergiant
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000029
+    m_Localized: Blue Supergiant
     m_Metadata:
       m_Items: []
   references:

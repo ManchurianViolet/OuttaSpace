@@ -67,10 +67,6 @@ MonoBehaviour:
     m_Key: star_moon
     m_Metadata:
       m_Items: []
-  - m_Id: 75319316492
-    m_Key: star_venus
-    m_Metadata:
-      m_Items: []
   - m_Id: 75319316493
     m_Key: star_mars
     m_Metadata:
@@ -131,6 +127,62 @@ MonoBehaviour:
     m_Key: star_betelgeuse
     m_Metadata:
       m_Items: []
+  - m_Id: 6976500000000009
+    m_Key: star_wolf359
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000010
+    m_Key: star_luyten
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000011
+    m_Key: star_ross128
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000012
+    m_Key: star_procyon
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000013
+    m_Key: star_cygnus61
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000014
+    m_Key: star_altair
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000015
+    m_Key: star_fomalhaut
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000016
+    m_Key: star_denebola
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000017
+    m_Key: star_capella
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000018
+    m_Key: star_aldebaran
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000019
+    m_Key: star_polaris
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000020
+    m_Key: star_antares
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000021
+    m_Key: star_rigel
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000022
+    m_Key: star_deneb
+    m_Metadata:
+      m_Items: []
   - m_Id: 75319316508
     m_Key: type_moon
     m_Metadata:
@@ -167,16 +219,40 @@ MonoBehaviour:
     m_Key: type_a_type
     m_Metadata:
       m_Items: []
-  - m_Id: 75319316517
-    m_Key: type_binary
-    m_Metadata:
-      m_Items: []
   - m_Id: 75319316518
     m_Key: type_red_giant
     m_Metadata:
       m_Items: []
   - m_Id: 75319316519
     m_Key: type_red_supergiant
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000023
+    m_Key: type_white_binary
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000024
+    m_Key: type_red_binary
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000025
+    m_Key: type_f_binary
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000026
+    m_Key: type_k_binary
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000027
+    m_Key: type_yellow_giant
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000028
+    m_Key: type_yellow_supergiant
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000029
+    m_Key: type_blue_supergiant
     m_Metadata:
       m_Items: []
   - m_Id: 75323510800
