@@ -7,7 +7,7 @@ public class WindowStateManager : MonoBehaviour
 {
     public static WindowStateManager Instance { get; private set; }
 
-    public enum WindowState { Traveling, Transitioning, Docked, TravelingExpanded }
+    public enum WindowState { Traveling, Transitioning, Docked, TravelingExpanded, Intro }
 
     [Header("Base Sizes (1920x1080 기준)")]
     public int widgetWidth = 384;
@@ -39,6 +39,16 @@ public class WindowStateManager : MonoBehaviour
     public float arrivalTransitionTime = 1.5f;
     public float dockedFadeInTime = 0.8f;
     public float shipFadeTime = 0.3f;
+
+    [Header("Intro Settings (첫 실행 시)")]
+    [Tooltip("지구 출발 인트로 - 수직 이륙 단계 시간")]
+    public float introLaunchDuration = 1.5f;
+    [Tooltip("이륙 후 항해 모드 전환 + 지구 점점 작아지는 시간 (10초 권장 - 웅장하게)")]
+    public float introFadeOutDuration = 10.0f;
+    [Tooltip("이륙 시 ship이 위로 올라가는 거리 (월드 단위)")]
+    public float introLaunchHeight = 10f;
+    [Tooltip("디버그: 매 실행마다 인트로 강제 재생 (hasSeenIntro 무시)")]
+    public bool forceIntroEveryRun = false;
 
     [Header("State")]
     public WindowState currentState = WindowState.Traveling;
@@ -120,10 +130,6 @@ public class WindowStateManager : MonoBehaviour
 
 #if UNITY_STANDALONE_WIN && !UNITY_EDITOR
         hWnd = GetActiveWindow();
-
-        // ★ 핵심: SetResolution 호출되기 전에 popup 스타일을 먼저 적용.
-        // 이러면 Unity가 이전 실행 사이즈로 standard 윈도우를 만들었더라도
-        // 즉시 popup으로 전환되어 caption/border가 제거됨 → 외곽=client.
         ApplyPopupStyle();
 #endif
 
@@ -173,12 +179,6 @@ public class WindowStateManager : MonoBehaviour
         StartCoroutine(StartupRoutine());
     }
 
-    /// <summary>
-    /// 초기화 race condition + Unity가 이전 실행 사이즈를 기억하는 문제를 동시에 해결.
-    ///
-    /// Awake에서 이미 popup 스타일을 적용했으므로 윈도우 외곽=client area가 보장됨.
-    /// 이제 Unity backbuffer가 안정화되길 기다린 뒤 카메라 설정 + 상태 전환 진입.
-    /// </summary>
     IEnumerator StartupRoutine()
     {
         yield return null;
@@ -186,14 +186,12 @@ public class WindowStateManager : MonoBehaviour
         yield return new WaitForEndOfFrame();
 
 #if UNITY_STANDALONE_WIN && !UNITY_EDITOR
-        // 카메라 투명 배경 설정
         if (Camera.main != null)
         {
             Camera.main.clearFlags = CameraClearFlags.SolidColor;
             Camera.main.backgroundColor = new Color(0, 0, 0, 0);
         }
 
-        // 한 번 더 popup 스타일 + frame change 확정
         ApplyPopupStyle();
         SetWindowPos(hWnd, alwaysOnTop ? HWND_TOPMOST : HWND_NOTOPMOST,
             0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_FRAMECHANGED | SWP_NOACTIVATE);
@@ -203,7 +201,20 @@ public class WindowStateManager : MonoBehaviour
 #endif
         windowInitialized = true;
 
-        if (GameManager.Instance != null && GameManager.Instance.isDocked)
+        bool shouldPlayIntro = GameManager.Instance != null
+            && (forceIntroEveryRun || !GameManager.Instance.hasSeenIntro);
+
+        if (GameManager.Instance != null)
+        {
+            Debug.Log($"[Intro Check] hasSeenIntro={GameManager.Instance.hasSeenIntro} " +
+                $"force={forceIntroEveryRun} → shouldPlayIntro={shouldPlayIntro}");
+        }
+
+        if (shouldPlayIntro)
+        {
+            yield return StartCoroutine(PlayIntroSequence());
+        }
+        else if (GameManager.Instance != null && GameManager.Instance.isDocked)
         {
             var arrived = GameManager.Instance.arrivedStars;
             if (arrived.Count > 0)
@@ -218,6 +229,168 @@ public class WindowStateManager : MonoBehaviour
         if (GameManager.Instance != null)
             GameManager.Instance.OnStarArrived += OnStarArrived;
     }
+
+    // ============ 인트로 (첫 실행: 지구 출발) ============
+
+    IEnumerator PlayIntroSequence()
+    {
+        currentState = WindowState.Intro;
+
+        // 카메라 줌 비활성 - 인트로 중 휠 굴리면 표면 짤림
+        CameraZoomController zoom = null;
+        if (Camera.main != null)
+            zoom = Camera.main.GetComponent<CameraZoomController>();
+        if (zoom != null)
+        {
+            zoom.ResetZoom();
+            zoom.enabled = false;
+        }
+
+        // 인트로 시작 — 게임 상태 리셋
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.distance = 0;
+            GameManager.Instance.currentStarIndex = 0;
+            GameManager.Instance.isDocked = false;
+            GameManager.Instance.arrivedStars.Clear();
+        }
+
+        StarData earth = CreateEarthStarData();
+        dockedStar = earth;
+
+        if (travelingUI != null) travelingUI.SetActive(false);
+        if (dockedUI != null) dockedUI.SetActive(false);
+
+        if (shipObject != null)
+        {
+            shipObject.SetActive(true);
+            shipObject.transform.localPosition = shipDockedPos;
+            if (shipRenderer != null)
+            {
+                Color c = shipRenderer.color;
+                c.a = 1f;
+                shipRenderer.color = c;
+            }
+            if (shipController != null)
+                shipController.enabled = false;
+        }
+        if (shipFlame != null) shipFlame.Play();
+        if (starfield != null) starfield.enabled = false;
+        if (terrain != null)
+        {
+            terrain.earthScrollSpeed = 4f; // 표면이 왼쪽으로 흐름 (출발 느낌)
+            terrain.GenerateTerrain(earth);
+        }
+        if (destinationVisual != null)
+            destinationVisual.gameObject.SetActive(false);
+        if (BoosterSystem.Instance != null)
+            BoosterSystem.Instance.gameObject.SetActive(false);
+
+        ResizeWindow(CurrentStationW, CurrentStationH, anchorBottomRight: true);
+        Camera.main.backgroundColor = new Color(0.5f, 0.75f, 0.95f); // 지구 하늘색
+
+        yield return new WaitForSeconds(0.8f);
+
+        // === 2단계: 수직 이륙 ===
+        bool boostActivated = false;
+        if (BoosterSystem.Instance != null)
+        {
+            BoosterSystem.Instance.gameObject.SetActive(true);
+            BoosterSystem.Instance.fuel = 1f;
+            BoosterSystem.Instance.isBoosting = true;
+            boostActivated = true;
+        }
+
+        // 이륙 중엔 표면 스크롤 더 빠르게 (가속 느낌)
+        if (terrain != null) terrain.earthScrollSpeed = 12f;
+
+        Vector3 launchStart = shipDockedPos;
+        Vector3 launchEnd = launchStart + new Vector3(0, introLaunchHeight, 0);
+
+        float t = 0f;
+        while (t < introLaunchDuration)
+        {
+            t += Time.deltaTime;
+            float p = t / introLaunchDuration;
+            float eased = p * p;
+            if (shipObject != null)
+                shipObject.transform.localPosition = Vector3.Lerp(launchStart, launchEnd, eased);
+            yield return null;
+        }
+
+        if (boostActivated && BoosterSystem.Instance != null)
+        {
+            BoosterSystem.Instance.isBoosting = false;
+            BoosterSystem.Instance.fuel = 0f;
+        }
+
+        // === 3단계: 항해 모드 전환 ===
+        dockedStar = null;
+
+        currentState = WindowState.Traveling;
+
+        if (travelingUI != null) travelingUI.SetActive(true);
+        if (dockedUI != null) dockedUI.SetActive(false);
+
+        if (terrain != null)
+        {
+            terrain.earthScrollSpeed = 0f;
+            terrain.Hide();
+        }
+
+        if (shipObject != null)
+        {
+            shipObject.transform.localPosition = shipTravelPos;
+            if (shipController != null)
+            {
+                shipController.enabled = true;
+                shipController.ResetBasePosition(shipTravelPos);
+            }
+        }
+
+        if (starfield != null) starfield.enabled = true;
+        if (BoosterSystem.Instance != null)
+            BoosterSystem.Instance.gameObject.SetActive(true);
+
+        ResizeWindow(CurrentWidgetW, CurrentWidgetH, anchorBottomRight: true);
+        Camera.main.backgroundColor = HexColor("#06060F");
+
+        ResetCameraZoom();
+
+        if (destinationVisual != null)
+        {
+            destinationVisual.gameObject.SetActive(true);
+            destinationVisual.ShowAsDeparture(earth, introFadeOutDuration);
+        }
+
+        OnStateChanged?.Invoke(currentState);
+
+        // 우주 전환 직후 줌 복원 — 지구가 원형으로 보이는 시점부터 확대/축소 가능
+        if (zoom != null)
+            zoom.enabled = true;
+
+        yield return new WaitForSeconds(introFadeOutDuration);
+
+        if (destinationVisual != null)
+            destinationVisual.EndDepartureMode();
+
+        if (GameManager.Instance != null)
+            GameManager.Instance.MarkIntroSeen();
+    }
+
+    StarData CreateEarthStarData()
+    {
+        return new StarData
+        {
+            nameKey = "star_earth", // PixelTerrainGenerator가 이 키로 지구 표면 분기
+            typeKey = "type_terrestrial",
+            distanceKM = 0,
+            color = HexColor("#3D7EFF"),
+            reward = 0,
+        };
+    }
+
+    // ============ 기존 메서드들 ============
 
     void Update()
     {
@@ -468,14 +641,6 @@ public class WindowStateManager : MonoBehaviour
     }
 
 #if UNITY_STANDALONE_WIN && !UNITY_EDITOR
-    /// <summary>
-    /// 1. popup 스타일 먼저 강제 (외곽=client 보장)
-    /// 2. SetResolution
-    /// 3. 2프레임 대기 (Unity backbuffer 안정화)
-    /// 4. 위치/크기/z-order 설정
-    /// 5. popup 스타일 + topmost 재확정
-    /// 6. client area 검증, 어긋났으면 외곽 크기 보정 (방어 코드)
-    /// </summary>
     IEnumerator ResizeWindowRoutine(int w, int h, bool anchorBottomRight)
     {
         int screenW = GetSystemMetrics(0);
@@ -492,29 +657,18 @@ public class WindowStateManager : MonoBehaviour
             y = (screenH - h) / 2;
         }
 
-        // Step 1: SetResolution 직전에 popup 스타일 적용 → 외곽=client 보장
         ApplyPopupStyle();
-
-        // Step 2: backbuffer 변경
         Screen.SetResolution(w, h, false);
 
-        // Step 3: Unity backbuffer 안정화 대기
         yield return null;
         yield return null;
 
         IntPtr insertAfter = alwaysOnTop ? HWND_TOPMOST : HWND_NOTOPMOST;
-
-        // Step 4: 위치/크기/z-order
         SetWindowPos(hWnd, insertAfter, x, y, w, h, SWP_SHOWWINDOW);
-
-        // Step 5: popup 스타일 + frame change 재확정 (Unity가 리셋했을 가능성)
         ApplyPopupStyle();
         SetWindowPos(hWnd, insertAfter, 0, 0, 0, 0,
             SWP_NOMOVE | SWP_NOSIZE | SWP_FRAMECHANGED | SWP_NOACTIVATE);
 
-        // Step 6: client area 검증. 어긋났으면 한 번 더 강제로 외곽 사이즈 재설정.
-        // popup이 제대로 적용됐다면 client == 외곽이지만, Unity가 캐싱한 standard
-        // 스타일이 남아있다면 client < 외곽이 되어 비율이 깨짐.
         yield return null;
         RECT clientRect;
         if (GetClientRect(hWnd, out clientRect))
@@ -523,7 +677,6 @@ public class WindowStateManager : MonoBehaviour
             int clientH = clientRect.bottom - clientRect.top;
             if (clientW != w || clientH != h)
             {
-                // popup 스타일 다시 강제 + 외곽 크기 재설정으로 복구
                 ApplyPopupStyle();
                 SetWindowPos(hWnd, insertAfter, x, y, w, h,
                     SWP_FRAMECHANGED | SWP_SHOWWINDOW);

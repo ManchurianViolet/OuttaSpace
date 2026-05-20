@@ -16,6 +16,10 @@ public class GameManager : MonoBehaviour
     public List<int> arrivedStars = new List<int>();
     public bool isDocked;
 
+    [Header("First Time")]
+    [Tooltip("첫 실행 시 지구 출발 인트로를 봤는지. 한 번만 실행됨.")]
+    public bool hasSeenIntro;
+
     [Header("Upgrade Levels")]
     public int speedLevel;
     public int boosterSpdLevel;
@@ -30,12 +34,9 @@ public class GameManager : MonoBehaviour
     private float tickTimer;
     private float saveTimer;
 
-    // 등급별 기본 속도 (km/s)
     private const double BASE_SPEED_COMMON = 3000;
     private const double BASE_SPEED_RARE = 10000;
     private const double BASE_SPEED_LEGENDARY = 100000;
-
-    // 업그레이드 contribution을 multiplier로 변환할 때 사용하는 정규화 기준
     private const double SPEED_NORMALIZE = 3000;
 
     void Awake()
@@ -107,8 +108,6 @@ public class GameManager : MonoBehaviour
             {
                 LocalizationSettings.SelectedLocale = locale;
                 Debug.Log($"언어 변경: {code}");
-
-                // UI 강제 갱신
                 OnStatsChanged?.Invoke();
                 return;
             }
@@ -165,9 +164,6 @@ public class GameManager : MonoBehaviour
 
     // ============ SPEED ============
 
-    /// <summary>
-    /// 현재 고양이 등급의 기본 속도 (km/s).
-    /// </summary>
     public double GetRarityBaseSpeed()
     {
         if (CatManager.Instance == null || CatDatabase.Instance == null)
@@ -184,10 +180,6 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// 최종 속도 = 등급 base × (1 + 업글 contribution / 3000)
-    /// 등급 차이가 후반에도 곱셈 비율로 유지됨.
-    /// </summary>
     public double GetTotalSpeed()
     {
         double baseSpeed = GetRarityBaseSpeed();
@@ -269,6 +261,7 @@ public class GameManager : MonoBehaviour
         PlayerPrefs.SetInt("SpeedLevel", speedLevel);
         PlayerPrefs.SetInt("BoosterSpdLevel", boosterSpdLevel);
         PlayerPrefs.SetInt("IsDocked", isDocked ? 1 : 0);
+        PlayerPrefs.SetInt("HasSeenIntro", hasSeenIntro ? 1 : 0);
         if (BoosterSystem.Instance != null)
             PlayerPrefs.SetFloat("BoosterFuel", BoosterSystem.Instance.fuel);
         PlayerPrefs.Save();
@@ -284,12 +277,22 @@ public class GameManager : MonoBehaviour
         speedLevel = PlayerPrefs.GetInt("SpeedLevel", 0);
         boosterSpdLevel = PlayerPrefs.GetInt("BoosterSpdLevel", 0);
         isDocked = PlayerPrefs.GetInt("IsDocked", 0) == 1;
+        hasSeenIntro = PlayerPrefs.GetInt("HasSeenIntro", 0) == 1;
 
         string arrivedStr = PlayerPrefs.GetString("ArrivedStars", "");
         arrivedStars.Clear();
         if (!string.IsNullOrEmpty(arrivedStr))
             foreach (string s in arrivedStr.Split(','))
                 if (int.TryParse(s, out int idx)) arrivedStars.Add(idx);
+    }
+
+    /// <summary>
+    /// 첫 인트로 완료 후 저장.
+    /// </summary>
+    public void MarkIntroSeen()
+    {
+        hasSeenIntro = true;
+        SaveGame();
     }
 
     void OnApplicationQuit() => SaveGame();
