@@ -407,6 +407,10 @@ MonoBehaviour:
     m_Key: friend_resting_on
     m_Metadata:
       m_Items: []
+  - m_Id: 6976430187782145
+    m_Key: friend_drifting_to
+    m_Metadata:
+      m_Items: []
   - m_Id: 6976431865503744
     m_Key: far_from_earth
     m_Metadata:

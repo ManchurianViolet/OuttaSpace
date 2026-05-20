@@ -221,7 +221,9 @@ public class FriendSyncManager : MonoBehaviour
 
     /// <summary>
     /// 화면에 표시할 만큼 가까운 친구 목록.
-    /// 룰: 같은 구간 + 거리차가 (현재 구간 거리 × nearbyDistanceRatio) 이내.
+    /// 룰: 같은 구간 + 거리차가 (현재 구간 거리 × nearbyDistanceRatio) 이내 + 항해 중(정박 X).
+    /// 정박한 친구는 행성에 머물러 있으므로 본인 옆에서 함께 나는 모습으로 표시하지 않음.
+    /// (친구창에는 GetLiveFriend로 별도 표시됨)
     /// </summary>
     public List<FriendData> GetNearbyFriends()
     {
@@ -235,6 +237,7 @@ public class FriendSyncManager : MonoBehaviour
         {
             FriendData fd = kvp.Value;
             if (fd.currentStarIndex != gm.currentStarIndex) continue;
+            if (fd.isDocked) continue; // 정박한 친구는 화면 표시 제외
 
             double diff = Math.Abs(fd.distanceKM - gm.distance);
             if (diff <= thresholdKM) nearby.Add(fd);

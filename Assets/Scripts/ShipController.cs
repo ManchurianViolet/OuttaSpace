@@ -18,6 +18,9 @@ public class ShipController : MonoBehaviour
     private Vector3 basePosition;
     private SpriteRenderer sr;
 
+    // 현재 적용된 평상시 불꽃 색 캐시 (고양이 변경 감지용)
+    private int cachedFlameCatId = -1;
+
     void Start()
     {
         basePosition = transform.localPosition;
@@ -54,7 +57,7 @@ public class ShipController : MonoBehaviour
                 main.startSpeed = 4f;
                 main.startSize = 0.17f;
 
-                // 하늘색~파란 그라데이션
+                // 부스트는 항상 파랑 고정 (모든 고양이 공통)
                 main.startColor = new ParticleSystem.MinMaxGradient(
                     new Color(0.15f, 0.55f, 1f, 0.95f),
                     new Color(0.45f, 0.9f, 1f, 0.95f)
@@ -78,6 +81,9 @@ public class ShipController : MonoBehaviour
 
                 colorOverLife.enabled = true;
                 colorOverLife.color = new ParticleSystem.MinMaxGradient(boostGrad);
+
+                // 부스트 끝나면 다시 고양이 색으로 돌아가도록 캐시 무효화
+                cachedFlameCatId = -1;
             }
             else
             {
@@ -85,29 +91,20 @@ public class ShipController : MonoBehaviour
                 main.startSpeed = Mathf.Lerp(0.5f, 3f, normalized);
                 main.startSize = 0.16f;
 
-                main.startColor = new ParticleSystem.MinMaxGradient(
-                    new Color(1f, 0.5f, 0.1f, 0.8f),
-                    new Color(1f, 0.7f, 0.2f, 0.8f)
-                );
+                // 평상시: 현재 고양이의 flameColor 적용
+                int currentCatId = (CatManager.Instance != null)
+                    ? CatManager.Instance.currentCatId : 0;
 
-                Gradient normalGrad = new Gradient();
-                normalGrad.SetKeys(
-                    new GradientColorKey[]
-                    {
-                        new GradientColorKey(new Color(1f, 0.7f, 0.2f), 0f),
-                        new GradientColorKey(new Color(1f, 0.3f, 0.1f), 0.5f),
-                        new GradientColorKey(new Color(0.8f, 0.1f, 0f), 1f)
-                    },
-                    new GradientAlphaKey[]
-                    {
-                        new GradientAlphaKey(0.8f, 0f),
-                        new GradientAlphaKey(0.5f, 0.5f),
-                        new GradientAlphaKey(0f, 1f)
-                    }
-                );
-
-                colorOverLife.enabled = true;
-                colorOverLife.color = new ParticleSystem.MinMaxGradient(normalGrad);
+                // 고양이가 바뀌었거나 부스트에서 막 빠져나왔을 때만 그라데이션 재계산
+                if (cachedFlameCatId != currentCatId)
+                {
+                    Color flameColor = CatDatabase.GetFlameColor(currentCatId);
+                    main.startColor = CatDatabase.BuildFlameStartColor(flameColor, 0.8f);
+                    colorOverLife.enabled = true;
+                    colorOverLife.color = new ParticleSystem.MinMaxGradient(
+                        CatDatabase.BuildFlameGradient(flameColor));
+                    cachedFlameCatId = currentCatId;
+                }
             }
         }
     }
@@ -136,6 +133,7 @@ public class ShipController : MonoBehaviour
 
         var colorOverLife = engineFlame.colorOverLifetime;
         colorOverLife.enabled = true;
+        // 초기 그라데이션 (Update에서 고양이 색으로 곧 덮어씀)
         Gradient grad = new Gradient();
         grad.SetKeys(
             new GradientColorKey[] {

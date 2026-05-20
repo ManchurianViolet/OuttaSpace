@@ -5,10 +5,13 @@ using System.Collections;
 
 /// <summary>
 /// 고양이 도감 UI.
-/// - 3x3 그리드, 5페이지 (일반 3장, 희귀 1장, 전설 1장)
+/// - 3x3 그리드, 5페이지 (일반 3장=27마리, 희귀 1장=9마리, 전설 1장=3마리)
+/// - 페이지 타이틀의 (n/m): n=현재 등급의 보유 수, m=현재 등급의 전체 수
+///   예: 일반 (12/27), 희귀 (3/9), 전설 (2/3)
+/// - 하단 페이지 번호: 단순히 1~5
 /// - 보유: 컬러 + 클릭 가능
 /// - 미보유: 검은 실루엣 (코드로 변환)
-/// - 현재 사용 중: 무지개 테두리
+/// - 현재 사용 중: 슬롯 배경 검정 + 별 흐름 + bobbing
 /// - 클릭 시 고양이 교체 + 팝업 닫기 + 창 축소
 ///
 /// Panel에 붙이고 Inspector에서 다 연결.
@@ -17,6 +20,8 @@ public class CatCollectionUI : MonoBehaviour
 {
     [Header("Page")]
     public TextMeshProUGUI pageTitleText;
+    [Tooltip("하단의 작은 페이지 번호 (1~5).")]
+    public TextMeshProUGUI pageNumberText;
     public Button prevButton;
     public Button nextButton;
 
@@ -28,14 +33,13 @@ public class CatCollectionUI : MonoBehaviour
 
     private int currentPage = 0;     // 0~4
     private const int SLOTS_PER_PAGE = 9;
+    private const int TOTAL_PAGES = 5;
 
-    // 실루엣 스프라이트 캐시 (원본 스프라이트 → 실루엣)
     private System.Collections.Generic.Dictionary<Sprite, Sprite> silhouetteCache
         = new System.Collections.Generic.Dictionary<Sprite, Sprite>();
 
     void OnEnable()
     {
-        // 항해 중이면 창 확장
         WindowStateManager wsm = WindowStateManager.Instance;
         if (wsm != null && wsm.currentState == WindowStateManager.WindowState.Traveling)
         {
@@ -79,12 +83,11 @@ public class CatCollectionUI : MonoBehaviour
 
     void Update()
     {
-        // 현재 사용 중 고양이 슬롯에 표시 (배경 검정 + bobbing은 슬롯 자체가 처리)
         int cm = (CatManager.Instance != null) ? CatManager.Instance.currentCatId : -1;
         for (int i = 0; i < slots.Length; i++)
         {
             int catId = currentPage * SLOTS_PER_PAGE + i;
-            if (slots[i] != null)
+            if (slots[i] != null && slots[i].gameObject.activeSelf)
                 slots[i].SetCurrent(catId == cm);
         }
     }
@@ -96,7 +99,7 @@ public class CatCollectionUI : MonoBehaviour
 
     void OnNext()
     {
-        if (currentPage < 4) { currentPage++; RefreshPage(); UpdateNav(); }
+        if (currentPage < TOTAL_PAGES - 1) { currentPage++; RefreshPage(); UpdateNav(); }
     }
 
     void OnClose()
@@ -107,39 +110,65 @@ public class CatCollectionUI : MonoBehaviour
         gameObject.SetActive(false);
     }
 
-    void OnCatsChanged() => RefreshPage();
+    void OnCatsChanged() { RefreshPage(); UpdateNav(); }
     void OnLanguageChanged() => UpdateNav();
     void OnCurrentChanged(int id) => RefreshPage();
 
     void UpdateNav()
     {
         if (prevButton != null) prevButton.interactable = currentPage > 0;
-        if (nextButton != null) nextButton.interactable = currentPage < 4;
+        if (nextButton != null) nextButton.interactable = currentPage < TOTAL_PAGES - 1;
 
         if (pageTitleText != null)
         {
             string title;
             Color titleColor;
+            CatRarity rarity;
 
             if (currentPage < 3)
             {
                 title = Loc.Get("rarity_common");
                 titleColor = Color.white;
+                rarity = CatRarity.Common;
             }
             else if (currentPage == 3)
             {
                 title = Loc.Get("rarity_rare");
-                titleColor = CatDatabase.GetRarityColor(CatRarity.Rare);       // 파랑
+                titleColor = CatDatabase.GetRarityColor(CatRarity.Rare);
+                rarity = CatRarity.Rare;
             }
             else
             {
                 title = Loc.Get("rarity_legendary");
-                titleColor = CatDatabase.GetRarityColor(CatRarity.Legendary);  // 노랑(주황계)
+                titleColor = CatDatabase.GetRarityColor(CatRarity.Legendary);
+                rarity = CatRarity.Legendary;
             }
 
-            pageTitleText.text = $"{title} ({currentPage + 1}/5)";
+            int total = CatDatabase.GetRarityCount(rarity);
+            int owned = CountOwnedByRarity(rarity);
+
+            pageTitleText.text = $"{title} ({owned}/{total})";
             pageTitleText.color = titleColor;
         }
+
+        // 하단 페이지 번호 (1~5)
+        if (pageNumberText != null)
+            pageNumberText.text = (currentPage + 1).ToString();
+    }
+
+    int CountOwnedByRarity(CatRarity rarity)
+    {
+        if (CatManager.Instance == null) return 0;
+
+        int start = CatDatabase.GetRarityStartIndex(rarity);
+        int count = CatDatabase.GetRarityCount(rarity);
+        int owned = 0;
+        for (int i = 0; i < count; i++)
+        {
+            if (CatManager.Instance.IsOwned(start + i))
+                owned++;
+        }
+        return owned;
     }
 
     void RefreshPage()
@@ -155,30 +184,26 @@ public class CatCollectionUI : MonoBehaviour
 
             if (catId >= CatDatabase.TOTAL_COUNT)
             {
-                slots[i].Clear();
+                slots[i].gameObject.SetActive(false);
                 continue;
             }
+
+            if (!slots[i].gameObject.activeSelf)
+                slots[i].gameObject.SetActive(true);
 
             CatData data = db.Get(catId);
             bool owned = cm.IsOwned(catId);
             Sprite displaySprite;
 
             if (owned)
-            {
                 displaySprite = data.sprite;
-            }
             else
-            {
                 displaySprite = GetSilhouette(data.sprite);
-            }
 
             slots[i].Setup(catId, displaySprite, owned);
         }
     }
 
-    /// <summary>
-    /// 컬러 스프라이트 → 검은 실루엣 스프라이트 (캐시)
-    /// </summary>
     Sprite GetSilhouette(Sprite original)
     {
         if (original == null) return null;

@@ -1,11 +1,13 @@
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 
 /// <summary>
 /// 도감 그리드의 한 칸.
 /// 현재 사용 중인 고양이는: 슬롯 배경이 검게 + 별이 흐름 + 고양이 살짝 bobbing.
+/// 마우스 호버 시 CatTooltip이 슬롯 위에 떠서 이름/설명 표시.
 /// </summary>
-public class CatSlot : MonoBehaviour
+public class CatSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
     [Header("References")]
     public Image slotBackground;   // 슬롯 회색 배경 (현재 슬롯일 때 색 전환)
@@ -120,5 +122,36 @@ public class CatSlot : MonoBehaviour
         CatCollectionUI parent = GetComponentInParent<CatCollectionUI>();
         if (parent != null && parent.closeButton != null)
             parent.closeButton.onClick.Invoke();
+    }
+
+    // ============ 호버 툴팁 ============
+
+    public void OnPointerEnter(PointerEventData eventData)
+    {
+        if (catId < 0) return;
+
+        // 툴팁이 아직 없으면 같은 캔버스에 생성
+        if (CatTooltip.Instance == null)
+        {
+            Canvas canvas = GetComponentInParent<Canvas>();
+            if (canvas != null && canvas.rootCanvas != null)
+                CatTooltip.GetOrCreate(canvas.rootCanvas);
+        }
+
+        if (CatTooltip.Instance != null)
+            CatTooltip.Instance.ShowFor(catId, transform as RectTransform, isOwned);
+    }
+
+    public void OnPointerExit(PointerEventData eventData)
+    {
+        if (CatTooltip.Instance != null)
+            CatTooltip.Instance.Hide();
+    }
+
+    void OnDisable()
+    {
+        // 슬롯이 비활성화될 때 (페이지 전환 등) 툴팁 같이 숨김
+        if (CatTooltip.Instance != null)
+            CatTooltip.Instance.Hide();
     }
 }
