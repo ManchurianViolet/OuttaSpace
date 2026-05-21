@@ -8,29 +8,24 @@ using UnityEngine;
 public class CameraZoomController : MonoBehaviour
 {
     [Header("Zoom Settings")]
-    public float minZoom = 2f;      // 최대 확대 (카메라 size 작을수록 확대)
-    public float maxZoom = 12f;     // 최대 축소
+    public float minZoom = 2f;
+    public float maxZoom = 12f;
     public float defaultZoom = 4f;
     public float zoomSpeed = 1.5f;
-    public float smoothSpeed = 8f;  // 부드러운 전환 속도
+    public float smoothSpeed = 8f;
 
     [Header("Zoom Target")]
-    public Transform zoomTarget; // Inspector에서 Ship 오브젝트 드래그
+    public Transform zoomTarget;
 
     private Camera cam;
     private float targetZoom;
 
     void Start()
     {
-        EnsureCamera();
+        cam = GetComponent<Camera>();
+        if (cam == null) cam = Camera.main;
         targetZoom = defaultZoom;
         cam.orthographicSize = defaultZoom;
-    }
-
-    void EnsureCamera()
-    {
-        if (cam == null) cam = GetComponent<Camera>();
-        if (cam == null) cam = Camera.main;
     }
 
     void Update()
@@ -41,7 +36,6 @@ public class CameraZoomController : MonoBehaviour
         float scroll = Input.GetAxis("Mouse ScrollWheel");
         if (scroll != 0f)
         {
-            float prevSize = cam.orthographicSize;
             targetZoom -= scroll * zoomSpeed * targetZoom * 0.5f;
             targetZoom = Mathf.Clamp(targetZoom, minZoom, maxZoom);
         }
@@ -61,23 +55,28 @@ public class CameraZoomController : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// 현재 줌 레벨 (0=최대확대, 1=최대축소)
-    /// </summary>
     public float GetZoomNormalized()
     {
-        return Mathf.InverseLerp(minZoom, maxZoom, cam != null ? cam.orthographicSize : defaultZoom);
+        return Mathf.InverseLerp(minZoom, maxZoom, cam.orthographicSize);
     }
 
     /// <summary>
-    /// 기본 줌으로 즉시 리셋.
-    /// docked 상태에서는 Update가 일찍 return하므로 Lerp가 일어나지 않아
-    /// orthographicSize도 같이 강제로 설정해야 한다.
+    /// 기본 줌으로 즉시 리셋. targetZoom + 실제 orthographicSize 둘 다 즉시 적용.
+    /// 정박 중에는 Update에서 Lerp가 작동 안 하므로 직접 강제해야 함.
+    /// 카메라 위치도 원점으로 복원 (줌 인 상태에서 ship 따라간 위치 보존되어 있을 수 있음).
     /// </summary>
     public void ResetZoom()
     {
-        EnsureCamera();
         targetZoom = defaultZoom;
-        if (cam != null) cam.orthographicSize = defaultZoom;
+        if (cam == null) cam = GetComponent<Camera>();
+        if (cam == null) cam = Camera.main;
+        if (cam != null)
+        {
+            cam.orthographicSize = defaultZoom;
+            Vector3 pos = cam.transform.position;
+            pos.x = 0;
+            pos.y = 0;
+            cam.transform.position = pos;
+        }
     }
 }

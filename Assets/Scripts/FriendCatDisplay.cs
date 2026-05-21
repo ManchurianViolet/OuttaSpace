@@ -58,6 +58,9 @@ public class FriendCatDisplay : MonoBehaviour
     private ulong[] slotOwners;
     private ShipController playerShipController;
 
+    // 디버그 로그 타이머 (2초마다 한 번)
+    private float diagLogTimer;
+
     class FriendCatObject
     {
         public GameObject root;
@@ -105,6 +108,23 @@ public class FriendCatDisplay : MonoBehaviour
 
         List<FriendData> nearby = FriendSyncManager.Instance.GetNearbyFriends();
         double myDistance = GameManager.Instance.distance;
+
+        // [DEBUG] 친구 진단 — 2초마다 한 번씩만 찍음 (스팸 방지)
+        diagLogTimer += updateInterval;
+        if (diagLogTimer >= 2f)
+        {
+            diagLogTimer = 0f;
+            var allFriends = FriendSyncManager.Instance.GetAllLiveFriends();
+            double thresh = FriendSyncManager.Instance.GetNearbyThresholdKM();
+            string s = $"[Friends] myStar={GameManager.Instance.currentStarIndex} myDist={myDistance:F0} threshold={thresh:F0} totalLive={allFriends.Count} nearby={nearby.Count}";
+            foreach (var fd in allFriends)
+            {
+                double diff = System.Math.Abs(fd.distanceKM - myDistance);
+                s += $"\n  → {fd.friendName}: star={fd.currentStarIndex} dist={fd.distanceKM:F0} diff={diff:F0} docked={fd.isDocked}";
+            }
+            Debug.Log(s);
+        }
+
         nearby.Sort((a, b) =>
         {
             double da = System.Math.Abs(a.distanceKM - myDistance);
@@ -162,8 +182,14 @@ public class FriendCatDisplay : MonoBehaviour
                 fco.cachedCatId = fd.catType;
             }
 
+            // X 위치 계산
+            // - 친구가 본인보다 앞서면 (deltaX > 0): 본인 오른쪽 + 슬롯 baseX
+            // - 친구가 본인보다 뒤처지면 (deltaX < 0): 본인 왼쪽 + 슬롯 baseX (음수로 반전)
+            // 이러면 본인 위치(0)를 중심으로 거리차에 따라 좌/우로 분산되고,
+            // 동시에 슬롯 baseX로 여러 친구가 안 겹침
             float baseX = GetSlotX(fco.slotIndex);
-            float targetX = Mathf.Clamp(baseX + deltaX, -maxVisualDistance, maxVisualDistance);
+            float deltaSign = deltaX >= 0 ? 1f : -1f;
+            float targetX = Mathf.Clamp(baseX * deltaSign + deltaX, -maxVisualDistance, maxVisualDistance);
 
             fco.targetX = targetX;
             fco.targetAlpha = alpha;

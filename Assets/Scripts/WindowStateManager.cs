@@ -329,7 +329,16 @@ public class WindowStateManager : MonoBehaviour
 
         currentState = WindowState.Traveling;
 
-        if (travelingUI != null) travelingUI.SetActive(true);
+        // travelingUI 활성 - 페이드인 위해 일단 alpha 0으로
+        CanvasGroup travelingCG = null;
+        if (travelingUI != null)
+        {
+            travelingUI.SetActive(true);
+            travelingCG = travelingUI.GetComponent<CanvasGroup>();
+            if (travelingCG == null)
+                travelingCG = travelingUI.AddComponent<CanvasGroup>();
+            travelingCG.alpha = 0f;
+        }
         if (dockedUI != null) dockedUI.SetActive(false);
 
         if (terrain != null)
@@ -365,9 +374,23 @@ public class WindowStateManager : MonoBehaviour
 
         OnStateChanged?.Invoke(currentState);
 
-        // 우주 전환 직후 줌 복원 — 지구가 원형으로 보이는 시점부터 확대/축소 가능
+        // 우주 전환 직후 줌 복원
         if (zoom != null)
             zoom.enabled = true;
+
+        // travelingUI 페이드인 (1.5초)
+        if (travelingCG != null)
+        {
+            float fadeT = 0f;
+            float fadeDur = 1.5f;
+            while (fadeT < fadeDur)
+            {
+                fadeT += Time.deltaTime;
+                travelingCG.alpha = Mathf.Clamp01(fadeT / fadeDur);
+                yield return null;
+            }
+            travelingCG.alpha = 1f;
+        }
 
         yield return new WaitForSeconds(introFadeOutDuration);
 
@@ -510,6 +533,9 @@ public class WindowStateManager : MonoBehaviour
     {
         currentState = WindowState.Transitioning;
 
+        // 도착 직전 카메라 줌 + 위치 즉시 리셋 — 줌인 상태에서 도착하면 화면 짤림
+        ResetCameraZoom();
+
         Vector3 targetPos = new Vector3(3f, 0, 0);
         Vector3 startPos = shipObject != null ? shipObject.transform.localPosition : Vector3.zero;
 
@@ -548,6 +574,9 @@ public class WindowStateManager : MonoBehaviour
     public void SetTraveling()
     {
         currentState = WindowState.Traveling;
+
+        // 카메라 줌 + 위치 즉시 리셋 (정박 중 줌이 변경됐을 수 있어도 안전하게)
+        ResetCameraZoom();
 
         if (travelingUI != null) travelingUI.SetActive(true);
         if (dockedUI != null) dockedUI.SetActive(false);
@@ -590,6 +619,9 @@ public class WindowStateManager : MonoBehaviour
     void SetDockedImmediate()
     {
         currentState = WindowState.Docked;
+
+        // 카메라 즉시 리셋 (줌 인 상태에서 정박하면 화면 짤림)
+        ResetCameraZoom();
 
         if (travelingUI != null) travelingUI.SetActive(false);
         if (dockedUI != null) dockedUI.SetActive(true);

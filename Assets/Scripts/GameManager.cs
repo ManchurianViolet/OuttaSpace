@@ -111,6 +111,35 @@ public class GameManager : MonoBehaviour
             Debug.Log($"[Debug] +10000 CR (현재 {credits:N0})");
         }
 
+        // 디버그: Shift+F → 가짜 친구 3명 추가 (멀티 표시 테스트용)
+        if (Input.GetKeyDown(KeyCode.F) && Input.GetKey(KeyCode.LeftShift))
+        {
+            if (FriendSyncManager.Instance != null)
+            {
+                // 거리 차이를 다르게 해서 슬롯 분산 효과 확인
+                string[] names = { "Tester_A", "Tester_B", "Tester_C" };
+                double[] offsets = { 1000, -3000, 8000 };
+                int[] catTypes = { 0, 27, 36 }; // common, rare, legendary
+
+                for (int i = 0; i < names.Length; i++)
+                {
+                    var fakeFriend = new FriendData
+                    {
+                        steamId = (ulong)(99001 + i),
+                        friendName = names[i],
+                        currentStarIndex = currentStarIndex,
+                        distanceKM = distance + offsets[i],
+                        speedKMS = 3000,
+                        catType = catTypes[i],
+                        isDocked = false,
+                        lastUpdateTime = Time.time
+                    };
+                    FriendSyncManager.Instance.friendDataMap[fakeFriend.steamId] = fakeFriend;
+                }
+                Debug.Log($"[Debug] 가짜 친구 3명 추가. starIdx={currentStarIndex} myDist={distance:F0}");
+            }
+        }
+
         if (isDocked && Input.GetKeyDown(KeyCode.Space))
         {
             DepartToNextStar();
