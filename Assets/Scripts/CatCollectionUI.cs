@@ -151,7 +151,7 @@ public class CatCollectionUI : MonoBehaviour
                 rarity = CatRarity.Legendary;
             }
 
-            int total = CatDatabase.GetRarityCount(rarity);
+            int total = GetAvailableCount(rarity);
             int owned = CountOwnedByRarity(rarity);
 
             pageTitleText.text = $"{title} ({owned}/{total})";
@@ -163,6 +163,9 @@ public class CatCollectionUI : MonoBehaviour
             pageNumberText.text = (currentPage + 1).ToString();
     }
 
+    /// <summary>
+    /// 해당 등급의 보유 수 / 전체 수 (잠긴 데모 ID는 제외).
+    /// </summary>
     int CountOwnedByRarity(CatRarity rarity)
     {
         if (CatManager.Instance == null) return 0;
@@ -172,10 +175,24 @@ public class CatCollectionUI : MonoBehaviour
         int owned = 0;
         for (int i = 0; i < count; i++)
         {
-            if (CatManager.Instance.IsOwned(start + i))
-                owned++;
+            int id = start + i;
+            if (CatDatabase.IsDemoLocked(id)) continue;
+            if (CatManager.Instance.IsOwned(id)) owned++;
         }
         return owned;
+    }
+
+    /// <summary>
+    /// 등급별 잠금 제외 전체 수.
+    /// </summary>
+    int GetAvailableCount(CatRarity rarity)
+    {
+        int start = CatDatabase.GetRarityStartIndex(rarity);
+        int count = CatDatabase.GetRarityCount(rarity);
+        int available = 0;
+        for (int i = 0; i < count; i++)
+            if (!CatDatabase.IsDemoLocked(start + i)) available++;
+        return available;
     }
 
     void RefreshPage()
@@ -199,15 +216,22 @@ public class CatCollectionUI : MonoBehaviour
                 slots[i].gameObject.SetActive(true);
 
             CatData data = db.Get(catId);
+            bool locked = CatDatabase.IsDemoLocked(catId);
             bool owned = cm.IsOwned(catId);
             Sprite displaySprite;
 
-            if (owned)
+            if (locked)
+            {
+                // 잠금: 회색 실루엣 (스프라이트 있어도 회색 처리)
+                displaySprite = (data != null && data.sprite != null)
+                    ? GetSilhouette(data.sprite) : null;
+            }
+            else if (owned)
                 displaySprite = data.sprite;
             else
                 displaySprite = GetSilhouette(data.sprite);
 
-            slots[i].Setup(catId, displaySprite, owned);
+            slots[i].Setup(catId, displaySprite, owned, locked);
         }
     }
 

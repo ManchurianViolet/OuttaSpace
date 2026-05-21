@@ -146,14 +146,19 @@ public class CatTooltip : MonoBehaviour
         rightRt.offsetMax = new Vector2(0, 0);
     }
 
-    public void ShowFor(int catId, RectTransform slotRect, bool owned)
+    public void ShowFor(int catId, RectTransform slotRect, bool owned, bool locked = false)
     {
         if (CatDatabase.Instance == null || slotRect == null) return;
 
         CatData cat = CatDatabase.Instance.Get(catId);
         if (cat == null) { Hide(); return; }
 
-        if (owned)
+        if (locked)
+        {
+            nameText.text = Loc.Get("coming_soon");
+            nameText.color = new Color(1f, 0.85f, 0.4f); // 노랑 (눈에 띄게)
+        }
+        else if (owned)
         {
             nameText.text = Loc.Get(cat.nameKey);
             nameText.color = CatDatabase.GetRarityColor(cat.rarity);

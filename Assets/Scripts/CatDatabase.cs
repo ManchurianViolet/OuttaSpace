@@ -32,7 +32,31 @@ public class CatDatabase : MonoBehaviour
     public const float PROB_RARE = 0.15f;
     public const float PROB_LEGENDARY = 0.05f;
 
-    public const int GACHA_COST = 300;        // 테스트용 1
+    public const int GACHA_COST = 300;
+
+    /// <summary>
+    /// 데모 빌드에서 잠금 처리할 고양이 ID 목록.
+    /// 정식 출시 시 이 배열을 비우면 (new int[0]) 자동으로 다 풀림.
+    /// 
+    /// 현재 잠금:
+    ///   일반 25, 26, 27 = catId 24, 25, 26 (Bagel, Muffin, Dumpling)
+    ///   희귀 6, 7, 8, 9 = catId 32, 33, 34, 35 (Orbit, Pixel, Stardust, Eclipse)
+    /// </summary>
+    public static readonly int[] DEMO_LOCKED_IDS = new int[]
+    {
+        24, 25, 26,           // 일반 25, 26, 27
+        32, 33, 34, 35,       // 희귀 6, 7, 8, 9
+    };
+
+    /// <summary>
+    /// 데모 잠금 대상인지 확인. 도감/가챠에서 활용.
+    /// </summary>
+    public static bool IsDemoLocked(int catId)
+    {
+        for (int i = 0; i < DEMO_LOCKED_IDS.Length; i++)
+            if (DEMO_LOCKED_IDS[i] == catId) return true;
+        return false;
+    }
 
     private CatData[] catDataCache;
 
@@ -249,7 +273,21 @@ public class CatDatabase : MonoBehaviour
 
         int start = GetRarityStartIndex(rarity);
         int count = GetRarityCount(rarity);
-        return start + Random.Range(0, count);
+
+        // 잠금 ID 제외하고 재시도 (최대 20회, 그래도 다 잠겼으면 첫 비잠금)
+        for (int i = 0; i < 20; i++)
+        {
+            int candidate = start + Random.Range(0, count);
+            if (!IsDemoLocked(candidate)) return candidate;
+        }
+        // 안전망: 등급 내 첫 비잠금 ID
+        for (int i = 0; i < count; i++)
+        {
+            int candidate = start + i;
+            if (!IsDemoLocked(candidate)) return candidate;
+        }
+        // 그래도 못 찾으면 (있을 수 없지만) starter
+        return STARTER_CAT_ID;
     }
 
     public static Color GetRarityColor(CatRarity rarity)

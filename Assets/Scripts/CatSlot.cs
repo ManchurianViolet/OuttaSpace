@@ -22,6 +22,7 @@ public class CatSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
     private int catId = -1;
     private bool isOwned;
     private bool isCurrent;
+    private bool isLocked; // 데모에서 잠긴 고양이
 
     private Color normalBgColor = Color.gray;
     private Vector2 catBasePos;
@@ -73,20 +74,24 @@ public class CatSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
         catImage.rectTransform.anchoredPosition = p;
     }
 
-    public void Setup(int id, Sprite sprite, bool owned)
+    public void Setup(int id, Sprite sprite, bool owned, bool locked = false)
     {
         catId = id;
         isOwned = owned;
+        isLocked = locked;
 
         if (catImage != null)
         {
             catImage.sprite = sprite;
-            catImage.color = owned ? Color.white : new Color(1, 1, 1, 0.9f);
+            if (locked)
+                catImage.color = new Color(0.4f, 0.4f, 0.4f, 1f); // 회색
+            else
+                catImage.color = owned ? Color.white : new Color(1, 1, 1, 0.9f);
             catImage.enabled = (sprite != null);
         }
 
         if (button != null)
-            button.interactable = owned;
+            button.interactable = owned && !locked;
     }
 
     public void Clear()
@@ -139,7 +144,7 @@ public class CatSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
         }
 
         if (CatTooltip.Instance != null)
-            CatTooltip.Instance.ShowFor(catId, transform as RectTransform, isOwned);
+            CatTooltip.Instance.ShowFor(catId, transform as RectTransform, isOwned, isLocked);
     }
 
     public void OnPointerExit(PointerEventData eventData)

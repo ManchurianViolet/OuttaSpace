@@ -543,6 +543,26 @@ MonoBehaviour:
     m_Key: settings_station_label
     m_Metadata:
       m_Items: []
+  - m_Id: 6976500000000035
+    m_Key: coming_soon
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000036
+    m_Key: demo_end_title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000037
+    m_Key: demo_end_message
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000038
+    m_Key: demo_wishlist
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000039
+    m_Key: dock_demo_end
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:

@@ -16,6 +16,22 @@ public class DockedUI : MonoBehaviour
     public Button departButton;
     public TextMeshProUGUI departButtonText;
 
+    [Header("Demo End")]
+    [Tooltip("데모 종료 시 표시할 위시리스트 버튼. 인스펙터에서 연결.")]
+    public Button wishlistButton;
+    [Tooltip("위시리스트 버튼 안의 TMP 라벨. 로컬라이징을 위해 연결.")]
+    public TextMeshProUGUI wishlistButtonLabel;
+    [Tooltip("Steam 위시리스트 페이지 URL (출시 후 실제 URL로 교체).")]
+    public string wishlistUrl = "https://store.steampowered.com/app/4616690";
+    [Tooltip("데모 종료 시 숨길 업그레이드/가챠 등 버튼들. 인스펙터에서 패널 GameObject 연결.")]
+    public GameObject[] hideOnDemoEnd;
+
+    // 평소 정박 화면의 nextDestText/etaText 원래 위치 캐시
+    // 데모 종료 시 화면 중앙으로 이동했다가 일반 정박 복귀 시 원위치
+    private Vector2 nextDestOriginalPos;
+    private Vector2 etaOriginalPos;
+    private bool textPositionsCached;
+
     void OnEnable()
     {
         starNameText.text = Loc.Get("loading_location");
@@ -24,6 +40,8 @@ public class DockedUI : MonoBehaviour
             WindowStateManager.Instance.OnStateChanged += OnWindowStateChanged;
         if (departButton != null)
             departButton.onClick.AddListener(OnDepartClicked);
+        if (wishlistButton != null)
+            wishlistButton.onClick.AddListener(OnWishlistClicked);
         if (GameManager.Instance != null)
             GameManager.Instance.OnStatsChanged += Refresh;
         Refresh();
@@ -35,6 +53,8 @@ public class DockedUI : MonoBehaviour
             WindowStateManager.Instance.OnStateChanged -= OnWindowStateChanged;
         if (departButton != null)
             departButton.onClick.RemoveListener(OnDepartClicked);
+        if (wishlistButton != null)
+            wishlistButton.onClick.RemoveListener(OnWishlistClicked);
         if (GameManager.Instance != null)
             GameManager.Instance.OnStatsChanged -= Refresh;
     }
@@ -69,11 +89,71 @@ public class DockedUI : MonoBehaviour
         if (creditsText != null)
             creditsText.text = GameManager.FormatNumber(gm.credits) + " CR";
 
+        // 데모 종료 분기 (현재 별이 DEMO_LAST_STAR_INDEX면 = 다음 별이 잠금)
+        bool isDemoEnd = StarDatabase.DEMO_LAST_STAR_INDEX >= 0
+            && gm.currentStarIndex >= StarDatabase.DEMO_LAST_STAR_INDEX;
+
+        // 텍스트 원래 위치 한 번만 캐시
+        if (!textPositionsCached)
+        {
+            if (nextDestText != null)
+                nextDestOriginalPos = nextDestText.rectTransform.anchoredPosition;
+            if (etaText != null)
+                etaOriginalPos = etaText.rectTransform.anchoredPosition;
+            textPositionsCached = true;
+        }
+
         int nextIdx = gm.currentStarIndex + 1;
         bool hasNext = nextIdx < StarDatabase.Stars.Length;
 
-        if (hasNext)
+        if (isDemoEnd)
         {
+            // 데모 끝 — 시리우스 도착 화면
+            if (nextDestText != null)
+            {
+                nextDestText.text = Loc.Get("demo_end_title");
+                nextDestText.rectTransform.anchoredPosition = new Vector2(0, 100);
+                nextDestText.alignment = TextAlignmentOptions.Center;
+            }
+            if (etaText != null)
+            {
+                etaText.text = Loc.Get("demo_end_message");
+                etaText.rectTransform.anchoredPosition = new Vector2(0, 50);
+                etaText.alignment = TextAlignmentOptions.Center;
+            }
+            if (departButton != null)
+                departButton.gameObject.SetActive(false);  // 출발 버튼 자체 숨김
+            if (wishlistButton != null)
+                wishlistButton.gameObject.SetActive(true);
+            if (wishlistButtonLabel != null)
+                wishlistButtonLabel.text = Loc.Get("demo_wishlist");
+
+            // 업그레이드/가챠 등 보조 UI 숨김
+            if (hideOnDemoEnd != null)
+            {
+                foreach (var obj in hideOnDemoEnd)
+                    if (obj != null) obj.SetActive(false);
+            }
+        }
+        else if (hasNext)
+        {
+            // 보조 UI 복원
+            if (hideOnDemoEnd != null)
+            {
+                foreach (var obj in hideOnDemoEnd)
+                    if (obj != null) obj.SetActive(true);
+            }
+            if (departButton != null)
+                departButton.gameObject.SetActive(true);
+            if (wishlistButton != null)
+                wishlistButton.gameObject.SetActive(false);
+
+            // 텍스트 원위치 복귀
+            if (nextDestText != null)
+                nextDestText.rectTransform.anchoredPosition = nextDestOriginalPos;
+            if (etaText != null)
+                etaText.rectTransform.anchoredPosition = etaOriginalPos;
+
             StarData next = StarDatabase.Stars[nextIdx];
             string nextName = Loc.Get(next.nameKey);
 
@@ -82,7 +162,6 @@ public class DockedUI : MonoBehaviour
 
             if (etaText != null)
             {
-                // 부스터 자동 사이클 평균 속도 반영
                 double avgSpeed = ComputeAverageSpeed(gm);
                 if (avgSpeed > 0)
                     etaText.text = Loc.Get("dock_eta", GameManager.FormatTime(next.distanceKM / avgSpeed));
@@ -90,23 +169,23 @@ public class DockedUI : MonoBehaviour
 
             if (departButtonText != null)
                 departButtonText.text = Loc.Get("dock_depart", nextName);
+
+            if (departButton != null)
+                departButton.interactable = true;
+            if (wishlistButton != null)
+                wishlistButton.gameObject.SetActive(false);
         }
         else
         {
+            // 데모 아닌 정식 빌드에서 최종 도착
             if (nextDestText != null) nextDestText.text = Loc.Get("dock_last_dest");
             if (etaText != null) etaText.text = "";
             if (departButtonText != null) departButtonText.text = Loc.Get("dock_complete");
+            if (departButton != null) departButton.interactable = false;
+            if (wishlistButton != null) wishlistButton.gameObject.SetActive(false);
         }
-
-        if (departButton != null)
-            departButton.interactable = hasNext;
     }
 
-    /// <summary>
-    /// 부스터 자동 사이클을 반영한 평균 속도 계산.
-    /// 부스터는 (충전 시간 / 소진 시간) 사이클로 항상 켜졌다 꺼지므로
-    /// 사이클 가중 평균이 실제 진행 속도에 가까움.
-    /// </summary>
     double ComputeAverageSpeed(GameManager gm)
     {
         double baseSpeed = gm.GetTotalSpeed();
@@ -117,7 +196,6 @@ public class DockedUI : MonoBehaviour
         float drainTime = bs.boostDrainPerSecond > 0 ? 1f / bs.boostDrainPerSecond : 5f;
         float boostMult = gm.GetBoosterSpeedMultiplier();
 
-        // 사이클: (chargeTime 동안 1배) + (drainTime 동안 boostMult배)
         double avgMult = (chargeTime + drainTime * boostMult) / (chargeTime + drainTime);
         return baseSpeed * avgMult;
     }
@@ -142,5 +220,10 @@ public class DockedUI : MonoBehaviour
     {
         if (WindowStateManager.Instance != null)
             WindowStateManager.Instance.Depart();
+    }
+
+    void OnWishlistClicked()
+    {
+        Application.OpenURL(wishlistUrl);
     }
 }

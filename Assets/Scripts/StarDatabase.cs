@@ -12,6 +12,23 @@ public class StarData
 
 public static class StarDatabase
 {
+    /// <summary>
+    /// 데모 빌드에서 마지막으로 도달 가능한 별 index.
+    /// 11 = 시리우스 (Sirius). 도착하면 출발 버튼 비활성 + "데모 끝" 안내.
+    /// 정식 출시 시 -1로 바꾸면 자동으로 끝까지 갈 수 있음.
+    /// </summary>
+    public const int DEMO_LAST_STAR_INDEX = 11;
+
+    /// <summary>
+    /// 데모 잠금 대상인지 (data 없음 + 도착 불가).
+    /// DEMO_LAST_STAR_INDEX 이후 별이면 true.
+    /// </summary>
+    public static bool IsDemoLocked(int starIndex)
+    {
+        if (DEMO_LAST_STAR_INDEX < 0) return false;
+        return starIndex > DEMO_LAST_STAR_INDEX;
+    }
+
     public static readonly StarData[] Stars = new StarData[]
     {
         // === 태양계 (7개) ===

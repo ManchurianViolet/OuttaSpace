@@ -347,11 +347,11 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 75323510850
-    m_Localized: Rocket
+    m_Localized: Einstein
     m_Metadata:
       m_Items: []
   - m_Id: 75323510851
-    m_Localized: Astro
+    m_Localized: Captain
     m_Metadata:
       m_Items: []
   - m_Id: 75323510852
@@ -375,11 +375,11 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 75323510857
-    m_Localized: Nova
+    m_Localized: Angel
     m_Metadata:
       m_Items: []
   - m_Id: 75323510858
-    m_Localized: Onyx
+    m_Localized: Apollo
     m_Metadata:
       m_Items: []
   - m_Id: 6976204232237056
@@ -546,6 +546,26 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 6976500000000034
     m_Localized: No
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000035
+    m_Localized: Coming Soon
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000036
+    m_Localized: Docked at Sirius.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000037
+    m_Localized: See you at the next star in the full release.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000038
+    m_Localized: Add to Wishlist
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000039
+    m_Localized: Demo Complete
     m_Metadata:
       m_Items: []
   references:
