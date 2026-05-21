@@ -4,7 +4,6 @@ using System.Collections.Generic;
 
 /// <summary>
 /// 보유 고양이 관리 + 현재 사용 중인 고양이 + Ship 스프라이트 교체.
-/// 빈 GameObject에 붙이고 shipRenderer를 Inspector에서 연결.
 /// </summary>
 public class CatManager : MonoBehaviour
 {
@@ -29,7 +28,6 @@ public class CatManager : MonoBehaviour
 
     void Start()
     {
-        // 첫 실행이면 기본 고양이 지급
         if (ownedCats.Count == 0)
         {
             ownedCats.Add(CatDatabase.STARTER_CAT_ID);
@@ -39,13 +37,8 @@ public class CatManager : MonoBehaviour
         ApplyCurrentCat();
     }
 
-    // ============ 소유 확인 ============
-
     public bool IsOwned(int id) => ownedCats.Contains(id);
-
     public int OwnedCount => ownedCats.Count;
-
-    // ============ 고양이 교체 ============
 
     public void SetCurrentCat(int id)
     {
@@ -57,26 +50,34 @@ public class CatManager : MonoBehaviour
         OnCatChanged?.Invoke(id);
         Save();
 
-        // 등급별 base 속도가 바뀌므로 HUD 즉시 갱신
+        // 속도가 등급 따라 바뀌므로 stats 갱신 알림
         if (GameManager.Instance != null)
             GameManager.Instance.NotifyStatsChanged();
     }
 
+    /// <summary>
+    /// Ship 스프라이트 + 엔진 불꽃 색 둘 다 갱신.
+    /// 정박 중에도 즉시 보이도록 ShipController.InvalidateFlameColor() 호출.
+    /// </summary>
     public void ApplyCurrentCat()
     {
-        if (shipRenderer == null) return;
         if (CatDatabase.Instance == null) return;
 
         CatData data = CatDatabase.Instance.Get(currentCatId);
-        if (data != null && data.sprite != null)
+
+        // Ship 스프라이트
+        if (shipRenderer != null && data != null && data.sprite != null)
             shipRenderer.sprite = data.sprite;
+
+        // 엔진 불꽃 색 즉시 갱신 (정박 중에도)
+        if (shipRenderer != null)
+        {
+            ShipController sc = shipRenderer.GetComponent<ShipController>();
+            if (sc != null)
+                sc.InvalidateFlameColor();
+        }
     }
 
-    // ============ 가챠 결과 처리 ============
-
-    /// <summary>
-    /// 가챠 결과 처리. 새 고양이면 추가, 중복이면 false 반환.
-    /// </summary>
     public bool AddFromGacha(int id)
     {
         if (IsOwned(id)) return false;
@@ -86,8 +87,6 @@ public class CatManager : MonoBehaviour
         Save();
         return true;
     }
-
-    // ============ 저장/로드 ============
 
     void Save()
     {

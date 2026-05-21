@@ -526,6 +526,28 @@ MonoBehaviour:
     m_Localized: Blue Supergiant
     m_Metadata:
       m_Items: []
+  - m_Id: 6976500000000030
+    m_Localized: Reset
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000031
+    m_Localized: Warning
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000032
+    m_Localized: 'All progress will be lost.
+
+      Are you sure?'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000033
+    m_Localized: Yes
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000034
+    m_Localized: No
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

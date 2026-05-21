@@ -21,6 +21,40 @@ public class ShipController : MonoBehaviour
     // 현재 적용된 평상시 불꽃 색 캐시 (고양이 변경 감지용)
     private int cachedFlameCatId = -1;
 
+    /// <summary>
+    /// 외부(CatManager 등)에서 고양이 변경 시 호출.
+    /// 정박 중 Update가 안 돌아도 즉시 새 색 적용.
+    /// </summary>
+    public void InvalidateFlameColor()
+    {
+        cachedFlameCatId = -1;
+        ApplyFlameColorImmediate();
+    }
+
+    /// <summary>
+    /// 현재 고양이의 불꽃 색을 파티클에 즉시 적용.
+    /// 부스트 중이면 무시 (Update에서 boost gradient 사용).
+    /// </summary>
+    void ApplyFlameColorImmediate()
+    {
+        if (engineFlame == null) return;
+        if (BoosterSystem.Instance != null && BoosterSystem.Instance.isBoosting) return;
+
+        int currentCatId = (CatManager.Instance != null)
+            ? CatManager.Instance.currentCatId : 0;
+        Color flameColor = CatDatabase.GetFlameColor(currentCatId);
+
+        var main = engineFlame.main;
+        main.startColor = CatDatabase.BuildFlameStartColor(flameColor, 0.8f);
+
+        var colorOverLife = engineFlame.colorOverLifetime;
+        colorOverLife.enabled = true;
+        colorOverLife.color = new ParticleSystem.MinMaxGradient(
+            CatDatabase.BuildFlameGradient(flameColor));
+
+        cachedFlameCatId = currentCatId;
+    }
+
     void Start()
     {
         basePosition = transform.localPosition;

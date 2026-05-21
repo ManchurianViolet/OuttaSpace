@@ -503,6 +503,26 @@ MonoBehaviour:
     m_Key: settings_credits
     m_Metadata:
       m_Items: []
+  - m_Id: 6976500000000030
+    m_Key: settings_reset
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000031
+    m_Key: reset_warning_title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000032
+    m_Key: reset_warning_message
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000033
+    m_Key: confirm_yes
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000034
+    m_Key: confirm_no
+    m_Metadata:
+      m_Items: []
   - m_Id: 6976500000000004
     m_Key: settings_language_title
     m_Metadata:

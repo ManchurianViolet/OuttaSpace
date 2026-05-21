@@ -43,14 +43,14 @@ public class DockedUI : MonoBehaviour
     {
         if (state == WindowStateManager.WindowState.Docked)
         {
-            Refresh(); // 👈 여기서 다시 갱신
+            Refresh();
         }
     }
 
     void Update()
     {
         if (creditsText != null && GameManager.Instance != null)
-            creditsText.text = GameManager.FormatCredits(GameManager.Instance.credits) + " CR";
+            creditsText.text = GameManager.FormatNumber(GameManager.Instance.credits) + " CR";
     }
 
     void Refresh()
@@ -67,7 +67,7 @@ public class DockedUI : MonoBehaviour
         }
 
         if (creditsText != null)
-            creditsText.text = GameManager.FormatCredits(GameManager.Instance.credits) + " CR";
+            creditsText.text = GameManager.FormatNumber(gm.credits) + " CR";
 
         int nextIdx = gm.currentStarIndex + 1;
         bool hasNext = nextIdx < StarDatabase.Stars.Length;
@@ -82,9 +82,10 @@ public class DockedUI : MonoBehaviour
 
             if (etaText != null)
             {
-                double speed = gm.GetTotalSpeed();
-                if (speed > 0)
-                    etaText.text = Loc.Get("dock_eta", GameManager.FormatTime(next.distanceKM / speed));
+                // 부스터 자동 사이클 평균 속도 반영
+                double avgSpeed = ComputeAverageSpeed(gm);
+                if (avgSpeed > 0)
+                    etaText.text = Loc.Get("dock_eta", GameManager.FormatTime(next.distanceKM / avgSpeed));
             }
 
             if (departButtonText != null)
@@ -99,6 +100,26 @@ public class DockedUI : MonoBehaviour
 
         if (departButton != null)
             departButton.interactable = hasNext;
+    }
+
+    /// <summary>
+    /// 부스터 자동 사이클을 반영한 평균 속도 계산.
+    /// 부스터는 (충전 시간 / 소진 시간) 사이클로 항상 켜졌다 꺼지므로
+    /// 사이클 가중 평균이 실제 진행 속도에 가까움.
+    /// </summary>
+    double ComputeAverageSpeed(GameManager gm)
+    {
+        double baseSpeed = gm.GetTotalSpeed();
+        if (BoosterSystem.Instance == null) return baseSpeed;
+
+        var bs = BoosterSystem.Instance;
+        float chargeTime = bs.autoFillPerSecond > 0 ? 1f / bs.autoFillPerSecond : 50f;
+        float drainTime = bs.boostDrainPerSecond > 0 ? 1f / bs.boostDrainPerSecond : 5f;
+        float boostMult = gm.GetBoosterSpeedMultiplier();
+
+        // 사이클: (chargeTime 동안 1배) + (drainTime 동안 boostMult배)
+        double avgMult = (chargeTime + drainTime * boostMult) / (chargeTime + drainTime);
+        return baseSpeed * avgMult;
     }
 
     StarData GetDockedStar(GameManager gm)
