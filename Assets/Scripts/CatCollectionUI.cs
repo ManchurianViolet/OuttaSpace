@@ -206,9 +206,23 @@ public class CatCollectionUI : MonoBehaviour
             int catId = currentPage * SLOTS_PER_PAGE + i;
             if (slots[i] == null) continue;
 
+            // 전설 페이지의 빈 슬롯(catId 39~44) → Coming Soon 표시
+            // 정식 출시 시 새 전설 추가되면 자동으로 해당 catId만큼 실제 슬롯으로 전환됨
             if (catId >= CatDatabase.TOTAL_COUNT)
             {
-                slots[i].gameObject.SetActive(false);
+                // 전설 페이지(currentPage == 4 — 슬롯 36~44) 안에서만 placeholder
+                if (currentPage == 4)
+                {
+                    if (!slots[i].gameObject.activeSelf)
+                        slots[i].gameObject.SetActive(true);
+                    // 첫 전설 고양이 실루엣을 placeholder로 사용 (실루엣 변환됨)
+                    Sprite placeholder = GetPlaceholderSilhouette();
+                    slots[i].Setup(catId, placeholder, false, locked: true);
+                }
+                else
+                {
+                    slots[i].gameObject.SetActive(false);
+                }
                 continue;
             }
 
@@ -267,6 +281,20 @@ public class CatCollectionUI : MonoBehaviour
         Sprite sil = Sprite.Create(tex, new Rect(0, 0, w, h), original.pivot / new Vector2(w, h), original.pixelsPerUnit);
         silhouetteCache[original] = sil;
         return sil;
+    }
+
+    /// <summary>
+    /// 전설 페이지의 빈 슬롯에 표시할 placeholder 실루엣.
+    /// 첫 전설 고양이(catId 36 = Rudolph)의 실루엣을 재활용.
+    /// </summary>
+    Sprite GetPlaceholderSilhouette()
+    {
+        var db = CatDatabase.Instance;
+        if (db == null) return null;
+        int firstLegendaryId = CatDatabase.GetRarityStartIndex(CatRarity.Legendary);
+        CatData firstLegendary = db.Get(firstLegendaryId);
+        if (firstLegendary == null || firstLegendary.sprite == null) return null;
+        return GetSilhouette(firstLegendary.sprite);
     }
 
     void OnDestroy()

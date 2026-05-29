@@ -92,6 +92,12 @@ public class CatTooltip : MonoBehaviour
         nameText.enableWordWrapping = false;
         nameText.overflowMode = TextOverflowModes.Overflow;
 
+        // 동적 생성된 TMP는 SettingsManager의 자동 폰트 교체에서 누락됨
+        // → 현재 언어 폰트 직접 적용 + 언어 변경 시에도 갱신
+        ApplyLanguageFont();
+        if (SettingsManager.Instance != null)
+            SettingsManager.Instance.OnLanguageChanged += ApplyLanguageFont;
+
         RectTransform nameRt = nameObj.GetComponent<RectTransform>();
         nameRt.anchorMin = Vector2.zero;
         nameRt.anchorMax = Vector2.one;
@@ -151,7 +157,8 @@ public class CatTooltip : MonoBehaviour
         if (CatDatabase.Instance == null || slotRect == null) return;
 
         CatData cat = CatDatabase.Instance.Get(catId);
-        if (cat == null) { Hide(); return; }
+        // 잠금 슬롯은 cat==null이어도 placeholder로 표시 (전설 페이지의 빈 슬롯 등)
+        if (cat == null && !locked) { Hide(); return; }
 
         if (locked)
         {
@@ -240,5 +247,26 @@ public class CatTooltip : MonoBehaviour
     {
         canvasGroup.alpha = 0f;
         gameObject.SetActive(false);
+    }
+
+    /// <summary>
+    /// 현재 언어에 맞는 폰트를 nameText에 적용.
+    /// 동적 생성된 TMP는 SettingsManager의 자동 교체에서 누락되므로 직접 적용.
+    /// </summary>
+    void ApplyLanguageFont()
+    {
+        if (nameText == null || SettingsManager.Instance == null) return;
+
+        string code = SettingsManager.Instance.GetCurrentLanguageCode();
+        var font = SettingsManager.Instance.GetFontForLocale(code);
+        if (font != null)
+            nameText.font = font;
+    }
+
+    void OnDestroy()
+    {
+        if (SettingsManager.Instance != null)
+            SettingsManager.Instance.OnLanguageChanged -= ApplyLanguageFont;
+        if (Instance == this) Instance = null;
     }
 }

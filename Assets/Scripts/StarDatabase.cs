@@ -74,15 +74,23 @@ public static class StarDatabase
     {
         if (km < 0) km = 0;
 
-        bool isKo = Loc.Get("hud_heading_to").Contains("향하는중");
+        var locale = UnityEngine.Localization.Settings.LocalizationSettings.SelectedLocale;
+        string lang = (locale != null) ? locale.Identifier.Code : "en";
+        bool isAsianUnits = (lang == "ko" || lang == "ja");
 
-        if (isKo)
+        if (isAsianUnits)
         {
+            // 한/일 공유: 万/億/兆/京 (한국어는 한글, 일본어는 한자)
+            string manUnit  = (lang == "ja") ? "万" : "만";
+            string okUnit   = (lang == "ja") ? "億" : "억";
+            string joUnit   = (lang == "ja") ? "兆" : "조";
+            string gyeong   = (lang == "ja") ? "京" : "경";
+
             if (km < 10000) return km.ToString("F0") + " km";
-            if (km < 100000000) return (km / 10000).ToString("F0") + "만 km";
-            if (km < 1000000000000) return (km / 100000000).ToString("F1") + "억 km";
-            if (km < 1000000000000000) return (km / 1000000000000).ToString("F2") + "조 km";
-            return (km / 1000000000000000).ToString("F2") + "경 km";
+            if (km < 100000000) return (km / 10000).ToString("F0") + manUnit + " km";
+            if (km < 1000000000000) return (km / 100000000).ToString("F1") + okUnit + " km";
+            if (km < 1000000000000000) return (km / 1000000000000).ToString("F2") + joUnit + " km";
+            return (km / 1000000000000000).ToString("F2") + gyeong + " km";
         }
         else
         {

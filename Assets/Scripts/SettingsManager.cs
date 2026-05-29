@@ -44,7 +44,23 @@ public class SettingsManager : MonoBehaviour
     {
         // Localization 초기화 대기
         yield return LocalizationSettings.InitializationOperation;
+
+        // 저장된 언어 복원
+        string savedLang = PlayerPrefs.GetString("Language", "");
+        if (!string.IsNullOrEmpty(savedLang))
+        {
+            foreach (var loc in LocalizationSettings.AvailableLocales.Locales)
+            {
+                if (loc.Identifier.Code == savedLang)
+                {
+                    LocalizationSettings.SelectedLocale = loc;
+                    break;
+                }
+            }
+        }
+
         ApplyFontForCurrentLocale();
+        OnLanguageChanged?.Invoke();
     }
 
     // ============ 언어 ============
@@ -60,6 +76,10 @@ public class SettingsManager : MonoBehaviour
 
         LocalizationSettings.SelectedLocale = target;
         ApplyFontForCurrentLocale();
+
+        // 언어 저장 (다음 실행 시 복원)
+        PlayerPrefs.SetString("Language", localeCode);
+        PlayerPrefs.Save();
 
         // GameManager의 OnStatsChanged도 트리거 (HUD 등 갱신)
         if (GameManager.Instance != null)

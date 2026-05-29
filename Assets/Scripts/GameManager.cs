@@ -56,17 +56,10 @@ public class GameManager : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.F1))
-            SetLanguage("ko");
-        if (Input.GetKeyDown(KeyCode.F2))
-            SetLanguage("en");
+#if UNITY_EDITOR
+        // ============ 디버그 단축키 (에디터 전용) ============
 
-        if (Input.GetKeyDown(KeyCode.Escape))
-        {
-            SaveGame();
-            Application.Quit();
-        }
-
+        // Shift+R: 모든 데이터 리셋 + 씬 재로드
         if (Input.GetKeyDown(KeyCode.R) && Input.GetKey(KeyCode.LeftShift))
         {
             PlayerPrefs.DeleteAll();
@@ -78,7 +71,7 @@ public class GameManager : MonoBehaviour
             return;
         }
 
-        // 디버그: Shift+U → 모든 고양이 언락
+        // Shift+U: 모든 고양이 언락
         if (Input.GetKeyDown(KeyCode.U) && Input.GetKey(KeyCode.LeftShift))
         {
             if (CatManager.Instance != null)
@@ -89,7 +82,7 @@ public class GameManager : MonoBehaviour
             }
         }
 
-        // 디버그: Shift+J → 다음 행성 30만 km 전으로 점프
+        // Shift+J: 다음 행성 30만 km 전으로 점프
         if (Input.GetKeyDown(KeyCode.J) && Input.GetKey(KeyCode.LeftShift))
         {
             if (currentStarIndex < StarDatabase.Stars.Length)
@@ -102,7 +95,7 @@ public class GameManager : MonoBehaviour
             }
         }
 
-        // 디버그: Shift+C → 크레딧 +10000
+        // Shift+C: 크레딧 +10000
         if (Input.GetKeyDown(KeyCode.C) && Input.GetKey(KeyCode.LeftShift))
         {
             credits += 10000;
@@ -111,15 +104,14 @@ public class GameManager : MonoBehaviour
             Debug.Log($"[Debug] +10000 CR (현재 {credits:N0})");
         }
 
-        // 디버그: Shift+F → 가짜 친구 3명 추가 (멀티 표시 테스트용)
+        // Shift+F: 가짜 친구 3명 추가 (멀티 표시 테스트용)
         if (Input.GetKeyDown(KeyCode.F) && Input.GetKey(KeyCode.LeftShift))
         {
             if (FriendSyncManager.Instance != null)
             {
-                // 거리 차이를 다르게 해서 슬롯 분산 효과 확인
                 string[] names = { "Tester_A", "Tester_B", "Tester_C" };
                 double[] offsets = { 1000, -3000, 8000 };
-                int[] catTypes = { 0, 27, 36 }; // common, rare, legendary
+                int[] catTypes = { 0, 27, 36 };
 
                 for (int i = 0; i < names.Length; i++)
                 {
@@ -139,13 +131,9 @@ public class GameManager : MonoBehaviour
                 Debug.Log($"[Debug] 가짜 친구 3명 추가. starIdx={currentStarIndex} myDist={distance:F0}");
             }
         }
+#endif
 
-        if (isDocked && Input.GetKeyDown(KeyCode.Space))
-        {
-            DepartToNextStar();
-            if (WindowStateManager.Instance != null)
-                WindowStateManager.Instance.Depart();
-        }
+        // ============ tick ============
 
         tickTimer += Time.deltaTime;
         while (tickTimer >= tickRate)
@@ -236,9 +224,9 @@ public class GameManager : MonoBehaviour
 
         switch (cat.rarity)
         {
-            case CatRarity.Rare: return BASE_SPEED_RARE;
+            case CatRarity.Rare:      return BASE_SPEED_RARE;
             case CatRarity.Legendary: return BASE_SPEED_LEGENDARY;
-            default: return BASE_SPEED_COMMON;
+            default:                  return BASE_SPEED_COMMON;
         }
     }
 
@@ -385,14 +373,20 @@ public class GameManager : MonoBehaviour
     {
         if (kmPerSec < 0) kmPerSec = 0;
 
-        bool isKo = Loc.Get("hud_heading_to").Contains("향하는중");
+        string lang = GetCurrentLanguageCode();
+        bool isAsianUnits = (lang == "ko" || lang == "ja");
 
-        if (isKo)
+        if (isAsianUnits)
         {
+            // 한/일 공유: 万/億/兆 (한국어 한글 vs 일본어 한자만 다름)
+            string manUnit = (lang == "ja") ? "万" : "만";
+            string okUnit = (lang == "ja") ? "億" : "억";
+            string joUnit = (lang == "ja") ? "兆" : "조";
+
             if (kmPerSec < 10000) return kmPerSec.ToString("F0") + " km/s";
-            if (kmPerSec < 100000000) return (kmPerSec / 10000).ToString("F0") + "만 km/s";
-            if (kmPerSec < 1000000000000) return (kmPerSec / 100000000).ToString("F1") + "억 km/s";
-            return (kmPerSec / 1000000000000).ToString("F2") + "조 km/s";
+            if (kmPerSec < 100000000) return (kmPerSec / 10000).ToString("F0") + manUnit + " km/s";
+            if (kmPerSec < 1000000000000) return (kmPerSec / 100000000).ToString("F1") + okUnit + " km/s";
+            return (kmPerSec / 1000000000000).ToString("F2") + joUnit + " km/s";
         }
         else
         {
@@ -401,6 +395,16 @@ public class GameManager : MonoBehaviour
             if (kmPerSec < 1000000000) return (kmPerSec / 1000000).ToString("F1") + "M km/s";
             return (kmPerSec / 1000000000).ToString("F2") + "B km/s";
         }
+    }
+
+    /// <summary>
+    /// 현재 활성 언어 코드 ("ko", "ja", "en"). LocalizationSettings에서 가져옴.
+    /// </summary>
+    static string GetCurrentLanguageCode()
+    {
+        var locale = UnityEngine.Localization.Settings.LocalizationSettings.SelectedLocale;
+        if (locale != null) return locale.Identifier.Code;
+        return "en";
     }
 
     public static string FormatTime(double sec)

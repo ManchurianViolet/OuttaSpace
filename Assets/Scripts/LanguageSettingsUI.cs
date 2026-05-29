@@ -69,17 +69,7 @@ public class LanguageSettingsUI : MonoBehaviour
         foreach (var loc in LocalizationSettings.AvailableLocales.Locales)
         {
             string code = loc.Identifier.Code;
-            string display;
-            try
-            {
-                display = new System.Globalization.CultureInfo(code).NativeName;
-                int paren = display.IndexOf('(');
-                if (paren > 0) display = display.Substring(0, paren).Trim();
-            }
-            catch
-            {
-                display = loc.LocaleName;
-            }
+            string display = GetDisplayName(code);
             options.Add(new TMP_Dropdown.OptionData(display));
             localeCodes.Add(code);
             if (code == currentCode) currentIndex = i;
@@ -89,6 +79,48 @@ public class LanguageSettingsUI : MonoBehaviour
         languageDropdown.AddOptions(options);
         languageDropdown.SetValueWithoutNotify(currentIndex);
         languageDropdown.RefreshShownValue();
+
+        // 드롭다운 안의 TMP 텍스트들에 현재 언어 폰트 적용
+        // (다국어 표기를 위해 가장 글자 커버리지 좋은 폰트로 통일하는 게 베스트지만
+        //  일단 현재 언어 폰트로)
+        ApplyDropdownFonts();
+    }
+
+    /// <summary>
+    /// 각 언어의 native name으로 표시 (한국어 → 한국어, English → English, 日本語 → 日本語).
+    /// LocaleName은 OS 환경 따라 달라져서 신뢰 못 함.
+    /// </summary>
+    string GetDisplayName(string code)
+    {
+        switch (code)
+        {
+            case "ko": return "한국어";
+            case "en": return "English";
+            case "ja": return "日本語";
+            case "zh-Hans": return "简体中文";
+            default:   return code;
+        }
+    }
+
+    /// <summary>
+    /// 드롭다운 내부 TMP 텍스트들에 현재 언어 폰트 강제 적용.
+    /// 드롭다운 옵션은 native name 표기라 모든 언어 글자가 다 나와야 하는데,
+    /// 단일 폰트로는 어렵고, 일단 현재 언어 폰트로 통일 (사용자가 영어 보고 있으면
+    /// 영어 폰트, 일본어 보고 있으면 일본어 폰트). 일본어 폰트에 한글/영문 다 들어있어야 OK.
+    /// </summary>
+    void ApplyDropdownFonts()
+    {
+        if (languageDropdown == null || SettingsManager.Instance == null) return;
+
+        string code = SettingsManager.Instance.GetCurrentLanguageCode();
+        var font = SettingsManager.Instance.GetFontForLocale(code);
+        if (font == null) return;
+
+        // 드롭다운 captionText + itemText 둘 다 갱신
+        if (languageDropdown.captionText != null)
+            languageDropdown.captionText.font = font;
+        if (languageDropdown.itemText != null)
+            languageDropdown.itemText.font = font;
     }
 
     void OnLanguageSelected(int index)
