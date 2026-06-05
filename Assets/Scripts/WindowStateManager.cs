@@ -73,6 +73,9 @@ public class WindowStateManager : MonoBehaviour
     [DllImport("user32.dll")] static extern bool GetClientRect(IntPtr hWnd, out RECT lpRect);
     [DllImport("user32.dll")] static extern int GetSystemMetrics(int nIndex);
     [DllImport("user32.dll")] static extern bool GetCursorPos(out POINT lpPoint);
+    [DllImport("user32.dll")] static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
+    [DllImport("user32.dll")] static extern bool IsIconic(IntPtr hWnd);
+    const int SW_RESTORE = 9;
     [DllImport("dwmapi.dll")] static extern int DwmExtendFrameIntoClientArea(IntPtr hWnd, ref MARGINS margins);
 
     struct MARGINS { public int left, right, top, bottom; }
@@ -415,12 +418,44 @@ public class WindowStateManager : MonoBehaviour
 
     // ============ 기존 메서드들 ============
 
+    private bool wasMinimized;
+
     void Update()
     {
 #if UNITY_STANDALONE_WIN && !UNITY_EDITOR
         HandleDrag();
+        DetectRestoreFromMinimize();
 #endif
     }
+
+#if UNITY_STANDALONE_WIN && !UNITY_EDITOR
+    /// <summary>
+    /// 최소화 → 복원 감지. 최소화 중에 정박/항해 상태가 바뀌면 리사이즈가 무시되므로,
+    /// 복원 시점에 현재 상태에 맞는 크기로 강제 재적용.
+    /// </summary>
+    void DetectRestoreFromMinimize()
+    {
+        if (hWnd == IntPtr.Zero || !windowInitialized) return;
+
+        bool isMinimized = IsIconic(hWnd);
+
+        // 방금 복원됨 (이전엔 minimized, 지금은 아님)
+        if (wasMinimized && !isMinimized)
+        {
+            // 현재 상태에 맞는 크기로 재리사이즈
+            if (currentState == WindowState.Docked)
+            {
+                ResizeWindow(CurrentStationW, CurrentStationH, anchorBottomRight: true);
+            }
+            else if (currentState == WindowState.Traveling)
+            {
+                ResizeWindow(CurrentWidgetW, CurrentWidgetH, anchorBottomRight: true);
+            }
+        }
+
+        wasMinimized = isMinimized;
+    }
+#endif
 
     void OnApplicationFocus(bool hasFocus)
     {
@@ -675,6 +710,14 @@ public class WindowStateManager : MonoBehaviour
 #if UNITY_STANDALONE_WIN && !UNITY_EDITOR
     IEnumerator ResizeWindowRoutine(int w, int h, bool anchorBottomRight)
     {
+        // 최소화 상태면 먼저 복원 (안 그러면 SetWindowPos가 무시됨)
+        if (hWnd != IntPtr.Zero && IsIconic(hWnd))
+        {
+            ShowWindow(hWnd, SW_RESTORE);
+            yield return null;
+            yield return null;
+        }
+
         int screenW = GetSystemMetrics(0);
         int screenH = GetSystemMetrics(1);
         int x, y;

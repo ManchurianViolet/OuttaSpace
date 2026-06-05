@@ -566,6 +566,14 @@ MonoBehaviour:
     m_Localized: "Demo \u5B8C\u6210"
     m_Metadata:
       m_Items: []
+  - m_Id: 6976500000000040
+    m_Localized: "\u661F\u9645\u63A8\u8FDB\u5668\u901F\u5EA6"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000041
+    m_Localized: "\u661F\u9645\u63A8\u8FDB\u5668\u53D1\u52A8\u65F6\u7684\u901F\u5EA6\u500D\u7387"
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

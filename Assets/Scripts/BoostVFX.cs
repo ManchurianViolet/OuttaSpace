@@ -17,8 +17,20 @@ public class BoostVFX : MonoBehaviour
     public float spawnInterval = 0.08f;    // 생성 간격
 
     [Header("Background Shift")]
-    public Color boostTint = new Color(0.03f, 0.04f, 0.12f, 1f); // 파란 톤 추가
+    public Color boostTint = new Color(0.03f, 0.04f, 0.12f, 1f); // 파란 톤 추가 (명왕성 이전)
     public float tintSpeed = 3f;
+
+    // 명왕성 통과 후엔 부스트마다 랜덤 색 (초/노/빨/파/보/남)
+    private Color[] interstellarTints = new Color[]
+    {
+        new Color(0.03f, 0.12f, 0.04f, 1f),  // 초록
+        new Color(0.12f, 0.10f, 0.02f, 1f),  // 노랑
+        new Color(0.12f, 0.03f, 0.03f, 1f),  // 빨강
+        new Color(0.03f, 0.04f, 0.12f, 1f),  // 파랑
+        new Color(0.08f, 0.03f, 0.12f, 1f),  // 보라
+        new Color(0.04f, 0.03f, 0.18f, 1f),  // 남색
+    };
+    private Color currentInterstellarTint;
 
     private Texture2D streakTex;
     private GameObject[] streaks;
@@ -94,12 +106,20 @@ public class BoostVFX : MonoBehaviour
         {
             // 부스트 시작: 현재 배경색 저장
             normalBgColor = Camera.main.backgroundColor;
+
+            // 명왕성 통과 후엔 매 부스트마다 랜덤 색
+            if (GameManager.Instance != null && GameManager.Instance.IsInterstellarUnlocked())
+            {
+                currentInterstellarTint = interstellarTints[Random.Range(0, interstellarTints.Length)];
+            }
         }
 
         if (boosting)
         {
-            // 파랗게
-            targetBgColor = normalBgColor + boostTint;
+            // interstellar이면 랜덤 색, 아니면 기본 파란 톤
+            bool interstellar = GameManager.Instance != null && GameManager.Instance.IsInterstellarUnlocked();
+            Color tint = interstellar ? currentInterstellarTint : boostTint;
+            targetBgColor = normalBgColor + tint;
             targetBgColor.a = 1f;
         }
         else

@@ -23,8 +23,8 @@ public static class UpgradeDatabase
             type = UpgradeType.Speed,
             nameKey = "upgrade_speed", descKey = "upgrade_speed_desc",
             baseCost = 10, costMult = 1.8,
-            baseEffect = 200, effectMult = 1.6,
-            maxCost = 2000
+            baseEffect = 1000, effectMult = 1.6,
+            maxCost = 1000
         },
         // BoosterSpeed: Speed보다 비싸게 시작, cap도 더 높음 (덜 자주 살 거)
         new UpgradeData {
@@ -32,7 +32,7 @@ public static class UpgradeDatabase
             nameKey = "upgrade_bspd", descKey = "upgrade_bspd_desc",
             baseCost = 50, costMult = 2.2,
             baseEffect = 1.0, effectMult = 1.5,
-            maxCost = 5000
+            maxCost = 1000
         },
     };
 

@@ -34,10 +34,17 @@ public class GameManager : MonoBehaviour
     private float tickTimer;
     private float saveTimer;
 
-    private const double BASE_SPEED_COMMON = 3000;
+    private const double BASE_SPEED_COMMON = 5000;
     private const double BASE_SPEED_RARE = 10000;
     private const double BASE_SPEED_LEGENDARY = 100000;
-    private const double SPEED_NORMALIZE = 3000;
+    private const double SPEED_NORMALIZE = 5000;
+
+    /// <summary>
+    /// 명왕성(index 6) 도착 후 활성화되는 외계 항성권 부스터.
+    /// 명왕성 → 프록시마 거리가 1만 배 점프하기 때문에 보상 차원에서 멀티플라이어 추가.
+    /// </summary>
+    private const int INTERSTELLAR_UNLOCK_INDEX = 6;
+    private const double INTERSTELLAR_BOOST_MULT = 30.0;
 
     void Awake()
     {
@@ -234,7 +241,30 @@ public class GameManager : MonoBehaviour
     {
         double baseSpeed = GetRarityBaseSpeed();
         double multiplier = 1.0 + GetUpgradeContribution(UpgradeType.Speed) / SPEED_NORMALIZE;
-        return baseSpeed * multiplier;
+        double speed = baseSpeed * multiplier;
+
+        // 명왕성(idx 6) 통과 후 외계 항성권 부스터 적용
+        if (IsInterstellarUnlocked())
+            speed *= INTERSTELLAR_BOOST_MULT;
+
+        return speed;
+    }
+
+    /// <summary>
+    /// 명왕성 통과해서 외계 항성권 부스터가 활성화됐는지.
+    /// arrivedStars에 명왕성(idx 6)이 포함됐다면 unlocked.
+    /// </summary>
+    public bool IsInterstellarUnlocked()
+    {
+        return arrivedStars.Contains(INTERSTELLAR_UNLOCK_INDEX);
+    }
+
+    /// <summary>
+    /// 외계 항성권 부스터 배수 (UI 표시용).
+    /// </summary>
+    public double GetInterstellarBoostMultiplier()
+    {
+        return IsInterstellarUnlocked() ? INTERSTELLAR_BOOST_MULT : 1.0;
     }
 
     public void NotifyStatsChanged()

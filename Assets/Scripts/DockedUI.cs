@@ -26,6 +26,11 @@ public class DockedUI : MonoBehaviour
     [Tooltip("데모 종료 시 숨길 업그레이드/가챠 등 버튼들. 인스펙터에서 패널 GameObject 연결.")]
     public GameObject[] hideOnDemoEnd;
 
+    // 명왕성 정박 시 ETA 깜빡 경고용 (다음이 프록시마라 거리 1만 배 점프)
+    private bool etaBlinking;
+    private Color etaOriginalColor;
+    private bool etaColorCached;
+
     // 평소 정박 화면의 nextDestText/etaText 원래 위치 캐시
     // 데모 종료 시 화면 중앙으로 이동했다가 일반 정박 복귀 시 원위치
     private Vector2 nextDestOriginalPos;
@@ -71,6 +76,21 @@ public class DockedUI : MonoBehaviour
     {
         if (creditsText != null && GameManager.Instance != null)
             creditsText.text = GameManager.FormatNumber(GameManager.Instance.credits) + " CR";
+
+        // 명왕성 정박 시 ETA 빨강 깜빡 (다음 별과의 거리 점프 경고)
+        if (etaBlinking && etaText != null)
+        {
+            // 원래 색 캐시 (한 번만)
+            if (!etaColorCached)
+            {
+                etaOriginalColor = etaText.color;
+                etaColorCached = true;
+            }
+
+            // 1초 주기로 빨강 ↔ 원래색
+            float t = Mathf.PingPong(Time.unscaledTime * 2f, 1f);
+            etaText.color = Color.Lerp(etaOriginalColor, new Color(1f, 0.3f, 0.3f), t);
+        }
     }
 
     void Refresh()
@@ -112,7 +132,7 @@ public class DockedUI : MonoBehaviour
             if (nextDestText != null)
             {
                 nextDestText.text = Loc.Get("demo_end_title");
-                nextDestText.rectTransform.anchoredPosition = new Vector2(0, 100);
+                nextDestText.rectTransform.anchoredPosition = new Vector2(0, 125);
                 nextDestText.alignment = TextAlignmentOptions.Center;
             }
             if (etaText != null)
@@ -153,6 +173,11 @@ public class DockedUI : MonoBehaviour
                 nextDestText.rectTransform.anchoredPosition = nextDestOriginalPos;
             if (etaText != null)
                 etaText.rectTransform.anchoredPosition = etaOriginalPos;
+
+            // 명왕성(index 6) 정박 시 = 다음이 프록시마(8조 km 점프)라 경고
+            etaBlinking = (gm.currentStarIndex == 6);
+            if (!etaBlinking && etaText != null && etaColorCached)
+                etaText.color = etaOriginalColor;
 
             StarData next = StarDatabase.Stars[nextIdx];
             string nextName = Loc.Get(next.nameKey);

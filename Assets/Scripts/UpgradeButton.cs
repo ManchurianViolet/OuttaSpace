@@ -40,19 +40,30 @@ public class UpgradeButton : MonoBehaviour
         double cost = gm.GetUpgradeCost(upgradeType);
         bool canAfford = gm.CanAfford(upgradeType);
 
-        if (nameText != null) nameText.text = Loc.Get(data.nameKey);
+        if (nameText != null)
+        {
+            // BoosterSpeed ì—…ê¸€ì€ ëª…ì™•ì„± í†µê³¼ í›„ 'ì„±ê°„ ë¶€ìŠ¤í„°'ë¡œ ë¼ë²¨ ë³€ê²½
+            string nameKey = data.nameKey;
+            string descKey = data.descKey;
+            if (upgradeType == UpgradeType.BoosterSpeed && gm.IsInterstellarUnlocked())
+            {
+                nameKey = "upgrade_bspd_interstellar";
+                descKey = "upgrade_bspd_interstellar_desc";
+            }
+            nameText.text = Loc.Get(nameKey);
+            if (descText != null) descText.text = Loc.Get(descKey);
+        }
         if (levelText != null) levelText.text = $"Lv.{level}";
-        if (descText != null) descText.text = Loc.Get(data.descKey);
         if (costText != null)
         {
-            costText.text = $"{GameManager.FormatCredits(cost)} CR";
+            costText.text = $"{GameManager.FormatNumber(cost)} CR";
             costText.color = canAfford ? affordableTextColor : unaffordableTextColor;
         }
 
         if (buyButton != null) buyButton.interactable = canAfford;
         if (buttonBackground != null) buttonBackground.color = Color.white;
 
-        // ¸ø »ç¸é ±ÛÀÚ¸¸ »ìÂ¦ Èå¸®°Ô
+        // ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Ú¸ï¿½ ï¿½ï¿½Â¦ ï¿½å¸®ï¿½ï¿½
         float textAlpha = canAfford ? 1f : 0.75f;
         if (nameText != null) { var c = nameText.color; c.a = textAlpha; nameText.color = c; }
         if (levelText != null) { var c = levelText.color; c.a = textAlpha; levelText.color = c; }
