@@ -44,7 +44,7 @@ public class GameManager : MonoBehaviour
     /// 명왕성 → 프록시마 거리가 1만 배 점프하기 때문에 보상 차원에서 멀티플라이어 추가.
     /// </summary>
     private const int INTERSTELLAR_UNLOCK_INDEX = 6;
-    private const double INTERSTELLAR_BOOST_MULT = 30.0;
+    private const double INTERSTELLAR_BOOST_MULT = 15.0;
 
     void Awake()
     {

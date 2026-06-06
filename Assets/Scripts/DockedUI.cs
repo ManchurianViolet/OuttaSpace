@@ -77,7 +77,7 @@ public class DockedUI : MonoBehaviour
         if (creditsText != null && GameManager.Instance != null)
             creditsText.text = GameManager.FormatNumber(GameManager.Instance.credits) + " CR";
 
-        // 명왕성 정박 시 ETA 빨강 깜빡 (다음 별과의 거리 점프 경고)
+        // ETA 24시간 초과 시 빨강 깜빡 + 크기 살짝 펌프
         if (etaBlinking && etaText != null)
         {
             // 원래 색 캐시 (한 번만)
@@ -90,6 +90,10 @@ public class DockedUI : MonoBehaviour
             // 1초 주기로 빨강 ↔ 원래색
             float t = Mathf.PingPong(Time.unscaledTime * 2f, 1f);
             etaText.color = Color.Lerp(etaOriginalColor, new Color(1f, 0.3f, 0.3f), t);
+
+            // 크기 1.0 ~ 1.15 사이 펌핑
+            float scale = 1f + Mathf.Sin(Time.unscaledTime * 4f) * 0.075f;
+            etaText.rectTransform.localScale = new Vector3(scale, scale, 1f);
         }
     }
 
@@ -174,23 +178,25 @@ public class DockedUI : MonoBehaviour
             if (etaText != null)
                 etaText.rectTransform.anchoredPosition = etaOriginalPos;
 
-            // 명왕성(index 6) 정박 시 = 다음이 프록시마(8조 km 점프)라 경고
-            etaBlinking = (gm.currentStarIndex == 6);
-            if (!etaBlinking && etaText != null && etaColorCached)
-                etaText.color = etaOriginalColor;
-
             StarData next = StarDatabase.Stars[nextIdx];
             string nextName = Loc.Get(next.nameKey);
+
+            // ETA 계산 → 12시간 초과면 깜빡 + 크기 변화 경고
+            double avgSpeed = ComputeAverageSpeed(gm);
+            double etaSeconds = avgSpeed > 0 ? next.distanceKM / avgSpeed : 0;
+            etaBlinking = (etaSeconds > 43200); // 12시간
+
+            if (!etaBlinking && etaText != null && etaColorCached)
+            {
+                etaText.color = etaOriginalColor;
+                etaText.rectTransform.localScale = Vector3.one;
+            }
 
             if (nextDestText != null)
                 nextDestText.text = Loc.Get("dock_next", nextName, StarDatabase.FormatKM(next.distanceKM));
 
-            if (etaText != null)
-            {
-                double avgSpeed = ComputeAverageSpeed(gm);
-                if (avgSpeed > 0)
-                    etaText.text = Loc.Get("dock_eta", GameManager.FormatTime(next.distanceKM / avgSpeed));
-            }
+            if (etaText != null && avgSpeed > 0)
+                etaText.text = Loc.Get("dock_eta", GameManager.FormatTime(etaSeconds));
 
             if (departButtonText != null)
                 departButtonText.text = Loc.Get("dock_depart", nextName);

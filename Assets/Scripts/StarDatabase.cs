@@ -17,7 +17,7 @@ public static class StarDatabase
     /// 11 = 시리우스 (Sirius). 도착하면 출발 버튼 비활성 + "데모 끝" 안내.
     /// 정식 출시 시 -1로 바꾸면 자동으로 끝까지 갈 수 있음.
     /// </summary>
-    public const int DEMO_LAST_STAR_INDEX = 11;
+    public const int DEMO_LAST_STAR_INDEX = 29;
 
     /// <summary>
     /// 데모 잠금 대상인지 (data 없음 + 도착 불가).
@@ -33,41 +33,41 @@ public static class StarDatabase
     {
         // === 태양계 (7개) ===
         new StarData { nameKey="star_moon",       typeKey="type_moon",            distanceKM=384400,             color=HexColor("#cccccc"), reward=10 },
-        new StarData { nameKey="star_mars",       typeKey="type_terrestrial",     distanceKM=78300000,           color=HexColor("#cc5533"), reward=30 },
-        new StarData { nameKey="star_jupiter",    typeKey="type_gas_giant",       distanceKM=628700000,          color=HexColor("#ddaa77"), reward=60 },
-        new StarData { nameKey="star_saturn",     typeKey="type_gas_giant",       distanceKM=1275000000,         color=HexColor("#eedd88"), reward=100 },
-        new StarData { nameKey="star_uranus",     typeKey="type_ice_giant",       distanceKM=2724000000,         color=HexColor("#88ccdd"), reward=150 },
-        new StarData { nameKey="star_neptune",    typeKey="type_ice_giant",       distanceKM=4351000000,         color=HexColor("#4477cc"), reward=220 },
-        new StarData { nameKey="star_pluto",      typeKey="type_dwarf_planet",    distanceKM=5906000000,         color=HexColor("#bbaa99"), reward=350 },
+        new StarData { nameKey="star_mars",       typeKey="type_terrestrial",     distanceKM=77915600,           color=HexColor("#cc5533"), reward=30 },
+        new StarData { nameKey="star_jupiter",    typeKey="type_gas_giant",       distanceKM=550400000,          color=HexColor("#ddaa77"), reward=60 },
+        new StarData { nameKey="star_saturn",     typeKey="type_gas_giant",       distanceKM=646300000,         color=HexColor("#eedd88"), reward=100 },
+        new StarData { nameKey="star_uranus",     typeKey="type_ice_giant",       distanceKM=1449000000,         color=HexColor("#88ccdd"), reward=150 },
+        new StarData { nameKey="star_neptune",    typeKey="type_ice_giant",       distanceKM=1627000000,         color=HexColor("#4477cc"), reward=220 },
+        new StarData { nameKey="star_pluto",      typeKey="type_dwarf_planet",    distanceKM=1555000000,         color=HexColor("#bbaa99"), reward=350 },
 
         // === 근접 항성 (8~18) ===
-        new StarData { nameKey="star_proxima",    typeKey="type_red_dwarf",       distanceKM=40113000000000,     color=HexColor("#ff6644"), reward=800 },
-        new StarData { nameKey="star_alpha",      typeKey="type_g_type",          distanceKM=41340000000000,     color=HexColor("#fff4cc"), reward=900 },
-        new StarData { nameKey="star_barnard",    typeKey="type_red_dwarf",       distanceKM=56390000000000,     color=HexColor("#ff8866"), reward=1500 },
-        new StarData { nameKey="star_wolf359",    typeKey="type_red_dwarf",       distanceKM=74000000000000,     color=HexColor("#ff7755"), reward=2200 },
-        new StarData { nameKey="star_sirius",     typeKey="type_white_binary",    distanceKM=81360000000000,     color=HexColor("#ccddff"), reward=3000 },
-        new StarData { nameKey="star_luyten",     typeKey="type_red_binary",      distanceKM=82000000000000,     color=HexColor("#ff8866"), reward=3500 },
-        new StarData { nameKey="star_epsilon",    typeKey="type_k_type",          distanceKM=99340000000000,     color=HexColor("#ffcc88"), reward=5000 },
-        new StarData { nameKey="star_ross128",    typeKey="type_red_dwarf",       distanceKM=103000000000000,    color=HexColor("#ff7755"), reward=5800 },
-        new StarData { nameKey="star_procyon",    typeKey="type_f_binary",        distanceKM=108000000000000,    color=HexColor("#fff8e0"), reward=6500 },
-        new StarData { nameKey="star_tau",        typeKey="type_g_type",          distanceKM=112680000000000,    color=HexColor("#fff8dd"), reward=8000 },
-        new StarData { nameKey="star_cygnus61",   typeKey="type_k_binary",        distanceKM=114000000000000,    color=HexColor("#ffcc88"), reward=9000 },
+        new StarData { nameKey="star_proxima",    typeKey="type_red_dwarf",       distanceKM=40165500000000,     color=HexColor("#ff6644"), reward=800 },
+        new StarData { nameKey="star_alpha",      typeKey="type_g_type",          distanceKM=1144781000000,     color=HexColor("#fff4cc"), reward=900 },
+        new StarData { nameKey="star_barnard",    typeKey="type_red_dwarf",       distanceKM=15071373000000,     color=HexColor("#ff8866"), reward=1500 },
+        new StarData { nameKey="star_wolf359",    typeKey="type_red_dwarf",       distanceKM=17975900000000,     color=HexColor("#ff7755"), reward=2200 },
+        new StarData { nameKey="star_sirius",     typeKey="type_white_binary",    distanceKM=7001140000000,     color=HexColor("#ccddff"), reward=3000 },
+        new StarData { nameKey="star_luyten",     typeKey="type_red_binary",      distanceKM=1229930000000,     color=HexColor("#ff8866"), reward=3500 },
+        new StarData { nameKey="star_epsilon",    typeKey="type_k_type",          distanceKM=16745970000000,     color=HexColor("#ffcc88"), reward=5000 },
+        new StarData { nameKey="star_ross128",    typeKey="type_red_dwarf",       distanceKM=5014330000000,    color=HexColor("#ff7755"), reward=5800 },
+        new StarData { nameKey="star_procyon",    typeKey="type_f_binary",        distanceKM=3595180000000,    color=HexColor("#fff8e0"), reward=6500 },
+        new StarData { nameKey="star_tau",        typeKey="type_g_type",          distanceKM=4730500000000,    color=HexColor("#fff8dd"), reward=8000 },
+        new StarData { nameKey="star_cygnus61",   typeKey="type_k_binary",        distanceKM=4730500000000,    color=HexColor("#ffcc88"), reward=9000 },
 
         // === 밝은 별 (19~25) ===
-        new StarData { nameKey="star_altair",     typeKey="type_a_type",          distanceKM=161000000000000,    color=HexColor("#e0eeff"), reward=14000 },
-        new StarData { nameKey="star_vega",       typeKey="type_a_type",          distanceKM=236900000000000,    color=HexColor("#ddeeff"), reward=20000 },
-        new StarData { nameKey="star_fomalhaut",  typeKey="type_a_type",          distanceKM=241000000000000,    color=HexColor("#e8f0ff"), reward=22000 },
-        new StarData { nameKey="star_denebola",   typeKey="type_a_type",          distanceKM=342000000000000,    color=HexColor("#ddeeff"), reward=40000 },
-        new StarData { nameKey="star_arcturus",   typeKey="type_red_giant",      distanceKM=347200000000000,    color=HexColor("#ffaa44"), reward=50000 },
-        new StarData { nameKey="star_capella",    typeKey="type_yellow_giant",    distanceKM=401000000000000,    color=HexColor("#ffe680"), reward=70000 },
-        new StarData { nameKey="star_aldebaran",  typeKey="type_red_giant",       distanceKM=615000000000000,    color=HexColor("#ff9933"), reward=110000 },
+        new StarData { nameKey="star_altair",     typeKey="type_a_type",          distanceKM=50332520000000,    color=HexColor("#e0eeff"), reward=14000 },
+        new StarData { nameKey="star_vega",       typeKey="type_a_type",          distanceKM=78620910000000,    color=HexColor("#ddeeff"), reward=20000 },
+        new StarData { nameKey="star_fomalhaut",  typeKey="type_a_type",          distanceKM=851490000000,    color=HexColor("#e8f0ff"), reward=22000 },
+        new StarData { nameKey="star_denebola",   typeKey="type_a_type",          distanceKM=101894970000000,    color=HexColor("#ddeeff"), reward=40000 },
+        new StarData { nameKey="star_arcturus",   typeKey="type_red_giant",      distanceKM=7568800000000,    color=HexColor("#ffaa44"), reward=50000 },
+        new StarData { nameKey="star_capella",    typeKey="type_yellow_giant",    distanceKM=58847420000000,    color=HexColor("#ffe680"), reward=70000 },
+        new StarData { nameKey="star_aldebaran",  typeKey="type_red_giant",       distanceKM=211074910000000,    color=HexColor("#ff9933"), reward=110000 },
 
         // === 초거성 (26~30) ===
-        new StarData { nameKey="star_polaris",    typeKey="type_yellow_supergiant", distanceKM=4000000000000000,  color=HexColor("#ffefb0"), reward=150000 },
-        new StarData { nameKey="star_antares",    typeKey="type_red_supergiant",  distanceKM=5200000000000000,   color=HexColor("#ff5533"), reward=180000 },
-        new StarData { nameKey="star_betelgeuse", typeKey="type_red_supergiant",  distanceKM=6620000000000000,   color=HexColor("#ff4422"), reward=220000 },
-        new StarData { nameKey="star_rigel",      typeKey="type_blue_supergiant", distanceKM=8200000000000000,   color=HexColor("#aaccff"), reward=280000 },
-        new StarData { nameKey="star_deneb",      typeKey="type_blue_supergiant", distanceKM=24700000000000000,  color=HexColor("#bbddff"), reward=500000 },
+        new StarData { nameKey="star_polaris",    typeKey="type_yellow_supergiant", distanceKM=3479471970000000,  color=HexColor("#ffefb0"), reward=150000 },
+        new StarData { nameKey="star_antares",    typeKey="type_red_supergiant",  distanceKM=1106937000000000,   color=HexColor("#ff5533"), reward=180000 },
+        new StarData { nameKey="star_betelgeuse", typeKey="type_red_supergiant",  distanceKM=1419150000000000,   color=HexColor("#ff4422"), reward=220000 },
+        new StarData { nameKey="star_rigel",      typeKey="type_blue_supergiant", distanceKM=1513760000000000,   color=HexColor("#aaccff"), reward=280000 },
+        new StarData { nameKey="star_deneb",      typeKey="type_blue_supergiant", distanceKM=16462140000000000,  color=HexColor("#bbddff"), reward=500000 },
     };
 
     public static string FormatKM(double km)

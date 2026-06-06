@@ -230,8 +230,13 @@ public class GachaSystem : MonoBehaviour
             }
         }
 
-        // 도감 추가 (중복이어도 환급 없음)
-        CatManager.Instance.AddFromGacha(finalCatId);
+        // 도감 추가 - 중복이면 GACHA_REFUND만큼 환급
+        bool isNew = CatManager.Instance.AddFromGacha(finalCatId);
+        if (!isNew && CatDatabase.GACHA_REFUND > 0 && GameManager.Instance != null)
+        {
+            GameManager.Instance.credits += CatDatabase.GACHA_REFUND;
+            GameManager.Instance.NotifyStatsChanged();
+        }
 
         CatData fd = CatDatabase.Instance.Get(finalCatId);
         if (resultNameText != null && fd != null)
