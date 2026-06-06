@@ -20,7 +20,7 @@ public class SteamManager : MonoBehaviour
 
     // Demo build = true, full release = false. Toggle this per build target.
     // Build AppID must match where the leaderboard/stats are registered (demo=4767050, main=4616690).
-    public const bool IS_DEMO = true;
+    public const bool IS_DEMO = false;
     public const uint APP_ID = IS_DEMO ? 4767050u : 4616690u;
 
 #if !DISABLESTEAMWORKS
