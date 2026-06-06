@@ -16,17 +16,20 @@ public class SettingsPanelUI : MonoBehaviour
     public Button languageButton;
     public Button creditsButton;
     public Button resetButton;
+    public Button leaderboardButton;
     public Button closeButton;
 
     [Header("Button Labels (TMP Text inside each button)")]
     public TextMeshProUGUI languageButtonLabel;
     public TextMeshProUGUI creditsButtonLabel;
     public TextMeshProUGUI resetButtonLabel;
+    public TextMeshProUGUI leaderboardButtonLabel;
 
     [Header("Sub Panels")]
     public GameObject languagePanel;
     public GameObject creditsPanel;
     public GameObject resetConfirmPanel;
+    public GameObject leaderboardPanel;
 
     private CanvasGroup canvasGroup;
 
@@ -44,6 +47,7 @@ public class SettingsPanelUI : MonoBehaviour
         if (languageButton != null) languageButton.onClick.AddListener(OpenLanguage);
         if (creditsButton != null) creditsButton.onClick.AddListener(OpenCredits);
         if (resetButton != null) resetButton.onClick.AddListener(OpenResetConfirm);
+        if (leaderboardButton != null) leaderboardButton.onClick.AddListener(OpenLeaderboard);
         if (closeButton != null) closeButton.onClick.AddListener(Close);
 
         if (SettingsManager.Instance != null)
@@ -57,6 +61,7 @@ public class SettingsPanelUI : MonoBehaviour
         if (languageButton != null) languageButton.onClick.RemoveListener(OpenLanguage);
         if (creditsButton != null) creditsButton.onClick.RemoveListener(OpenCredits);
         if (resetButton != null) resetButton.onClick.RemoveListener(OpenResetConfirm);
+        if (leaderboardButton != null) leaderboardButton.onClick.RemoveListener(OpenLeaderboard);
         if (closeButton != null) closeButton.onClick.RemoveListener(Close);
 
         if (SettingsManager.Instance != null)
@@ -68,6 +73,7 @@ public class SettingsPanelUI : MonoBehaviour
         if (languageButtonLabel != null) languageButtonLabel.text = Loc.Get("settings_language");
         if (creditsButtonLabel != null) creditsButtonLabel.text = Loc.Get("settings_credits");
         if (resetButtonLabel != null) resetButtonLabel.text = Loc.Get("settings_reset");
+        if (leaderboardButtonLabel != null) leaderboardButtonLabel.text = Loc.Get("lb_title");
     }
 
     void OpenLanguage()
@@ -85,6 +91,12 @@ public class SettingsPanelUI : MonoBehaviour
     void OpenResetConfirm()
     {
         if (resetConfirmPanel != null) resetConfirmPanel.SetActive(true);
+        HideSelf();
+    }
+
+    void OpenLeaderboard()
+    {
+        if (leaderboardPanel != null) leaderboardPanel.SetActive(true);
         HideSelf();
     }
 

@@ -576,6 +576,14 @@ MonoBehaviour:
       \uBC30\uC728"
     m_Metadata:
       m_Items: []
+  - m_Id: 6976500000000042
+    m_Localized: "\uB9AC\uB354\uBCF4\uB4DC"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000046
+    m_Localized: "\uC544\uC9C1 \uAE30\uB85D\uC774 \uC5C6\uC5B4\uC694"
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

@@ -576,6 +576,14 @@ MonoBehaviour:
     m_Localized: Speed multiplier when interstellar booster fires
     m_Metadata:
       m_Items: []
+  - m_Id: 6976500000000042
+    m_Localized: Leaderboard
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000046
+    m_Localized: No records yet
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []
