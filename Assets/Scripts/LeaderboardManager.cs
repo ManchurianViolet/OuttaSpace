@@ -112,7 +112,10 @@ public class LeaderboardManager : MonoBehaviour
     {
         if (!leaderboardReady || GameManager.Instance == null) return;
 
-        double km = GameManager.Instance.totalDistance;
+        var gm = GameManager.Instance;
+        // 친구창에서 보이는 거리와 동일하게 계산 (별 인덱스 누적 + 현재 진행)
+        // gm.totalDistance는 별 데이터 변경 전후 일관성 안 보장됨
+        double km = StarDatabase.GetCumulativeDistance(gm.currentStarIndex, gm.distance);
         if (km < 0) km = 0;
 
         // 압축: km / divisor = int32 안전
