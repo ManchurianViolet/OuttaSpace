@@ -14,10 +14,9 @@ public static class StarDatabase
 {
     /// <summary>
     /// 데모 빌드에서 마지막으로 도달 가능한 별 index.
-    /// 11 = 시리우스 (Sirius). 도착하면 출발 버튼 비활성 + "데모 끝" 안내.
-    /// 정식 출시 시 -1로 바꾸면 자동으로 끝까지 갈 수 있음.
+    /// -1 = 정식 출시 (데모 종료 분기/위시리스트/수고메시지 비활성, 데네브 도착 시 클리어 화면).
     /// </summary>
-    public const int DEMO_LAST_STAR_INDEX = 29;
+    public const int DEMO_LAST_STAR_INDEX = -1;
 
     /// <summary>
     /// 데모 잠금 대상인지 (data 없음 + 도착 불가).
@@ -89,8 +88,8 @@ public static class StarDatabase
             if (km < 10000) return km.ToString("F0") + " km";
             if (km < 100000000) return (km / 10000).ToString("F0") + manUnit + " km";
             if (km < 1000000000000) return (km / 100000000).ToString("F1") + okUnit + " km";
-            if (km < 1000000000000000) return (km / 1000000000000).ToString("F2") + joUnit + " km";
-            return (km / 1000000000000000).ToString("F2") + gyeong + " km";
+            if (km < 10000000000000000) return (km / 1000000000000).ToString("F2") + joUnit + " km";
+            return (km / 10000000000000000).ToString("F2") + gyeong + " km";
         }
         else
         {
