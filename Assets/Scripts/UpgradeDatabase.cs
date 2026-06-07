@@ -22,7 +22,7 @@ public static class UpgradeDatabase
         new UpgradeData {
             type = UpgradeType.Speed,
             nameKey = "upgrade_speed", descKey = "upgrade_speed_desc",
-            baseCost = 10, costMult = 1.8,
+            baseCost = 10, costMult = 1.6,
             baseEffect = 1000, effectMult = 1.6,
             maxCost = 1000
         },
@@ -30,7 +30,7 @@ public static class UpgradeDatabase
         new UpgradeData {
             type = UpgradeType.BoosterSpeed,
             nameKey = "upgrade_bspd", descKey = "upgrade_bspd_desc",
-            baseCost = 50, costMult = 2.2,
+            baseCost = 40, costMult = 1.4,
             baseEffect = 1.0, effectMult = 1.5,
             maxCost = 1000
         },
