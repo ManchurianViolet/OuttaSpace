@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using System;
 using UnityEngine.Localization.Settings;
 using System.Collections.Generic;
@@ -42,8 +42,8 @@ public class GameManager : MonoBehaviour
     private float tickTimer;
     private float saveTimer;
 
-    private const double BASE_SPEED_COMMON = 5000;
-    private const double BASE_SPEED_RARE = 10000;
+    private const double BASE_SPEED_COMMON = 10000;
+    private const double BASE_SPEED_RARE = 30000;
     private const double BASE_SPEED_LEGENDARY = 100000;
     private const double SPEED_NORMALIZE = 5000;
 
@@ -100,14 +100,11 @@ public class GameManager : MonoBehaviour
         // Shift+J: 다음 행성 30만 km 전으로 점프
         if (Input.GetKeyDown(KeyCode.J) && Input.GetKey(KeyCode.LeftShift))
         {
-            if (currentStarIndex < StarDatabase.Stars.Length)
-            {
-                double target = StarDatabase.Stars[currentStarIndex].distanceKM - 300000;
-                if (target < 0) target = 0;
-                distance = target;
-                NotifyStatsChanged();
-                Debug.Log($"[Debug] 다음 행성 30만 km 전으로 점프 (distance={distance})");
-            }
+            double target = StarDatabase.GetStar(currentStarIndex).distanceKM - 300000;
+            if (target < 0) target = 0;
+            distance = target;
+            NotifyStatsChanged();
+            Debug.Log($"[Debug] 다음 행성 30만 km 전으로 점프 (distance={distance})");
         }
 
 #if UNITY_EDITOR
@@ -209,7 +206,7 @@ public class GameManager : MonoBehaviour
         distance += distGain;
         totalDistance += distGain;
 
-        StarData current = StarDatabase.Stars[currentStarIndex];
+        StarData current = StarDatabase.GetStar(currentStarIndex);
         if (distance >= current.distanceKM && !arrivedStars.Contains(currentStarIndex))
             ArriveAtStar(currentStarIndex);
 
@@ -218,19 +215,27 @@ public class GameManager : MonoBehaviour
 
     void ArriveAtStar(int index)
     {
-        StarData star = StarDatabase.Stars[index];
+        StarData star = StarDatabase.GetStar(index);
         arrivedStars.Add(index);
         isDocked = true;
 
+        // 도착 보상 (달 +10000 / 명왕성 +20000 / 포말하우트 +5000, 나머지 0)
+        string arriveMsg = Loc.Get("notif_arrived", Loc.Get(star.nameKey));
+        if (star.reward > 0)
+        {
+            credits += star.reward;
+            totalCredits += star.reward;
+            arriveMsg += $" +{star.reward:N0} CR";
+        }
+
         OnStarArrived?.Invoke(star);
-        OnNotification?.Invoke(Loc.Get("notif_arrived", Loc.Get(star.nameKey)));
+        OnNotification?.Invoke(arriveMsg);
         SaveGame();
     }
 
     public void DepartToNextStar()
     {
-        if (currentStarIndex < StarDatabase.Stars.Length - 1)
-            currentStarIndex++;
+        currentStarIndex++; // 무한 모드: 상한 없음
         distance = 0;
         isDocked = false;
         OnStatsChanged?.Invoke();
@@ -307,7 +312,27 @@ public class GameManager : MonoBehaviour
         UpgradeData data = UpgradeDatabase.Get(type);
         int level = GetUpgradeLevel(type);
         if (level == 0) return 0;
+        // effectMult가 1.0이면 선형 누적 (렙당 +baseEffect)
+        if (Math.Abs(data.effectMult - 1.0) < 0.0001)
+            return data.baseEffect * level;
         return data.baseEffect * (Math.Pow(data.effectMult, level) - 1) / (data.effectMult - 1);
+    }
+
+    public bool IsUpgradeMaxLevel(UpgradeType type)
+    {
+        // 계획된 마지막 별(M87) 도착 후엔 레벨 제한 해제 (무한 모드)
+        if (IsInfiniteModeUnlocked()) return false;
+        UpgradeData data = UpgradeDatabase.Get(type);
+        if (data.maxLevel <= 0) return false;
+        return GetUpgradeLevel(type) >= data.maxLevel;
+    }
+
+    /// <summary>
+    /// 계획된 마지막 별(M87, index 99)에 도착했는지. 도착 후 무한 모드 (레벨 캡 해제).
+    /// </summary>
+    public bool IsInfiniteModeUnlocked()
+    {
+        return arrivedStars.Contains(StarDatabase.LAST_PLANNED_INDEX);
     }
 
     public int GetUpgradeLevel(UpgradeType type)
@@ -333,10 +358,11 @@ public class GameManager : MonoBehaviour
         return cost;
     }
 
-    public bool CanAfford(UpgradeType type) => credits >= GetUpgradeCost(type);
+    public bool CanAfford(UpgradeType type) => !IsUpgradeMaxLevel(type) && credits >= GetUpgradeCost(type);
 
     public bool BuyUpgrade(UpgradeType type)
     {
+        if (IsUpgradeMaxLevel(type)) return false;
         double cost = GetUpgradeCost(type);
         if (credits < cost) return false;
         credits -= cost;
@@ -421,27 +447,43 @@ public class GameManager : MonoBehaviour
         if (kmPerSec < 0) kmPerSec = 0;
 
         string lang = GetCurrentLanguageCode();
-        bool isAsianUnits = (lang == "ko" || lang == "ja");
+        bool isAsianUnits = (lang == "ko" || lang == "ja" || lang.StartsWith("zh"));
 
         if (isAsianUnits)
         {
-            // 한/일 공유: 万/億/兆 (한국어 한글 vs 일본어 한자만 다름)
-            string manUnit = (lang == "ja") ? "万" : "만";
-            string okUnit = (lang == "ja") ? "億" : "억";
-            string joUnit = (lang == "ja") ? "兆" : "조";
+            // 한/일/중: 만/억/조 → 9999조 초과부터 지수 표기 (FormatKM과 동일 규칙)
+            string manUnit = (lang == "ko") ? "만" : "万";
+            string okUnit = (lang == "ko") ? "억" : "億";
+            string joUnit = (lang == "ko") ? "조" : "兆";
+            if (lang.StartsWith("zh")) { okUnit = "亿"; joUnit = "万亿"; }
 
             if (kmPerSec < 10000) return kmPerSec.ToString("F0") + " km/s";
             if (kmPerSec < 100000000) return (kmPerSec / 10000).ToString("F0") + manUnit + " km/s";
             if (kmPerSec < 1000000000000) return (kmPerSec / 100000000).ToString("F1") + okUnit + " km/s";
-            return (kmPerSec / 1000000000000).ToString("F2") + joUnit + " km/s";
+            if (kmPerSec < 10000000000000000) return (kmPerSec / 1000000000000).ToString("F2") + joUnit + " km/s";
+            return FormatSpeedScientific(kmPerSec);
         }
         else
         {
+            // 영어: K/M/B/T → 999T 초과부터 지수 표기
             if (kmPerSec < 1000) return kmPerSec.ToString("F0") + " km/s";
             if (kmPerSec < 1000000) return (kmPerSec / 1000).ToString("F1") + "K km/s";
             if (kmPerSec < 1000000000) return (kmPerSec / 1000000).ToString("F1") + "M km/s";
-            return (kmPerSec / 1000000000).ToString("F2") + "B km/s";
+            if (kmPerSec < 1000000000000) return (kmPerSec / 1000000000).ToString("F2") + "B km/s";
+            if (kmPerSec < 1000000000000000) return (kmPerSec / 1000000000000).ToString("F2") + "T km/s";
+            return FormatSpeedScientific(kmPerSec);
         }
+    }
+
+    /// <summary>
+    /// 속도 지수 표기: 1.5 × 10¹⁶ km/s (TMP 리치 텍스트 &lt;sup&gt; — Rich Text 켜져 있어야 함).
+    /// </summary>
+    public static string FormatSpeedScientific(double kmPerSec)
+    {
+        if (kmPerSec < 1) return "0 km/s";
+        int exp = (int)System.Math.Floor(System.Math.Log10(kmPerSec));
+        double mantissa = kmPerSec / System.Math.Pow(10, exp);
+        return $"{mantissa:F1} × 10<sup>{exp}</sup> km/s";
     }
 
     /// <summary>
@@ -470,9 +512,9 @@ public class GameManager : MonoBehaviour
     /// </summary>
     public void DebugJumpToStar(int targetIndex)
     {
-        if (targetIndex < 0 || targetIndex >= StarDatabase.Stars.Length)
+        if (targetIndex < 0)
         {
-            Debug.LogWarning($"[Debug] Jump 실패: 인덱스 {targetIndex} 범위 밖 (0~{StarDatabase.Stars.Length - 1})");
+            Debug.LogWarning($"[Debug] Jump 실패: 인덱스 {targetIndex} 범위 밖 (0 이상, 100+는 무한 모드)");
             return;
         }
 
@@ -491,7 +533,7 @@ public class GameManager : MonoBehaviour
         }
 
         currentStarIndex = targetIndex;
-        double target = StarDatabase.Stars[targetIndex].distanceKM - 10000;
+        double target = StarDatabase.GetStar(targetIndex).distanceKM - 10000;
         if (target < 0) target = 0;
         distance = target;
         isDocked = false;
@@ -499,11 +541,11 @@ public class GameManager : MonoBehaviour
         // 누적 거리도 다시 계산
         totalDistance = 0;
         for (int i = 0; i < targetIndex; i++)
-            totalDistance += StarDatabase.Stars[i].distanceKM;
+            totalDistance += StarDatabase.GetStar(i).distanceKM;
         totalDistance += distance;
 
         NotifyStatsChanged();
-        StarData s = StarDatabase.Stars[targetIndex];
+        StarData s = StarDatabase.GetStar(targetIndex);
         Debug.Log($"[Debug] {Loc.Get(s.nameKey)} (#{targetIndex}) 10,000km 전으로 점프. distance={distance:F0}, totalDistance={totalDistance:F0}");
     }
 #endif

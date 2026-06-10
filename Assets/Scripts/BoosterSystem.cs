@@ -56,6 +56,27 @@ public class BoosterSystem : MonoBehaviour
         {
             GlobalInputHook.Instance.OnGlobalKeyPress += OnKeyPress;
         }
+
+        // 행성 도착 시 게이지 초기화 (도착 직전 게이지/부스트가 다음 출발로 이월되는 것 방지)
+        if (GameManager.Instance != null)
+            GameManager.Instance.OnStarArrived += OnStarArrived;
+    }
+
+    void OnStarArrived(StarData star)
+    {
+        ResetGauge();
+    }
+
+    /// <summary>
+    /// 게이지/부스트 상태 전부 초기화. 출발하면 0부터 다시 쌓음.
+    /// </summary>
+    public void ResetGauge()
+    {
+        fuel = 0f;
+        isBoosting = false;
+        isFullWaiting = false;
+        fullWaitTimer = 0f;
+        currentShake = 0f;
     }
 
     void Update()
@@ -286,5 +307,8 @@ public class BoosterSystem : MonoBehaviour
         {
             GlobalInputHook.Instance.OnGlobalKeyPress -= OnKeyPress;
         }
+
+        if (GameManager.Instance != null)
+            GameManager.Instance.OnStarArrived -= OnStarArrived;
     }
 }

@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using System.Collections.Generic;
@@ -112,8 +112,8 @@ public class FriendCardUI : MonoBehaviour
         bool isSailing = false;
         if (activityText != null)
         {
-            int safeStarIdx = Mathf.Clamp(e.currentStarIndex, 0, StarDatabase.Stars.Length - 1);
-            StarData star = StarDatabase.Stars[safeStarIdx];
+            int safeStarIdx = Mathf.Max(e.currentStarIndex, 0); // 무한 모드: 상한 없음
+            StarData star = StarDatabase.GetStar(safeStarIdx);
             string starName = Loc.Get(star.nameKey);
 
             if (e.status == FriendStatus.Sailing && !e.isDocked)

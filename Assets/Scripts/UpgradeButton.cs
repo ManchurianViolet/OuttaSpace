@@ -54,13 +54,23 @@ public class UpgradeButton : MonoBehaviour
             if (descText != null) descText.text = Loc.Get(descKey);
         }
         if (levelText != null) levelText.text = $"Lv.{level}";
+
+        bool maxed = gm.IsUpgradeMaxLevel(upgradeType);
         if (costText != null)
         {
-            costText.text = $"{GameManager.FormatNumber(cost)} CR";
-            costText.color = canAfford ? affordableTextColor : unaffordableTextColor;
+            if (maxed)
+            {
+                costText.text = "MAX";
+                costText.color = affordableTextColor;
+            }
+            else
+            {
+                costText.text = $"{GameManager.FormatNumber(cost)} CR";
+                costText.color = canAfford ? affordableTextColor : unaffordableTextColor;
+            }
         }
 
-        if (buyButton != null) buyButton.interactable = canAfford;
+        if (buyButton != null) buyButton.interactable = canAfford && !maxed;
         if (buttonBackground != null) buttonBackground.color = Color.white;
 
         // �� ��� ���ڸ� ��¦ �帮��

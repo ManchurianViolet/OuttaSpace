@@ -176,23 +176,17 @@ public class CatCollectionUI : MonoBehaviour
         for (int i = 0; i < count; i++)
         {
             int id = start + i;
-            if (CatDatabase.IsDemoLocked(id)) continue;
             if (CatManager.Instance.IsOwned(id)) owned++;
         }
         return owned;
     }
 
     /// <summary>
-    /// 등급별 잠금 제외 전체 수.
+    /// 등급별 전체 수.
     /// </summary>
     int GetAvailableCount(CatRarity rarity)
     {
-        int start = CatDatabase.GetRarityStartIndex(rarity);
-        int count = CatDatabase.GetRarityCount(rarity);
-        int available = 0;
-        for (int i = 0; i < count; i++)
-            if (!CatDatabase.IsDemoLocked(start + i)) available++;
-        return available;
+        return CatDatabase.GetRarityCount(rarity);
     }
 
     void RefreshPage()
@@ -230,7 +224,7 @@ public class CatCollectionUI : MonoBehaviour
                 slots[i].gameObject.SetActive(true);
 
             CatData data = db.Get(catId);
-            bool locked = CatDatabase.IsDemoLocked(catId);
+            bool locked = false;  // 정식판: 모든 고양이 잠금 없음
             bool owned = cm.IsOwned(catId);
             Sprite displaySprite;
 

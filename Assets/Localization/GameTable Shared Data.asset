@@ -875,6 +875,26 @@ MonoBehaviour:
     m_Key: clear_restart_unlock
     m_Metadata:
       m_Items: []
+  - m_Id: 6976500000000146
+    m_Key: lb_rank
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000147
+    m_Key: lb_username
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000148
+    m_Key: lb_far_from_earth
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000149
+    m_Key: lb_score
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000150
+    m_Key: dock_depart_abyss
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:

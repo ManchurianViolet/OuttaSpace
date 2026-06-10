@@ -880,6 +880,26 @@ MonoBehaviour:
     m_Localized: Play Again + Unlock All Cats
     m_Metadata:
       m_Items: []
+  - m_Id: 6976500000000146
+    m_Localized: Rank
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000147
+    m_Localized: UserName
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000148
+    m_Localized: Far from Earth
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000149
+    m_Localized: Score
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000150
+    m_Localized: Into the Abyss
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

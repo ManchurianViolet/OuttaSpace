@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using System;
 using System.Collections;
 using System.Runtime.InteropServices;
@@ -221,7 +221,7 @@ public class WindowStateManager : MonoBehaviour
         {
             var arrived = GameManager.Instance.arrivedStars;
             if (arrived.Count > 0)
-                dockedStar = StarDatabase.Stars[arrived[arrived.Count - 1]];
+                dockedStar = StarDatabase.GetStar(arrived[arrived.Count - 1]);
             SetDockedImmediate();
         }
         else

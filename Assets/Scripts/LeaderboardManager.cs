@@ -5,40 +5,24 @@ using System.Collections.Generic;
 
 /// <summary>
 /// Steam Leaderboards 래퍼.
-/// 
+///
 /// 작동:
-/// - 정박 시점에 totalDistance를 Steam에 업로드
-/// - LeaderboardUI에서 조회해서 표시
-/// 
-/// 주의:
-/// - Steam Leaderboard 점수는 int32 (최대 약 21억)
-/// - 우리 거리는 km 단위로 24,700조까지 가니까 오버플로
-/// - "백만 km 단위"로 압축해서 저장 (24,700조 → 24.7억, int32 가능)
-/// - 24,700조 / 1,000,000 = 24,700,000,000 → 32비트로는 21억까지만 → 여전히 오버
-/// - 더 큰 단위로 압축: "10억 km(=Gm) 단위" → 24,700,000 (안전)
+/// - 점수 = 지나간 항성 수 (arrivedStars.Count, 달 도착 = 1)
+/// - 시작 1회 + 60초마다 자동 업로드, LeaderboardUI에서 조회
+///
+/// 점수는 int32 — 항성 수(0~100+무한)라 오버플로 걱정 없음.
+/// 리더보드는 FindOrCreateLeaderboard로 API 자동 생성 (웹 포털 작업 불필요).
 /// </summary>
 public class LeaderboardManager : MonoBehaviour
 {
     public static LeaderboardManager Instance { get; private set; }
 
-    private const string LEADERBOARD_NAME = "td_diag1"; // API 생성 리더보드 (기존 막힌 total_distance 대신)
-
-    /// <summary>
-    /// 거리를 int32 score로 압축할 때 나누는 값.
-    /// 1점 = 100만 km. 달(38만 km) 직후부터 점수 잡힘.
-    /// 최대 거리(2.1조 km까지) — 데모/정식판 데네브(1.6 × 10^16) 표현 불가.
-    /// 1점 = 1억 km로 안전하지만 초반 게임이 의미 없음.
-    /// 
-    /// 정식판에 데네브 너머 가는 컨텐츠 추가 시 SCORE_DIVISOR 조정 필요.
-    /// 현재는 데모 중심으로 화성~데네브 잘 표현되는 1억 km 단위 유지.
-    /// </summary>
-    public const double SCORE_DIVISOR = 100_000_000.0; // 1억 km 단위
+    private const string LEADERBOARD_NAME = "stars_passed"; // 점수 = 지나간 항성 수. API 자동 생성.
 
     private SteamLeaderboard_t leaderboard;
     private bool leaderboardReady;
     private float uploadTimer;
-    private double lastUploadedDistance;
-    private int lastUploadedScore = -1;           // 마지막으로 업로드된 압축 점수
+    private int lastUploadedScore = -1;           // 마지막으로 업로드된 점수
     private float lastUploadRealtime = -9999f;     // 마지막 업로드 시각 (realtime)
     private const float MIN_UPLOAD_INTERVAL = 65f; // 최소 업로드 간격(초). Steam 제한(10분/10회) 회피
 
@@ -88,7 +72,7 @@ public class LeaderboardManager : MonoBehaviour
         leaderboardReady = true;
         Debug.Log($"[Leaderboard] Ready: {LEADERBOARD_NAME}");
 
-        // 처음 발견 시 한 번 업로드 (현재 거리)
+        // 처음 발견 시 한 번 업로드
         UploadCurrentScore();
     }
 
@@ -106,27 +90,20 @@ public class LeaderboardManager : MonoBehaviour
     }
 
     /// <summary>
-    /// 현재 totalDistance를 Steam에 업로드. 더 큰 값일 때만 갱신됨 (Steam이 처리).
+    /// 지나간 항성 수를 Steam에 업로드. 더 큰 값일 때만 갱신됨.
     /// </summary>
     public void UploadCurrentScore()
     {
         if (!leaderboardReady || GameManager.Instance == null) return;
 
         var gm = GameManager.Instance;
-        // 친구창에서 보이는 거리와 동일하게 계산 (별 인덱스 누적 + 현재 진행)
-        // gm.totalDistance는 별 데이터 변경 전후 일관성 안 보장됨
-        double km = StarDatabase.GetCumulativeDistance(gm.currentStarIndex, gm.distance);
-        if (km < 0) km = 0;
-
-        // 압축: km / divisor = int32 안전
-        long compressed = (long)(km / SCORE_DIVISOR);
-        if (compressed > int.MaxValue) compressed = int.MaxValue;
-        int score = (int)compressed;
+        // 점수 = 도착한 별 개수 (달 도착 = 1)
+        int score = gm.arrivedStars.Count;
 
         // 0점은 업로드 의미 없음 (Steam이 정렬 못하고 본인 순위도 못 잡음)
         if (score <= 0)
         {
-            Debug.Log($"[Leaderboard] Skip upload (score=0, distance={km:N0} km)");
+            Debug.Log("[Leaderboard] Skip upload (score=0, no stars passed)");
             return;
         }
 
@@ -136,7 +113,6 @@ public class LeaderboardManager : MonoBehaviour
         // Steam 제한: 10분에 10회 + 동시 호출 1개. 최소 간격 강제로 레이트리밋 방지
         if (Time.realtimeSinceStartup - lastUploadRealtime < MIN_UPLOAD_INTERVAL) return;
 
-        lastUploadedDistance = km;
         lastUploadedScore = score;
         lastUploadRealtime = Time.realtimeSinceStartup;
 
@@ -147,7 +123,7 @@ public class LeaderboardManager : MonoBehaviour
             null, 0);
         uploadResult.Set(handle);
 
-        Debug.Log($"[Leaderboard] Uploading: {km:N0} km → score {score:N0}");
+        Debug.Log($"[Leaderboard] Uploading: {score} stars passed");
     }
 
     void OnScoreUploaded(LeaderboardScoreUploaded_t result, bool ioFailure)
@@ -211,8 +187,7 @@ public class LeaderboardManager : MonoBehaviour
                 rank = e.m_nGlobalRank,
                 steamId = e.m_steamIDUser.m_SteamID,
                 steamName = SteamFriends.GetFriendPersonaName(e.m_steamIDUser),
-                score = e.m_nScore,
-                distanceKM = (double)e.m_nScore * SCORE_DIVISOR
+                score = e.m_nScore
             });
         }
         return entries;
@@ -253,6 +228,5 @@ public class LeaderboardEntry
     public int rank;
     public ulong steamId;
     public string steamName;
-    public int score;       // 압축된 점수
-    public double distanceKM; // 실제 km
+    public int score;       // 지나간 항성 수
 }

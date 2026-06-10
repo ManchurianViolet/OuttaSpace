@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 public class DestinationVisual : MonoBehaviour
 {
@@ -377,7 +377,7 @@ public class DestinationVisual : MonoBehaviour
             RegeneratePlanet(currentDestIndex);
         }
 
-        StarData dest = StarDatabase.Stars[gm.currentStarIndex];
+        StarData dest = StarDatabase.GetStar(gm.currentStarIndex);
         float progress = dest.distanceKM > 0
             ? Mathf.Clamp01((float)(gm.distance / dest.distanceKM))
             : 0f;
@@ -417,7 +417,7 @@ public class DestinationVisual : MonoBehaviour
             glowObj.transform.localScale = Vector3.one * scale * 3f;
             if (glowRenderer != null)
             {
-                StarData star = StarDatabase.Stars[gm.currentStarIndex];
+                StarData star = StarDatabase.GetStar(gm.currentStarIndex);
                 Color gc = star.color;
                 gc.a = visibility * 0.2f;
                 glowRenderer.color = gc;
@@ -430,7 +430,7 @@ public class DestinationVisual : MonoBehaviour
     void RegeneratePlanet(int index)
     {
         if (planetTex != null) Destroy(planetTex);
-        StarData star = StarDatabase.Stars[index];
+        StarData star = StarDatabase.GetStar(index);
         int size = 24;
         if (star.typeKey.Contains("hypergiant") || star.typeKey.Contains("lbv"))
             size = 40;  // 극대거성/LBV 가장 큼

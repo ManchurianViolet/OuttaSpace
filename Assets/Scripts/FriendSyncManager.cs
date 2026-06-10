@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using System;
 using System.IO;
 using System.Collections.Generic;
@@ -188,7 +188,7 @@ public class FriendSyncManager : MonoBehaviour
         var gm = GameManager.Instance;
         if (gm == null) return;
 
-        StarData star = StarDatabase.Stars[gm.currentStarIndex];
+        StarData star = StarDatabase.GetStar(gm.currentStarIndex);
         string starName = Loc.Get(star.nameKey);
 
         if (gm.isDocked)
@@ -253,8 +253,8 @@ public class FriendSyncManager : MonoBehaviour
     {
         var gm = GameManager.Instance;
         if (gm == null) return 1.0;
-        int starIdx = Mathf.Clamp(gm.currentStarIndex, 0, StarDatabase.Stars.Length - 1);
-        return StarDatabase.Stars[starIdx].distanceKM * nearbyDistanceRatio;
+        int starIdx = Mathf.Max(gm.currentStarIndex, 0); // 무한 모드: 상한 없음
+        return StarDatabase.GetStar(starIdx).distanceKM * nearbyDistanceRatio;
     }
 
     public List<FriendData> GetAllLiveFriends()

@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
@@ -71,7 +71,7 @@ public class HUDController : MonoBehaviour
             speedText.color = boosting ? boostSpeedColor : normalSpeedColor;
         }
 
-        StarData star = StarDatabase.Stars[gm.currentStarIndex];
+        StarData star = StarDatabase.GetStar(gm.currentStarIndex);
         string starName = Loc.Get(star.nameKey);
 
         if (destinationText != null)

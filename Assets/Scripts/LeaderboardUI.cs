@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using System.Collections.Generic;
@@ -22,6 +22,18 @@ public class LeaderboardUI : MonoBehaviour
     public TextMeshProUGUI myRankText;
     public TextMeshProUGUI myNameText;
     public TextMeshProUGUI myDistanceText;
+    [Tooltip("본인 지구로부터 거리 TMP (드래그 연결)")]
+    public TextMeshProUGUI myFromEarthText;
+
+    [Header("Column Headers (CSV 키로 자동 번역)")]
+    [Tooltip("순위 칸 헤더 (lb_rank)")]
+    public TextMeshProUGUI rankHeaderText;
+    [Tooltip("이름 칸 헤더 (lb_username)")]
+    public TextMeshProUGUI nameHeaderText;
+    [Tooltip("지구로부터 칸 헤더 (lb_far_from_earth)")]
+    public TextMeshProUGUI fromEarthHeaderText;
+    [Tooltip("점수 칸 헤더 (lb_score)")]
+    public TextMeshProUGUI scoreHeaderText;
 
     [Header("UI")]
     public TextMeshProUGUI titleText;
@@ -65,6 +77,10 @@ public class LeaderboardUI : MonoBehaviour
             closeButton.onClick.AddListener(Close);
 
         if (titleText != null) titleText.text = Loc.Get("lb_title");
+        if (rankHeaderText != null) rankHeaderText.text = Loc.Get("lb_rank");
+        if (nameHeaderText != null) nameHeaderText.text = Loc.Get("lb_username");
+        if (fromEarthHeaderText != null) fromEarthHeaderText.text = Loc.Get("lb_far_from_earth");
+        if (scoreHeaderText != null) scoreHeaderText.text = Loc.Get("lb_score");
 
         FetchAndShow();
     }
@@ -101,6 +117,7 @@ public class LeaderboardUI : MonoBehaviour
         // 본인 영역 초기화
         if (myRankText != null) myRankText.text = "...";
         if (myDistanceText != null) myDistanceText.text = "";
+        if (myFromEarthText != null) myFromEarthText.text = "";
         if (myNameText != null)
             myNameText.text = SteamManager.Initialized ? SteamFriends.GetPersonaName() : "";
         if (myAvatar != null) LoadAvatar((CSteamID)mySteamId, myAvatar);
@@ -134,11 +151,27 @@ public class LeaderboardUI : MonoBehaviour
             var go = Instantiate(entryPrefab, entryContainer);
             spawnedEntries.Add(go);
 
-            // TMP 텍스트들 (자식 순서: rank, name, distance)
-            var texts = go.GetComponentsInChildren<TextMeshProUGUI>(true);
-            if (texts.Length >= 1) texts[0].text = $"#{entry.rank}";
-            if (texts.Length >= 2) texts[1].text = entry.steamName;
-            if (texts.Length >= 3) texts[2].text = StarDatabase.FormatKM(entry.distanceKM);
+            // 프리팹에 LeaderboardEntryRow가 있으면 드래그 연결된 TMP 사용 (권장)
+            var row = go.GetComponent<LeaderboardEntryRow>();
+            if (row != null)
+            {
+                if (row.rankText != null) row.rankText.text = $"#{entry.rank}";
+                if (row.nameText != null) row.nameText.text = entry.steamName;
+                if (row.starsText != null) row.starsText.text = $"★ {entry.score}";
+                if (row.fromEarthText != null)
+                {
+                    row.fromEarthText.richText = true; // 지수 표기(<sup>)용
+                    row.fromEarthText.text = FromEarthText(entry.score);
+                }
+            }
+            else
+            {
+                // 컴포넌트 없으면 기존 방식 (자식 순서: rank, name, stars)
+                var texts = go.GetComponentsInChildren<TextMeshProUGUI>(true);
+                if (texts.Length >= 1) texts[0].text = $"#{entry.rank}";
+                if (texts.Length >= 2) texts[1].text = entry.steamName;
+                if (texts.Length >= 3) texts[2].text = $"★ {entry.score}";
+            }
 
             // 아바타 (자식의 첫 번째 RawImage)
             var avatar = go.GetComponentInChildren<RawImage>(true);
@@ -147,18 +180,37 @@ public class LeaderboardUI : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// 점수(지나간 항성 수) → 지구로부터 추정 거리 (거리만, 라벨 없음).
+    /// 점수 N = N번째 별 도착 후 다음 별로 이동 중 → 누적거리 + 다음 구간의 절반으로 추정.
+    /// 표기는 FormatKM 공통 사용 (조/T 초과 시 지수 표기).
+    /// </summary>
+    static string FromEarthText(int score)
+    {
+        if (score <= 0) return "";
+        double est = StarDatabase.GetCumulativeDistance(score, 0)
+                   + StarDatabase.GetStar(score).distanceKM * 0.5;
+        return StarDatabase.FormatKM(est);
+    }
+
     void OnMyRankFetched(LeaderboardEntry me)
     {
         if (me == null)
         {
             if (myRankText != null) myRankText.text = "-";
-            if (myDistanceText != null) myDistanceText.text = "0 km";
+            if (myDistanceText != null) myDistanceText.text = "★ 0";
+            if (myFromEarthText != null) myFromEarthText.text = "";
             return;
         }
 
         if (myRankText != null) myRankText.text = $"#{me.rank}";
         if (myNameText != null) myNameText.text = me.steamName;
-        if (myDistanceText != null) myDistanceText.text = StarDatabase.FormatKM(me.distanceKM);
+        if (myDistanceText != null) myDistanceText.text = $"★ {me.score}";
+        if (myFromEarthText != null)
+        {
+            myFromEarthText.richText = true; // 지수 표기(<sup>)용
+            myFromEarthText.text = FromEarthText(me.score);
+        }
     }
 
     // ============ Steam Avatar ============
