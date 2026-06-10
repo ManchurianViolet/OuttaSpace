@@ -9,8 +9,8 @@ using UnityEditor.Build.Reporting;
 #endif
 
 /// <summary>
-/// Steamworks ÃÊ±âÈ­ ¹× ÄÝ¹é °ü¸®.
-/// ºôµå ½Ã steam_appid.txt¸¦ ÀÚµ¿À¸·Î ºôµå Æú´õ¿¡ º¹»ç.
+/// Steamworks ï¿½Ê±ï¿½È­ ï¿½ï¿½ ï¿½Ý¹ï¿½ ï¿½ï¿½ï¿½ï¿½.
+/// ï¿½ï¿½ï¿½ ï¿½ï¿½ steam_appid.txtï¿½ï¿½ ï¿½Úµï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½.
 /// AppID: 4616690
 /// </summary>
 public class SteamManager : MonoBehaviour
@@ -116,7 +116,7 @@ public class SteamManager : MonoBehaviour
 #endif
 }
 
-// ============ ºôµå ½Ã steam_appid.txt ÀÚµ¿ º¹»ç ============
+// ============ ï¿½ï¿½ï¿½ ï¿½ï¿½ steam_appid.txt ï¿½Úµï¿½ ï¿½ï¿½ï¿½ï¿½ ============
 #if UNITY_EDITOR
 public class SteamAppIdPostProcessor : IPostprocessBuildWithReport
 {

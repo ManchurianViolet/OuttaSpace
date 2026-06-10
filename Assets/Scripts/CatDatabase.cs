@@ -33,7 +33,7 @@ public class CatDatabase : MonoBehaviour
     public const float PROB_LEGENDARY = 0.05f;
 
     public const int GACHA_COST = 100;
-    public const int GACHA_REFUND = 50;       // 중복 시 50% 환급
+    public const int GACHA_REFUND = 30;       // 중복 시 50% 환급
 
     private CatData[] catDataCache;
 
