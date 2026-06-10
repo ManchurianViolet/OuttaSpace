@@ -16,7 +16,7 @@ public static class StarDatabase
     /// 데모 빌드에서 마지막으로 도달 가능한 별 index.
     /// -1 = 정식 출시 (데모 종료 분기/위시리스트/수고메시지 비활성, 데네브 도착 시 클리어 화면).
     /// </summary>
-    public const int DEMO_LAST_STAR_INDEX = -1;
+    public const int DEMO_LAST_STAR_INDEX = 29;
 
     /// <summary>
     /// 데모 잠금 대상인지 (data 없음 + 도착 불가).
