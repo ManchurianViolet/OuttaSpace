@@ -27,6 +27,14 @@ public class GameManager : MonoBehaviour
     [Header("Settings")]
     public float tickRate = 0.05f;
 
+#if UNITY_EDITOR
+    [Header("=== Debug Jump (Editor Only) ===")]
+    [Tooltip("이 인덱스의 별로 점프할 거리(km 전). 0이면 100,000km 전.")]
+    public int debugJumpToStarIndex = 0;
+    [Tooltip("체크하면 위 인덱스 별의 10,000km 전으로 즉시 이동. 자동으로 다시 해제됨.")]
+    public bool debugJumpTrigger = false;
+#endif
+
     public event Action<StarData> OnStarArrived;
     public event Action OnStatsChanged;
     public event Action<string> OnNotification;
@@ -101,6 +109,15 @@ public class GameManager : MonoBehaviour
                 Debug.Log($"[Debug] 다음 행성 30만 km 전으로 점프 (distance={distance})");
             }
         }
+
+#if UNITY_EDITOR
+        // 인스펙터 체크박스 트리거: debugJumpTrigger를 true로 하면 debugJumpToStarIndex 별 10,000km 전으로
+        if (debugJumpTrigger)
+        {
+            debugJumpTrigger = false;  // 자동 해제
+            DebugJumpToStar(debugJumpToStarIndex);
+        }
+#endif
 
         // Shift+C: 크레딧 +10000
         if (Input.GetKeyDown(KeyCode.C) && Input.GetKey(KeyCode.LeftShift))
@@ -444,4 +461,50 @@ public class GameManager : MonoBehaviour
         if (sec < 86400) return Loc.Get("time_hour", $"{sec / 3600:F1}");
         return Loc.Get("time_day", $"{sec / 86400:F1}");
     }
+
+#if UNITY_EDITOR
+    /// <summary>
+    /// 디버그: 지정한 starIndex의 별 10,000km 전으로 즉시 이동.
+    /// 인스펙터 체크박스 또는 코드에서 호출 가능.
+    /// 그 이전 별들은 모두 도착 처리됨 (arrivedStars 갱신).
+    /// </summary>
+    public void DebugJumpToStar(int targetIndex)
+    {
+        if (targetIndex < 0 || targetIndex >= StarDatabase.Stars.Length)
+        {
+            Debug.LogWarning($"[Debug] Jump 실패: 인덱스 {targetIndex} 범위 밖 (0~{StarDatabase.Stars.Length - 1})");
+            return;
+        }
+
+        // 점프 = "targetIndex 별로 향하는 중, 10,000km 남음" 상태로 만들기
+        // currentStarIndex = targetIndex - 1로 하고 distance = (targetIndex-1 별 거리 - 10000)?
+        // 아니, distance는 "현재 currentStarIndex 별까지의 진행 거리"임
+        // 즉 currentStarIndex 별 위치로 향하는 중. 도착하면 currentStarIndex++됨.
+        // 따라서: targetIndex로 향하려면 currentStarIndex = targetIndex로 두고,
+        //         distance = Stars[targetIndex].distanceKM - 10000
+
+        // 이전 별들 모두 도착 처리
+        arrivedStars.Clear();
+        for (int i = 0; i < targetIndex; i++)
+        {
+            if (!arrivedStars.Contains(i)) arrivedStars.Add(i);
+        }
+
+        currentStarIndex = targetIndex;
+        double target = StarDatabase.Stars[targetIndex].distanceKM - 10000;
+        if (target < 0) target = 0;
+        distance = target;
+        isDocked = false;
+
+        // 누적 거리도 다시 계산
+        totalDistance = 0;
+        for (int i = 0; i < targetIndex; i++)
+            totalDistance += StarDatabase.Stars[i].distanceKM;
+        totalDistance += distance;
+
+        NotifyStatsChanged();
+        StarData s = StarDatabase.Stars[targetIndex];
+        Debug.Log($"[Debug] {Loc.Get(s.nameKey)} (#{targetIndex}) 10,000km 전으로 점프. distance={distance:F0}, totalDistance={totalDistance:F0}");
+    }
+#endif
 }

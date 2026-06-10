@@ -432,15 +432,51 @@ public class DestinationVisual : MonoBehaviour
         if (planetTex != null) Destroy(planetTex);
         StarData star = StarDatabase.Stars[index];
         int size = 24;
-        if (star.typeKey.Contains("giant") || star.typeKey.Contains("binary"))
+        if (star.typeKey.Contains("hypergiant") || star.typeKey.Contains("lbv"))
+            size = 40;  // 극대거성/LBV 가장 큼
+        else if (star.typeKey.Contains("galaxy"))
+            size = 48;  // 은하 매우 큼
+        else if (star.typeKey.Contains("nebula") || star.typeKey.Contains("remnant"))
+            size = 44;  // 성운 큼
+        else if (star.typeKey.Contains("cluster"))
+            size = 40;  // 성단 큼
+        else if (star.typeKey.Contains("black_hole") || star.typeKey.Contains("smbh"))
+            size = 32;  // 블랙홀
+        else if (star.typeKey.Contains("supergiant") || star.typeKey.Contains("wolf_rayet"))
+            size = 36;  // 초거성/WR
+        else if (star.typeKey.Contains("giant") || star.typeKey.Contains("binary") || star.typeKey.Contains("multi"))
             size = 32;
-        else if (star.typeKey.Contains("dwarf") || star.typeKey.Contains("moon"))
+        else if (star.typeKey.Contains("dwarf") || star.typeKey.Contains("moon") || star.typeKey.Contains("neutron") || star.typeKey.Contains("pulsar"))
             size = 16;
 
         bool isSaturn = star.nameKey == "star_saturn";
         if (isSaturn)
         {
             planetTex = GenerateSaturn(size, star.color, index);
+        }
+        else if (star.typeKey.Contains("smbh") || star.typeKey.Contains("black_hole"))
+        {
+            planetTex = GenerateBlackHole(size, star.color, star.typeKey, index);
+        }
+        else if (star.typeKey.Contains("neutron") || star.typeKey.Contains("pulsar"))
+        {
+            planetTex = GenerateNeutronStar(size, star.color, star.typeKey, index);
+        }
+        else if (star.typeKey.Contains("galaxy"))
+        {
+            planetTex = GenerateGalaxy(size, star.color, star.typeKey, index);
+        }
+        else if (star.typeKey.Contains("nebula") || star.typeKey.Contains("remnant"))
+        {
+            planetTex = GenerateNebula(size, star.color, star.typeKey, index);
+        }
+        else if (star.typeKey.Contains("cluster"))
+        {
+            planetTex = GenerateCluster(size, star.color, star.typeKey, index);
+        }
+        else if (star.typeKey.Contains("hypergiant") || star.typeKey.Contains("wolf_rayet") || star.typeKey.Contains("lbv"))
+        {
+            planetTex = GenerateHypergiant(size, star.color, star.typeKey, index);
         }
         else if (star.typeKey.Contains("binary"))
         {
@@ -924,5 +960,738 @@ public class DestinationVisual : MonoBehaviour
             GameManager.Instance.OnStatsChanged -= UpdateVisual;
             GameManager.Instance.OnStarArrived -= OnArrived;
         }
+    }
+
+    // ============================================================
+    // 새 typeKey 텍스처 생성 함수들 (100개 별 시스템용)
+    // ============================================================
+
+    /// <summary>
+    /// 블랙홀: 어두운 중심 + 사건의 지평선 + 강착원반 링.
+    /// type별:
+    ///  - black_hole (Gaia BH1/2, Cygnus X-1, V404): 강착원반 + 제트
+    ///  - smbh (Sgr A*): 더 크고 화려한 강착원반
+    /// </summary>
+    Texture2D GenerateBlackHole(int size, Color baseColor, string typeKey, int seed)
+    {
+        Random.InitState(seed);
+        Texture2D tex = new Texture2D(size, size, TextureFormat.RGBA32, false);
+        tex.filterMode = FilterMode.Point;
+        Color clear = new Color(0, 0, 0, 0);
+        for (int x = 0; x < size; x++)
+            for (int y = 0; y < size; y++)
+                tex.SetPixel(x, y, clear);
+
+        float cx = size * 0.5f;
+        float cy = size * 0.5f;
+        float horizonR = size * 0.18f;  // 사건의 지평선
+        float diskInner = size * 0.22f;
+        float diskOuter = size * 0.42f;
+        bool isSmbh = typeKey.Contains("smbh");
+
+        // 강착원반 색 (오렌지/노랑 발광)
+        Color diskHot = isSmbh ? new Color(1f, 0.9f, 0.5f, 1f) : new Color(1f, 0.7f, 0.3f, 1f);
+        Color diskCold = new Color(1f, 0.4f, 0.1f, 0.7f);
+
+        for (int x = 0; x < size; x++)
+        {
+            for (int y = 0; y < size; y++)
+            {
+                float dx = x - cx;
+                float dy = y - cy;
+                float d = Mathf.Sqrt(dx * dx + dy * dy);
+
+                if (d < horizonR)
+                {
+                    // 완전 검은 사건의 지평선
+                    tex.SetPixel(x, y, new Color(0.02f, 0.02f, 0.05f, 1f));
+                }
+                else if (d < horizonR + 1.5f)
+                {
+                    // 광자 구체 (밝은 흰 테두리)
+                    tex.SetPixel(x, y, new Color(1f, 0.95f, 0.8f, 1f));
+                }
+                else if (d >= diskInner && d <= diskOuter)
+                {
+                    // 강착원반: 수평으로 늘어진 타원
+                    float verticalSquish = Mathf.Abs(dy) / (size * 0.15f);
+                    if (verticalSquish < 1f)
+                    {
+                        float t = (d - diskInner) / (diskOuter - diskInner);
+                        Color c = Color.Lerp(diskHot, diskCold, t);
+                        c.a = Mathf.Lerp(1f, 0.3f, verticalSquish);
+                        tex.SetPixel(x, y, c);
+                    }
+                }
+            }
+        }
+
+        // 제트 (위/아래 좁은 빔)
+        if (isSmbh || typeKey.Contains("black_hole"))
+        {
+            Color jet = new Color(0.6f, 0.8f, 1f, 0.5f);
+            int jetW = 2;
+            for (int y = 0; y < size; y++)
+            {
+                float dy = y - cy;
+                if (Mathf.Abs(dy) > horizonR + 2f)
+                {
+                    for (int x = (int)cx - jetW; x <= (int)cx + jetW; x++)
+                    {
+                        if (x >= 0 && x < size)
+                        {
+                            Color existing = tex.GetPixel(x, y);
+                            if (existing.a < 0.1f)
+                                tex.SetPixel(x, y, jet);
+                        }
+                    }
+                }
+            }
+        }
+
+        tex.Apply();
+        return tex;
+    }
+
+    /// <summary>
+    /// 중성자별/펄사: 매우 작고 밝은 점 + 자기장 빔 (펄사면 회전).
+    /// </summary>
+    Texture2D GenerateNeutronStar(int size, Color baseColor, string typeKey, int seed)
+    {
+        Random.InitState(seed);
+        Texture2D tex = new Texture2D(size, size, TextureFormat.RGBA32, false);
+        tex.filterMode = FilterMode.Point;
+        Color clear = new Color(0, 0, 0, 0);
+        for (int x = 0; x < size; x++)
+            for (int y = 0; y < size; y++)
+                tex.SetPixel(x, y, clear);
+
+        float cx = size * 0.5f;
+        float cy = size * 0.5f;
+        float coreR = size * 0.15f;  // 매우 작은 코어
+        bool isPulsar = typeKey.Contains("pulsar");
+
+        // 코어 + 외부 광휘
+        for (int x = 0; x < size; x++)
+        {
+            for (int y = 0; y < size; y++)
+            {
+                float dx = x - cx;
+                float dy = y - cy;
+                float d = Mathf.Sqrt(dx * dx + dy * dy);
+
+                if (d < coreR)
+                {
+                    // 백색 코어
+                    tex.SetPixel(x, y, new Color(1f, 1f, 1f, 1f));
+                }
+                else if (d < coreR + 1f)
+                {
+                    // 푸른 광휘
+                    tex.SetPixel(x, y, new Color(0.7f, 0.85f, 1f, 1f));
+                }
+                else if (d < size * 0.3f)
+                {
+                    // 페이드 글로우
+                    float t = (d - coreR - 1f) / (size * 0.3f - coreR - 1f);
+                    Color c = new Color(0.5f, 0.7f, 1f, Mathf.Lerp(0.6f, 0f, t));
+                    tex.SetPixel(x, y, c);
+                }
+            }
+        }
+
+        // 펄사: 십자 빔 (자기장 축)
+        if (isPulsar)
+        {
+            Color beam = new Color(0.8f, 0.9f, 1f, 0.7f);
+            int beamLen = size / 2;
+            // 수직 빔
+            for (int dy = -beamLen; dy <= beamLen; dy++)
+            {
+                int y = (int)cy + dy;
+                if (y >= 0 && y < size && Mathf.Abs(dy) > coreR)
+                {
+                    int x = (int)cx;
+                    Color existing = tex.GetPixel(x, y);
+                    if (existing.a < 0.5f) tex.SetPixel(x, y, beam);
+                }
+            }
+            // 수평 빔
+            for (int dx = -beamLen; dx <= beamLen; dx++)
+            {
+                int x = (int)cx + dx;
+                if (x >= 0 && x < size && Mathf.Abs(dx) > coreR)
+                {
+                    int y = (int)cy;
+                    Color existing = tex.GetPixel(x, y);
+                    if (existing.a < 0.5f) tex.SetPixel(x, y, beam);
+                }
+            }
+        }
+
+        tex.Apply();
+        return tex;
+    }
+
+    /// <summary>
+    /// 성운: 가스 구름 (불규칙한 컬러풀 영역).
+    /// type별:
+    ///  - emission_nebula (Orion/Lagoon/Eagle/Carina/Trifid/Tarantula): 분홍/빨강 위주
+    ///  - planetary_nebula (Helix/Ring/Dumbbell/Cat's Eye): 동심원 고리
+    ///  - supernova_remnant (Crab): 필라멘트 구조
+    /// </summary>
+    Texture2D GenerateNebula(int size, Color baseColor, string typeKey, int seed)
+    {
+        Random.InitState(seed);
+        Texture2D tex = new Texture2D(size, size, TextureFormat.RGBA32, false);
+        tex.filterMode = FilterMode.Point;
+        Color clear = new Color(0, 0, 0, 0);
+        for (int x = 0; x < size; x++)
+            for (int y = 0; y < size; y++)
+                tex.SetPixel(x, y, clear);
+
+        float cx = size * 0.5f;
+        float cy = size * 0.5f;
+        bool isPlanetary = typeKey.Contains("planetary");
+        bool isRemnant = typeKey.Contains("remnant");
+
+        if (isPlanetary)
+        {
+            // 행성상 성운: 동심원 고리
+            float ringInner = size * 0.25f;
+            float ringOuter = size * 0.45f;
+            // 중심 별
+            for (int x = 0; x < size; x++)
+            {
+                for (int y = 0; y < size; y++)
+                {
+                    float dx = x - cx;
+                    float dy = y - cy;
+                    float d = Mathf.Sqrt(dx * dx + dy * dy);
+                    if (d < 1.5f)
+                    {
+                        tex.SetPixel(x, y, new Color(1f, 1f, 0.8f, 1f));
+                    }
+                    else if (d >= ringInner && d <= ringOuter)
+                    {
+                        float t = (d - ringInner) / (ringOuter - ringInner);
+                        // 내부는 밝게, 외부는 페이드
+                        float intensity = Mathf.Sin(t * Mathf.PI);
+                        Color c = baseColor;
+                        c.a = intensity * 0.85f;
+                        // 약간의 노이즈
+                        c.a *= (0.7f + Random.value * 0.3f);
+                        tex.SetPixel(x, y, c);
+                    }
+                }
+            }
+        }
+        else
+        {
+            // 방출 성운 / 초신성 잔해: 불규칙 가스 구름
+            // 여러 가우시안 블롭 합성
+            int blobs = isRemnant ? 12 : 6;
+            for (int b = 0; b < blobs; b++)
+            {
+                float blobX = cx + (Random.value - 0.5f) * size * 0.5f;
+                float blobY = cy + (Random.value - 0.5f) * size * 0.5f;
+                float blobR = size * (0.15f + Random.value * 0.2f);
+                Color blobColor = baseColor;
+                // 약간 색 변형
+                blobColor.r = Mathf.Clamp01(blobColor.r + (Random.value - 0.5f) * 0.2f);
+                blobColor.g = Mathf.Clamp01(blobColor.g + (Random.value - 0.5f) * 0.2f);
+                blobColor.b = Mathf.Clamp01(blobColor.b + (Random.value - 0.5f) * 0.2f);
+
+                for (int x = 0; x < size; x++)
+                {
+                    for (int y = 0; y < size; y++)
+                    {
+                        float dx = x - blobX;
+                        float dy = y - blobY;
+                        float d = Mathf.Sqrt(dx * dx + dy * dy);
+                        if (d < blobR)
+                        {
+                            float alpha = (1f - d / blobR) * 0.4f;
+                            Color existing = tex.GetPixel(x, y);
+                            Color blended = blobColor;
+                            blended.a = alpha;
+                            // 알파 블렌딩
+                            float newA = existing.a + alpha * (1f - existing.a);
+                            if (newA > 0.01f)
+                            {
+                                Color result = new Color(
+                                    (existing.r * existing.a + blended.r * alpha * (1f - existing.a)) / newA,
+                                    (existing.g * existing.a + blended.g * alpha * (1f - existing.a)) / newA,
+                                    (existing.b * existing.a + blended.b * alpha * (1f - existing.a)) / newA,
+                                    Mathf.Min(newA, 0.95f)
+                                );
+                                tex.SetPixel(x, y, result);
+                            }
+                        }
+                    }
+                }
+            }
+
+            // 초신성 잔해: 중심에 펄사 점 추가
+            if (isRemnant)
+            {
+                tex.SetPixel((int)cx, (int)cy, new Color(1f, 1f, 1f, 1f));
+                tex.SetPixel((int)cx + 1, (int)cy, new Color(0.8f, 0.9f, 1f, 1f));
+                tex.SetPixel((int)cx - 1, (int)cy, new Color(0.8f, 0.9f, 1f, 1f));
+                tex.SetPixel((int)cx, (int)cy + 1, new Color(0.8f, 0.9f, 1f, 1f));
+                tex.SetPixel((int)cx, (int)cy - 1, new Color(0.8f, 0.9f, 1f, 1f));
+            }
+        }
+
+        tex.Apply();
+        return tex;
+    }
+
+    /// <summary>
+    /// 은하: 나선/타원/렌즈형/폭발형 별 분포.
+    /// type별:
+    ///  - spiral_galaxy (Andromeda/Triangulum/M81/Sculptor/M101/M51/Black Eye): 나선팔 + 중심 벌지
+    ///  - elliptical_galaxy (Centaurus A/M87): 부드러운 타원
+    ///  - lenticular_galaxy (Sombrero): 디스크 + 중심 벌지
+    ///  - starburst_galaxy (M82): 시가형 + 폭발 발광
+    ///  - galaxy (LMC/SMC): 불규칙 모양
+    /// </summary>
+    Texture2D GenerateGalaxy(int size, Color baseColor, string typeKey, int seed)
+    {
+        Random.InitState(seed);
+        Texture2D tex = new Texture2D(size, size, TextureFormat.RGBA32, false);
+        tex.filterMode = FilterMode.Point;
+        Color clear = new Color(0, 0, 0, 0);
+        for (int x = 0; x < size; x++)
+            for (int y = 0; y < size; y++)
+                tex.SetPixel(x, y, clear);
+
+        float cx = size * 0.5f;
+        float cy = size * 0.5f;
+
+        if (typeKey.Contains("spiral"))
+        {
+            // 나선은하: 중심 벌지 + 2개 나선팔
+            float bulgeR = size * 0.12f;
+            // 벌지
+            for (int x = 0; x < size; x++)
+            {
+                for (int y = 0; y < size; y++)
+                {
+                    float dx = x - cx;
+                    float dy = y - cy;
+                    float d = Mathf.Sqrt(dx * dx + dy * dy);
+                    if (d < bulgeR)
+                    {
+                        float t = d / bulgeR;
+                        Color c = Color.Lerp(new Color(1f, 0.95f, 0.8f, 1f), baseColor, t);
+                        tex.SetPixel(x, y, c);
+                    }
+                }
+            }
+            // 나선팔 (2개, 각각 점들로 표현)
+            int armPoints = 80;
+            for (int arm = 0; arm < 2; arm++)
+            {
+                float armOffset = arm * Mathf.PI;
+                for (int p = 0; p < armPoints; p++)
+                {
+                    float t = (p + 1) / (float)armPoints;
+                    float r = bulgeR + t * (size * 0.35f);
+                    float angle = armOffset + t * Mathf.PI * 2f;  // 한 바퀴 감김
+                    float px = cx + r * Mathf.Cos(angle);
+                    float py = cy + r * Mathf.Sin(angle);
+                    
+                    // 점 주변 작은 영역 칠하기
+                    for (int dx = -1; dx <= 1; dx++)
+                    {
+                        for (int dy = -1; dy <= 1; dy++)
+                        {
+                            int xi = (int)(px + dx);
+                            int yi = (int)(py + dy);
+                            if (xi < 0 || xi >= size || yi < 0 || yi >= size) continue;
+                            float distFromPt = Mathf.Sqrt(dx * dx + dy * dy);
+                            if (distFromPt > 1.2f) continue;
+                            Color c = baseColor;
+                            c.a = Mathf.Lerp(0.8f, 0.2f, t);
+                            Color existing = tex.GetPixel(xi, yi);
+                            if (existing.a < c.a) tex.SetPixel(xi, yi, c);
+                        }
+                    }
+                }
+            }
+            // 별 점 노이즈 추가
+            for (int i = 0; i < size * 2; i++)
+            {
+                float angle = Random.value * Mathf.PI * 2f;
+                float r = bulgeR + Random.value * size * 0.35f;
+                int xi = (int)(cx + r * Mathf.Cos(angle));
+                int yi = (int)(cy + r * Mathf.Sin(angle));
+                if (xi >= 0 && xi < size && yi >= 0 && yi < size)
+                {
+                    Color existing = tex.GetPixel(xi, yi);
+                    if (existing.a < 0.5f)
+                        tex.SetPixel(xi, yi, new Color(1f, 1f, 0.9f, 0.6f));
+                }
+            }
+        }
+        else if (typeKey.Contains("elliptical"))
+        {
+            // 타원은하: 부드러운 타원 그라데이션
+            float maxR = size * 0.45f;
+            float ellipseRatio = 0.7f;  // 약간 납작
+            for (int x = 0; x < size; x++)
+            {
+                for (int y = 0; y < size; y++)
+                {
+                    float dx = (x - cx);
+                    float dy = (y - cy) / ellipseRatio;
+                    float d = Mathf.Sqrt(dx * dx + dy * dy);
+                    if (d < maxR)
+                    {
+                        float t = d / maxR;
+                        // 중심은 밝게, 외곽 어둡게
+                        Color c = Color.Lerp(new Color(1f, 0.95f, 0.8f, 1f), baseColor, t);
+                        c.a = Mathf.Lerp(1f, 0.1f, t * t);
+                        tex.SetPixel(x, y, c);
+                    }
+                }
+            }
+        }
+        else if (typeKey.Contains("lenticular"))
+        {
+            // 렌즈형 (솜브레로): 가로로 긴 디스크 + 중심 벌지 + 어두운 가로띠
+            float diskW = size * 0.45f;
+            float diskH = size * 0.15f;
+            // 디스크
+            for (int x = 0; x < size; x++)
+            {
+                for (int y = 0; y < size; y++)
+                {
+                    float dx = (x - cx) / diskW;
+                    float dy = (y - cy) / diskH;
+                    float d = Mathf.Sqrt(dx * dx + dy * dy);
+                    if (d < 1f)
+                    {
+                        float t = d;
+                        Color c = baseColor;
+                        c.a = Mathf.Lerp(0.9f, 0.1f, t);
+                        tex.SetPixel(x, y, c);
+                    }
+                }
+            }
+            // 중심 벌지
+            float bulgeR = size * 0.18f;
+            for (int x = 0; x < size; x++)
+            {
+                for (int y = 0; y < size; y++)
+                {
+                    float dx = x - cx;
+                    float dy = y - cy;
+                    float d = Mathf.Sqrt(dx * dx + dy * dy);
+                    if (d < bulgeR)
+                    {
+                        float t = d / bulgeR;
+                        Color c = Color.Lerp(new Color(1f, 1f, 0.85f, 1f), baseColor, t);
+                        tex.SetPixel(x, y, c);
+                    }
+                }
+            }
+            // 어두운 가로 띠 (먼지)
+            for (int x = 0; x < size; x++)
+            {
+                int y = (int)cy;
+                Color existing = tex.GetPixel(x, y);
+                if (existing.a > 0.2f)
+                    tex.SetPixel(x, y, new Color(0.2f, 0.15f, 0.1f, existing.a));
+            }
+        }
+        else if (typeKey.Contains("starburst"))
+        {
+            // 시가 모양 + 폭발 발광
+            float cigarW = size * 0.45f;
+            float cigarH = size * 0.18f;
+            // 30도 회전된 시가
+            float ang = Mathf.PI / 6f;
+            float cosA = Mathf.Cos(ang);
+            float sinA = Mathf.Sin(ang);
+            for (int x = 0; x < size; x++)
+            {
+                for (int y = 0; y < size; y++)
+                {
+                    float dx = x - cx;
+                    float dy = y - cy;
+                    // 회전
+                    float rx = dx * cosA + dy * sinA;
+                    float ry = -dx * sinA + dy * cosA;
+                    float nx = rx / cigarW;
+                    float ny = ry / cigarH;
+                    float d = Mathf.Sqrt(nx * nx + ny * ny);
+                    if (d < 1f)
+                    {
+                        float t = d;
+                        // 중심부 강한 발광
+                        Color core = new Color(1f, 0.9f, 0.6f, 1f);
+                        Color c = Color.Lerp(core, baseColor, t);
+                        c.a = Mathf.Lerp(1f, 0.2f, t);
+                        tex.SetPixel(x, y, c);
+                    }
+                }
+            }
+        }
+        else
+        {
+            // 불규칙 은하 (LMC/SMC)
+            // 여러 블롭 합성
+            int blobs = 8;
+            for (int b = 0; b < blobs; b++)
+            {
+                float bx = cx + (Random.value - 0.5f) * size * 0.4f;
+                float by = cy + (Random.value - 0.5f) * size * 0.4f;
+                float br = size * (0.1f + Random.value * 0.15f);
+                Color bc = baseColor;
+                for (int x = 0; x < size; x++)
+                {
+                    for (int y = 0; y < size; y++)
+                    {
+                        float dx = x - bx;
+                        float dy = y - by;
+                        float d = Mathf.Sqrt(dx * dx + dy * dy);
+                        if (d < br)
+                        {
+                            float a = (1f - d / br) * 0.5f;
+                            Color existing = tex.GetPixel(x, y);
+                            if (existing.a < a)
+                            {
+                                Color c = bc;
+                                c.a = a;
+                                tex.SetPixel(x, y, c);
+                            }
+                        }
+                    }
+                }
+            }
+            // 별 노이즈
+            for (int i = 0; i < size * 3; i++)
+            {
+                int xi = Random.Range(0, size);
+                int yi = Random.Range(0, size);
+                Color existing = tex.GetPixel(xi, yi);
+                if (existing.a > 0.1f && existing.a < 0.7f)
+                    tex.SetPixel(xi, yi, new Color(1f, 1f, 0.9f, 0.8f));
+            }
+        }
+
+        tex.Apply();
+        return tex;
+    }
+
+    /// <summary>
+    /// 성단: 여러 별이 모여 있는 모양.
+    /// type별:
+    ///  - open_cluster (Pleiades/Hyades/Beehive): 느슨한 분포
+    ///  - globular_cluster (M13/Omega Cen/47 Tuc): 구형 밀집
+    /// </summary>
+    Texture2D GenerateCluster(int size, Color baseColor, string typeKey, int seed)
+    {
+        Random.InitState(seed);
+        Texture2D tex = new Texture2D(size, size, TextureFormat.RGBA32, false);
+        tex.filterMode = FilterMode.Point;
+        Color clear = new Color(0, 0, 0, 0);
+        for (int x = 0; x < size; x++)
+            for (int y = 0; y < size; y++)
+                tex.SetPixel(x, y, clear);
+
+        float cx = size * 0.5f;
+        float cy = size * 0.5f;
+        bool isGlobular = typeKey.Contains("globular");
+
+        if (isGlobular)
+        {
+            // 구상성단: 중심에 매우 밀집된 별
+            int starCount = size * 8;
+            for (int i = 0; i < starCount; i++)
+            {
+                // 가우시안에 가까운 분포 (Box-Muller 근사)
+                float u1 = Random.value;
+                float u2 = Random.value;
+                float gauss = Mathf.Sqrt(-2 * Mathf.Log(u1 + 0.001f)) * Mathf.Cos(2 * Mathf.PI * u2);
+                float gauss2 = Mathf.Sqrt(-2 * Mathf.Log(u1 + 0.001f)) * Mathf.Sin(2 * Mathf.PI * u2);
+                float r = Mathf.Abs(gauss) * size * 0.12f;
+                float angle = gauss2 * Mathf.PI;
+                int xi = Mathf.RoundToInt(cx + r * Mathf.Cos(angle));
+                int yi = Mathf.RoundToInt(cy + r * Mathf.Sin(angle));
+                if (xi >= 0 && xi < size && yi >= 0 && yi < size)
+                {
+                    // 밝기 다양
+                    float brightness = 0.6f + Random.value * 0.4f;
+                    Color c = baseColor * brightness;
+                    c.a = 1f;
+                    tex.SetPixel(xi, yi, c);
+                }
+            }
+            // 중심 글로우
+            float coreR = size * 0.12f;
+            for (int x = 0; x < size; x++)
+            {
+                for (int y = 0; y < size; y++)
+                {
+                    float dx = x - cx;
+                    float dy = y - cy;
+                    float d = Mathf.Sqrt(dx * dx + dy * dy);
+                    if (d < coreR)
+                    {
+                        Color existing = tex.GetPixel(x, y);
+                        if (existing.a < 0.3f)
+                        {
+                            Color c = baseColor;
+                            c.a = (1f - d / coreR) * 0.4f;
+                            tex.SetPixel(x, y, c);
+                        }
+                    }
+                }
+            }
+        }
+        else
+        {
+            // 산개성단: 느슨하게 흩어진 별들
+            int starCount = size;
+            for (int i = 0; i < starCount; i++)
+            {
+                float dist = Random.value * size * 0.4f;
+                float angle = Random.value * Mathf.PI * 2f;
+                int xi = Mathf.RoundToInt(cx + dist * Mathf.Cos(angle));
+                int yi = Mathf.RoundToInt(cy + dist * Mathf.Sin(angle));
+                if (xi >= 0 && xi < size && yi >= 0 && yi < size)
+                {
+                    // 크기 다양
+                    int starSize = (Random.value < 0.2f) ? 2 : 1;
+                    Color c = baseColor;
+                    c.a = 1f;
+                    for (int dx = 0; dx < starSize; dx++)
+                    {
+                        for (int dy = 0; dy < starSize; dy++)
+                        {
+                            int xx = xi + dx;
+                            int yy = yi + dy;
+                            if (xx >= 0 && xx < size && yy >= 0 && yy < size)
+                            {
+                                if (dx == 0 && dy == 0) tex.SetPixel(xx, yy, c);
+                                else
+                                {
+                                    Color faint = c;
+                                    faint.a = 0.5f;
+                                    Color existing = tex.GetPixel(xx, yy);
+                                    if (existing.a < faint.a) tex.SetPixel(xx, yy, faint);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        tex.Apply();
+        return tex;
+    }
+
+    /// <summary>
+    /// 극대거성/LBV/Wolf-Rayet: 거대하고 코로나 강한 별.
+    /// type별:
+    ///  - hypergiant (VY CMa/UY Sct/NML Cyg/Stephenson 2-18/WOH G64/Westerlund 1-26): 거대 적색
+    ///  - yellow_hypergiant (Rho Cas): 노란 극대거성
+    ///  - lbv (Eta Carinae/Pistol): 청색 변광 + 분출
+    ///  - wolf_rayet (WR 104): 항성풍 + 나선 먼지
+    /// </summary>
+    Texture2D GenerateHypergiant(int size, Color baseColor, string typeKey, int seed)
+    {
+        Random.InitState(seed);
+        Texture2D tex = new Texture2D(size, size, TextureFormat.RGBA32, false);
+        tex.filterMode = FilterMode.Point;
+        Color clear = new Color(0, 0, 0, 0);
+        for (int x = 0; x < size; x++)
+            for (int y = 0; y < size; y++)
+                tex.SetPixel(x, y, clear);
+
+        float cx = size * 0.5f;
+        float cy = size * 0.5f;
+        float coreR = size * 0.32f;  // 큰 코어
+        bool isLbv = typeKey.Contains("lbv");
+        bool isWr = typeKey.Contains("wolf_rayet");
+
+        // 본체 (그라데이션)
+        for (int x = 0; x < size; x++)
+        {
+            for (int y = 0; y < size; y++)
+            {
+                float dx = x - cx;
+                float dy = y - cy;
+                float d = Mathf.Sqrt(dx * dx + dy * dy);
+                if (d < coreR)
+                {
+                    float t = d / coreR;
+                    // 중심부 더 밝게, 외곽 본색
+                    Color brightCore = new Color(
+                        Mathf.Min(1f, baseColor.r + 0.3f),
+                        Mathf.Min(1f, baseColor.g + 0.3f),
+                        Mathf.Min(1f, baseColor.b + 0.2f),
+                        1f
+                    );
+                    Color c = Color.Lerp(brightCore, baseColor, t);
+                    tex.SetPixel(x, y, c);
+                }
+                else if (d < coreR + size * 0.1f)
+                {
+                    // 코로나/아우라
+                    float t = (d - coreR) / (size * 0.1f);
+                    Color c = baseColor;
+                    c.a = (1f - t) * 0.5f;
+                    tex.SetPixel(x, y, c);
+                }
+            }
+        }
+
+        // LBV: 분출 폭발 효과 (양쪽으로 길게)
+        if (isLbv)
+        {
+            Color burst = new Color(1f, 0.9f, 0.7f, 0.7f);
+            int len = size / 2;
+            for (int i = (int)coreR; i < len; i++)
+            {
+                int y = (int)cy;
+                int x1 = (int)cx + i;
+                int x2 = (int)cx - i;
+                float alpha = (1f - i / (float)len) * 0.6f;
+                Color c = burst;
+                c.a = alpha;
+                if (x1 < size) tex.SetPixel(x1, y, c);
+                if (x2 >= 0) tex.SetPixel(x2, y, c);
+            }
+        }
+
+        // Wolf-Rayet: 나선 먼지 (한 쪽으로 휘어진 꼬리)
+        if (isWr)
+        {
+            Color dust = new Color(0.8f, 0.5f, 0.2f, 0.6f);
+            int spiralPoints = 30;
+            for (int i = 0; i < spiralPoints; i++)
+            {
+                float t = i / (float)spiralPoints;
+                float r = coreR + t * size * 0.25f;
+                float angle = t * Mathf.PI * 1.5f;
+                int xi = (int)(cx + r * Mathf.Cos(angle));
+                int yi = (int)(cy + r * Mathf.Sin(angle));
+                if (xi >= 0 && xi < size && yi >= 0 && yi < size)
+                {
+                    Color c = dust;
+                    c.a = (1f - t) * 0.7f;
+                    Color existing = tex.GetPixel(xi, yi);
+                    if (existing.a < c.a) tex.SetPixel(xi, yi, c);
+                }
+            }
+        }
+
+        tex.Apply();
+        return tex;
     }
 }

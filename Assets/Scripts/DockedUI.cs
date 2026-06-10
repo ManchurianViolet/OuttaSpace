@@ -16,17 +16,19 @@ public class DockedUI : MonoBehaviour
     public Button departButton;
     public TextMeshProUGUI departButtonText;
 
-    [Header("Demo End")]
-    [Tooltip("데모 종료 시 표시할 위시리스트 버튼. 인스펙터에서 연결.")]
-    public Button wishlistButton;
-    [Tooltip("위시리스트 버튼 안의 TMP 라벨. 로컬라이징을 위해 연결.")]
-    public TextMeshProUGUI wishlistButtonLabel;
-    [Tooltip("Steam 위시리스트 페이지 URL (출시 후 실제 URL로 교체).")]
-    public string wishlistUrl = "https://store.steampowered.com/app/4616690";
-    [Tooltip("데모 종료 시 숨길 업그레이드/가챠 등 버튼들. 인스펙터에서 패널 GameObject 연결.")]
-    public GameObject[] hideOnDemoEnd;
+    [Header("Game Clear (last star arrival)")]
+    [Tooltip("마지막 별 도착 시 표시할 '다시하기' 버튼.")]
+    public Button restartButton;
+    [Tooltip("다시하기 버튼 안의 TMP 라벨.")]
+    public TextMeshProUGUI restartButtonLabel;
+    [Tooltip("마지막 별 도착 시 표시할 '다시하기 + 모든 고양이 잠금해제' 버튼.")]
+    public Button restartUnlockButton;
+    [Tooltip("잠금해제 버튼 안의 TMP 라벨.")]
+    public TextMeshProUGUI restartUnlockButtonLabel;
+    [Tooltip("마지막 별 도착 시 숨길 업그레이드/가챠 등 버튼들.")]
+    public GameObject[] hideOnClear;
 
-    // 명왕성 정박 시 ETA 깜빡 경고용 (다음이 프록시마라 거리 1만 배 점프)
+    // ETA 깜빡 경고용 (12시간 초과 시)
     private bool etaBlinking;
     private Color etaOriginalColor;
     private bool etaColorCached;
@@ -45,8 +47,10 @@ public class DockedUI : MonoBehaviour
             WindowStateManager.Instance.OnStateChanged += OnWindowStateChanged;
         if (departButton != null)
             departButton.onClick.AddListener(OnDepartClicked);
-        if (wishlistButton != null)
-            wishlistButton.onClick.AddListener(OnWishlistClicked);
+        if (restartButton != null)
+            restartButton.onClick.AddListener(OnRestartClicked);
+        if (restartUnlockButton != null)
+            restartUnlockButton.onClick.AddListener(OnRestartUnlockClicked);
         if (GameManager.Instance != null)
             GameManager.Instance.OnStatsChanged += Refresh;
         Refresh();
@@ -58,8 +62,10 @@ public class DockedUI : MonoBehaviour
             WindowStateManager.Instance.OnStateChanged -= OnWindowStateChanged;
         if (departButton != null)
             departButton.onClick.RemoveListener(OnDepartClicked);
-        if (wishlistButton != null)
-            wishlistButton.onClick.RemoveListener(OnWishlistClicked);
+        if (restartButton != null)
+            restartButton.onClick.RemoveListener(OnRestartClicked);
+        if (restartUnlockButton != null)
+            restartUnlockButton.onClick.RemoveListener(OnRestartUnlockClicked);
         if (GameManager.Instance != null)
             GameManager.Instance.OnStatsChanged -= Refresh;
     }
@@ -113,9 +119,8 @@ public class DockedUI : MonoBehaviour
         if (creditsText != null)
             creditsText.text = GameManager.FormatNumber(gm.credits) + " CR";
 
-        // 데모 종료 분기 (현재 별이 DEMO_LAST_STAR_INDEX면 = 다음 별이 잠금)
-        bool isDemoEnd = StarDatabase.DEMO_LAST_STAR_INDEX >= 0
-            && gm.currentStarIndex >= StarDatabase.DEMO_LAST_STAR_INDEX;
+        // 클리어 분기 — 마지막 별(M87) 도착 시
+        bool isCleared = gm.currentStarIndex >= StarDatabase.Stars.Length - 1;
 
         // 텍스트 원래 위치 한 번만 캐시
         if (!textPositionsCached)
@@ -130,47 +135,53 @@ public class DockedUI : MonoBehaviour
         int nextIdx = gm.currentStarIndex + 1;
         bool hasNext = nextIdx < StarDatabase.Stars.Length;
 
-        if (isDemoEnd)
+        if (isCleared)
         {
-            // 데모 끝 — 시리우스 도착 화면
+            // 클리어 — 마지막 별 도착 화면
             if (nextDestText != null)
             {
-                nextDestText.text = Loc.Get("demo_end_title");
+                nextDestText.text = Loc.Get("clear_title");
                 nextDestText.rectTransform.anchoredPosition = new Vector2(0, 125);
                 nextDestText.alignment = TextAlignmentOptions.Center;
             }
             if (etaText != null)
             {
-                etaText.text = Loc.Get("demo_end_message");
+                etaText.text = "";
                 etaText.rectTransform.anchoredPosition = new Vector2(0, 50);
                 etaText.alignment = TextAlignmentOptions.Center;
             }
             if (departButton != null)
-                departButton.gameObject.SetActive(false);  // 출발 버튼 자체 숨김
-            if (wishlistButton != null)
-                wishlistButton.gameObject.SetActive(true);
-            if (wishlistButtonLabel != null)
-                wishlistButtonLabel.text = Loc.Get("demo_wishlist");
+                departButton.gameObject.SetActive(false);  // 출발 버튼 숨김
+            if (restartButton != null)
+                restartButton.gameObject.SetActive(true);
+            if (restartButtonLabel != null)
+                restartButtonLabel.text = Loc.Get("clear_restart");
+            if (restartUnlockButton != null)
+                restartUnlockButton.gameObject.SetActive(true);
+            if (restartUnlockButtonLabel != null)
+                restartUnlockButtonLabel.text = Loc.Get("clear_restart_unlock");
 
             // 업그레이드/가챠 등 보조 UI 숨김
-            if (hideOnDemoEnd != null)
+            if (hideOnClear != null)
             {
-                foreach (var obj in hideOnDemoEnd)
+                foreach (var obj in hideOnClear)
                     if (obj != null) obj.SetActive(false);
             }
         }
         else if (hasNext)
         {
             // 보조 UI 복원
-            if (hideOnDemoEnd != null)
+            if (hideOnClear != null)
             {
-                foreach (var obj in hideOnDemoEnd)
+                foreach (var obj in hideOnClear)
                     if (obj != null) obj.SetActive(true);
             }
             if (departButton != null)
                 departButton.gameObject.SetActive(true);
-            if (wishlistButton != null)
-                wishlistButton.gameObject.SetActive(false);
+            if (restartButton != null)
+                restartButton.gameObject.SetActive(false);
+            if (restartUnlockButton != null)
+                restartUnlockButton.gameObject.SetActive(false);
 
             // 텍스트 원위치 복귀
             if (nextDestText != null)
@@ -253,8 +264,36 @@ public class DockedUI : MonoBehaviour
             WindowStateManager.Instance.Depart();
     }
 
-    void OnWishlistClicked()
+    void OnRestartClicked()
     {
-        Application.OpenURL(wishlistUrl);
+        // 전체 데이터 리셋 + 씬 재로드 (Shift+R과 동일)
+        PlayerPrefs.DeleteAll();
+        PlayerPrefs.Save();
+        if (GameManager.Instance != null)
+        {
+            Destroy(GameManager.Instance.gameObject);
+        }
+        UnityEngine.SceneManagement.SceneManager.LoadScene(
+            UnityEngine.SceneManagement.SceneManager.GetActiveScene().buildIndex);
+    }
+
+    void OnRestartUnlockClicked()
+    {
+        // 모든 고양이 ID를 임시로 저장 → 리셋 → 씬 로드 후 다시 적용
+        var allCats = new System.Collections.Generic.List<int>();
+        for (int i = 0; i < CatDatabase.TOTAL_COUNT; i++)
+            allCats.Add(i);
+
+        PlayerPrefs.DeleteAll();
+        // 고양이 보유 정보만 미리 PlayerPrefs에 박아둠 (CatManager.LoadCats가 읽음)
+        PlayerPrefs.SetString("OwnedCats", string.Join(",", allCats));
+        PlayerPrefs.Save();
+
+        if (GameManager.Instance != null)
+        {
+            Destroy(GameManager.Instance.gameObject);
+        }
+        UnityEngine.SceneManagement.SceneManager.LoadScene(
+            UnityEngine.SceneManagement.SceneManager.GetActiveScene().buildIndex);
     }
 }

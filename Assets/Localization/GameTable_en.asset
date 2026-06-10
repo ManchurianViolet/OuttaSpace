@@ -518,10 +518,6 @@ MonoBehaviour:
     m_Localized: Yellow Giant
     m_Metadata:
       m_Items: []
-  - m_Id: 6976500000000028
-    m_Localized: Yellow Supergiant
-    m_Metadata:
-      m_Items: []
   - m_Id: 6976500000000029
     m_Localized: Blue Supergiant
     m_Metadata:
@@ -582,6 +578,306 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 6976500000000046
     m_Localized: No records yet
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000047
+    m_Localized: Not connected to Steam
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000048
+    m_Localized: Lalande 21185
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000049
+    m_Localized: Luyten 726-8
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000050
+    m_Localized: Ross 154
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000051
+    m_Localized: Pollux
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000052
+    m_Localized: Castor
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000053
+    m_Localized: Hamal
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000054
+    m_Localized: Regulus
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000055
+    m_Localized: Mizar
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000056
+    m_Localized: Algol
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000057
+    m_Localized: Alkaid
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000058
+    m_Localized: Achernar
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000059
+    m_Localized: Alphard
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000060
+    m_Localized: Bellatrix
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000061
+    m_Localized: Spica
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000062
+    m_Localized: Mira
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000063
+    m_Localized: Canopus
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000064
+    m_Localized: Gamma Cassiopeiae
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000065
+    m_Localized: Mirfak
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000066
+    m_Localized: Wezen
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000067
+    m_Localized: Mu Cephei
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000068
+    m_Localized: VY Canis Majoris
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000069
+    m_Localized: UY Scuti
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000070
+    m_Localized: NML Cygni
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000071
+    m_Localized: Stephenson 2-18
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000072
+    m_Localized: WOH G64
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000073
+    m_Localized: Rho Cassiopeiae
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000074
+    m_Localized: Westerlund 1-26
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000075
+    m_Localized: Pistol Star
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000076
+    m_Localized: Eta Carinae
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000077
+    m_Localized: WR 104
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000078
+    m_Localized: RX J1856.5
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000079
+    m_Localized: Vela Pulsar
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000080
+    m_Localized: Gaia BH1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000081
+    m_Localized: Gaia BH2
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000082
+    m_Localized: Cygnus X-1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000083
+    m_Localized: V404 Cygni
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000084
+    m_Localized: Sagittarius A*
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000085
+    m_Localized: Helix Nebula
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000086
+    m_Localized: Orion Nebula
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000087
+    m_Localized: Dumbbell Nebula
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000088
+    m_Localized: Ring Nebula
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000089
+    m_Localized: Cat's Eye Nebula
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000090
+    m_Localized: Lagoon Nebula
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000091
+    m_Localized: Trifid Nebula
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000092
+    m_Localized: Eagle Nebula
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000093
+    m_Localized: Carina Nebula
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000094
+    m_Localized: Crab Nebula
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000095
+    m_Localized: Tarantula Nebula
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000096
+    m_Localized: Hyades
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000097
+    m_Localized: Pleiades
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000098
+    m_Localized: Beehive
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000099
+    m_Localized: Wild Duck
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000100
+    m_Localized: Double Cluster
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000101
+    m_Localized: 47 Tucanae
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000102
+    m_Localized: Omega Centauri
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000103
+    m_Localized: M13
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000104
+    m_Localized: M15
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000105
+    m_Localized: M3
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000106
+    m_Localized: Large Magellanic Cloud
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000107
+    m_Localized: Small Magellanic Cloud
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000108
+    m_Localized: Andromeda
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000109
+    m_Localized: Triangulum
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000110
+    m_Localized: Sculptor
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000111
+    m_Localized: M82
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000112
+    m_Localized: M81
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000113
+    m_Localized: Centaurus A
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000114
+    m_Localized: Black Eye
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000115
+    m_Localized: Pinwheel
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000116
+    m_Localized: Whirlpool
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000117
+    m_Localized: Sombrero
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000118
+    m_Localized: Messier 87
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000143
+    m_Localized: Thanks for playing OUTTA SPACE
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000144
+    m_Localized: Play Again
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000145
+    m_Localized: Play Again + Unlock All Cats
     m_Metadata:
       m_Items: []
   references:

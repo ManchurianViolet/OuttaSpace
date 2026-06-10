@@ -247,10 +247,6 @@ MonoBehaviour:
     m_Key: type_yellow_giant
     m_Metadata:
       m_Items: []
-  - m_Id: 6976500000000028
-    m_Key: type_yellow_supergiant
-    m_Metadata:
-      m_Items: []
   - m_Id: 6976500000000029
     m_Key: type_blue_supergiant
     m_Metadata:
@@ -577,6 +573,306 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 6976500000000046
     m_Key: lb_empty
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000047
+    m_Key: lb_steam_offline
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000048
+    m_Key: star_lalande
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000049
+    m_Key: star_luyten726
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000050
+    m_Key: star_ross154
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000051
+    m_Key: star_pollux
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000052
+    m_Key: star_castor
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000053
+    m_Key: star_hamal
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000054
+    m_Key: star_regulus
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000055
+    m_Key: star_mizar
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000056
+    m_Key: star_algol
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000057
+    m_Key: star_alkaid
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000058
+    m_Key: star_achernar
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000059
+    m_Key: star_alphard
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000060
+    m_Key: star_bellatrix
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000061
+    m_Key: star_spica
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000062
+    m_Key: star_mira
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000063
+    m_Key: star_canopus
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000064
+    m_Key: star_gamcas
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000065
+    m_Key: star_mirfak
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000066
+    m_Key: star_wezen
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000067
+    m_Key: star_mucep
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000068
+    m_Key: star_vycma
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000069
+    m_Key: star_uyscuti
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000070
+    m_Key: star_nmlcyg
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000071
+    m_Key: star_stephenson
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000072
+    m_Key: star_wohg64
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000073
+    m_Key: star_rhocas
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000074
+    m_Key: star_west1_26
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000075
+    m_Key: star_pistol
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000076
+    m_Key: star_etacar
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000077
+    m_Key: star_wr104
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000078
+    m_Key: star_rxj1856
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000079
+    m_Key: star_vela
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000080
+    m_Key: star_gaiabh1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000081
+    m_Key: star_gaiabh2
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000082
+    m_Key: star_cygx1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000083
+    m_Key: star_v404
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000084
+    m_Key: star_sgra
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000085
+    m_Key: star_helix
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000086
+    m_Key: star_orion_neb
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000087
+    m_Key: star_dumbbell
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000088
+    m_Key: star_ring
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000089
+    m_Key: star_catseye
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000090
+    m_Key: star_lagoon
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000091
+    m_Key: star_trifid
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000092
+    m_Key: star_eagle
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000093
+    m_Key: star_carina
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000094
+    m_Key: star_crab
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000095
+    m_Key: star_tarantula
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000096
+    m_Key: star_hyades
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000097
+    m_Key: star_pleiades
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000098
+    m_Key: star_beehive
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000099
+    m_Key: star_wildduck
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000100
+    m_Key: star_doublec
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000101
+    m_Key: star_47tuc
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000102
+    m_Key: star_omegacen
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000103
+    m_Key: star_m13
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000104
+    m_Key: star_m15
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000105
+    m_Key: star_m3
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000106
+    m_Key: star_lmc
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000107
+    m_Key: star_smc
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000108
+    m_Key: star_andromeda
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000109
+    m_Key: star_triangulum
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000110
+    m_Key: star_sculptor
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000111
+    m_Key: star_m82
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000112
+    m_Key: star_m81
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000113
+    m_Key: star_centaurusA
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000114
+    m_Key: star_blackeye
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000115
+    m_Key: star_pinwheel
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000116
+    m_Key: star_whirlpool
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000117
+    m_Key: star_sombrero
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000118
+    m_Key: star_m87
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000143
+    m_Key: clear_title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000144
+    m_Key: clear_restart
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000145
+    m_Key: clear_restart_unlock
     m_Metadata:
       m_Items: []
   m_Metadata:
