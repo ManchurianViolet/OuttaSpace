@@ -895,6 +895,30 @@ MonoBehaviour:
     m_Key: dock_depart_abyss
     m_Metadata:
       m_Items: []
+  - m_Id: 6976500000000151
+    m_Key: cat_legendary_04
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000152
+    m_Key: cat_legendary_05
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000153
+    m_Key: cat_legendary_06
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000154
+    m_Key: cat_legendary_07
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000155
+    m_Key: cat_legendary_08
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000156
+    m_Key: cat_legendary_09
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:

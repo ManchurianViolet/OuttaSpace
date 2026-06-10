@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using System.Collections.Generic;
 
 public enum CatRarity { Common, Rare, Legendary }
@@ -17,14 +17,14 @@ public class CatDatabase : MonoBehaviour
 {
     public static CatDatabase Instance { get; private set; }
 
-    [Header("Cat Sprites (39 total: 27 Common + 9 Rare + 3 Legendary)")]
+    [Header("Cat Sprites (45 total: 27 Common + 9 Rare + 9 Legendary)")]
     [Tooltip("순서대로 0-26=일반, 27-35=희귀, 36-38=전설")]
-    public Sprite[] catSprites = new Sprite[39];
+    public Sprite[] catSprites = new Sprite[45];
 
     public const int COMMON_COUNT = 27;
     public const int RARE_COUNT = 9;
-    public const int LEGENDARY_COUNT = 3;
-    public const int TOTAL_COUNT = 39;
+    public const int LEGENDARY_COUNT = 9;
+    public const int TOTAL_COUNT = 45;
 
     public const int STARTER_CAT_ID = 0;
 
@@ -33,7 +33,7 @@ public class CatDatabase : MonoBehaviour
     public const float PROB_LEGENDARY = 0.05f;
 
     public const int GACHA_COST = 100;
-    public const int GACHA_REFUND = 30;       // 중복 시 50% 환급
+    public const int GACHA_REFUND = 30;       // 중복 시 30% 환급
 
     private CatData[] catDataCache;
 
@@ -84,10 +84,16 @@ public class CatDatabase : MonoBehaviour
         HexC("#FF6B1A"), // 34 Phoenix - 불사조 주황
         HexC("#1A0F2E"), // 35 Onyx - 검정+자주광
 
-        // Legendary 36-38 (천체현상)
-        HexC("#FFF4B8"), // 36 Nova - 백색폭발
-        HexC("#5FFFE0"), // 37 Aurora - 오로라 시안초록
-        HexC("#FF00FF"), // 38 Cosmos - 우주 마젠타
+        // Legendary 36-44 (천체현상/신화)
+        HexC("#FFF4B8"), // 36 백색폭발
+        HexC("#5FFFE0"), // 37 오로라 시안초록
+        HexC("#FF00FF"), // 38 우주 마젠타
+        HexC("#FFE08A"), // 39 Nova - 백금 폭발
+        HexC("#C8D8FF"), // 40 Luna - 은빛 달
+        HexC("#FFE830"), // 41 Zeus - 번개 노랑
+        HexC("#6A7BFF"), // 42 Titan - 강철 블루
+        HexC("#9B30FF"), // 43 Cosmos - 딥 바이올렛
+        HexC("#6050E0"), // 44 Galaxy - 푸른 보라
     };
 
     static Color HexC(string hex)

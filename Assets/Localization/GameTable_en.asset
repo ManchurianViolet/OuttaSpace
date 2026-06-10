@@ -900,6 +900,30 @@ MonoBehaviour:
     m_Localized: Into the Abyss
     m_Metadata:
       m_Items: []
+  - m_Id: 6976500000000151
+    m_Localized: Nova
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000152
+    m_Localized: Luna
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000153
+    m_Localized: Zeus
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000154
+    m_Localized: Titan
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000155
+    m_Localized: Cosmos
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000156
+    m_Localized: Galaxy
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []
