@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using System.Collections;
@@ -31,9 +31,9 @@ public class CatCollectionUI : MonoBehaviour
     [Header("Close Button")]
     public Button closeButton;
 
-    private int currentPage = 0;     // 0~4
+    private int currentPage = 0;     // 0~3
     private const int SLOTS_PER_PAGE = 9;
-    private const int TOTAL_PAGES = 5;
+    private const int TOTAL_PAGES = 4;
 
     private System.Collections.Generic.Dictionary<Sprite, Sprite> silhouetteCache
         = new System.Collections.Generic.Dictionary<Sprite, Sprite>();
@@ -132,13 +132,13 @@ public class CatCollectionUI : MonoBehaviour
             Color titleColor;
             CatRarity rarity;
 
-            if (currentPage < 3)
+            if (currentPage < 2)
             {
                 title = Loc.Get("rarity_common");
                 titleColor = Color.white;
                 rarity = CatRarity.Common;
             }
-            else if (currentPage == 3)
+            else if (currentPage == 2)
             {
                 title = Loc.Get("rarity_rare");
                 titleColor = CatDatabase.GetRarityColor(CatRarity.Rare);
@@ -158,7 +158,7 @@ public class CatCollectionUI : MonoBehaviour
             pageTitleText.color = titleColor;
         }
 
-        // 하단 페이지 번호 (1~5)
+        // 하단 페이지 번호 (1~4)
         if (pageNumberText != null)
             pageNumberText.text = (currentPage + 1).ToString();
     }
@@ -200,23 +200,10 @@ public class CatCollectionUI : MonoBehaviour
             int catId = currentPage * SLOTS_PER_PAGE + i;
             if (slots[i] == null) continue;
 
-            // 전설 페이지의 빈 슬롯(catId 39~44) → Coming Soon 표시
-            // 정식 출시 시 새 전설 추가되면 자동으로 해당 catId만큼 실제 슬롯으로 전환됨
+            // 36마리(0~35)는 4페이지(9칸×4=36)에 정확히 채워짐. 범위 밖 슬롯은 숨김.
             if (catId >= CatDatabase.TOTAL_COUNT)
             {
-                // 전설 페이지(currentPage == 4 — 슬롯 36~44) 안에서만 placeholder
-                if (currentPage == 4)
-                {
-                    if (!slots[i].gameObject.activeSelf)
-                        slots[i].gameObject.SetActive(true);
-                    // 첫 전설 고양이 실루엣을 placeholder로 사용 (실루엣 변환됨)
-                    Sprite placeholder = GetPlaceholderSilhouette();
-                    slots[i].Setup(catId, placeholder, false, locked: true);
-                }
-                else
-                {
-                    slots[i].gameObject.SetActive(false);
-                }
+                slots[i].gameObject.SetActive(false);
                 continue;
             }
 

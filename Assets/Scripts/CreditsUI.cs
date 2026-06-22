@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
@@ -18,6 +18,9 @@ public class CreditsUI : MonoBehaviour
     {
         var wsm = WindowStateManager.Instance;
         if (wsm != null) wsm.ExpandForCollection();
+
+        if (AchievementManager.Instance != null)
+            AchievementManager.Instance.OnCreditsViewed();
 
         if (closeButton != null)
             closeButton.onClick.AddListener(OnClose);

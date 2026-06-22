@@ -107,14 +107,12 @@ public class GameManager : MonoBehaviour
             Debug.Log($"[Debug] 다음 행성 30만 km 전으로 점프 (distance={distance})");
         }
 
-#if UNITY_EDITOR
         // 인스펙터 체크박스 트리거: debugJumpTrigger를 true로 하면 debugJumpToStarIndex 별 10,000km 전으로
         if (debugJumpTrigger)
         {
             debugJumpTrigger = false;  // 자동 해제
             DebugJumpToStar(debugJumpToStarIndex);
         }
-#endif
 
         // Shift+C: 크레딧 +10000
         if (Input.GetKeyDown(KeyCode.C) && Input.GetKey(KeyCode.LeftShift))
@@ -206,6 +204,9 @@ public class GameManager : MonoBehaviour
         distance += distGain;
         totalDistance += distGain;
 
+        if (AchievementManager.Instance != null)
+            AchievementManager.Instance.CheckSpeed(effectiveSpeed);
+
         StarData current = StarDatabase.GetStar(currentStarIndex);
         if (distance >= current.distanceKM && !arrivedStars.Contains(currentStarIndex))
             ArriveAtStar(currentStarIndex);
@@ -230,6 +231,13 @@ public class GameManager : MonoBehaviour
 
         OnStarArrived?.Invoke(star);
         OnNotification?.Invoke(arriveMsg);
+
+        if (AchievementManager.Instance != null)
+        {
+            AchievementManager.Instance.OnStarArrived(index);
+            if (star.reward > 0) AchievementManager.Instance.CheckCredits(totalCredits);
+        }
+
         SaveGame();
     }
 
@@ -372,6 +380,8 @@ public class GameManager : MonoBehaviour
             case UpgradeType.BoosterSpeed: boosterSpdLevel++; break;
         }
         OnStatsChanged?.Invoke();
+        if (AchievementManager.Instance != null)
+            AchievementManager.Instance.CheckMaxUpgrade();
         return true;
     }
 

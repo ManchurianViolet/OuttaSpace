@@ -343,72 +343,36 @@ MonoBehaviour:
     m_Key: cat_common_10
     m_Metadata:
       m_Items: []
-  - m_Id: 75323510830
+  - m_Id: 75323510831
     m_Key: cat_common_11
     m_Metadata:
       m_Items: []
-  - m_Id: 75323510831
+  - m_Id: 75323510832
     m_Key: cat_common_12
     m_Metadata:
       m_Items: []
-  - m_Id: 75323510832
+  - m_Id: 75323510833
     m_Key: cat_common_13
     m_Metadata:
       m_Items: []
-  - m_Id: 75323510833
+  - m_Id: 75323510834
     m_Key: cat_common_14
     m_Metadata:
       m_Items: []
-  - m_Id: 75323510834
+  - m_Id: 75323510837
     m_Key: cat_common_15
     m_Metadata:
       m_Items: []
-  - m_Id: 75323510835
+  - m_Id: 75323510839
     m_Key: cat_common_16
     m_Metadata:
       m_Items: []
-  - m_Id: 75323510836
+  - m_Id: 75323510841
     m_Key: cat_common_17
     m_Metadata:
       m_Items: []
-  - m_Id: 75323510837
-    m_Key: cat_common_18
-    m_Metadata:
-      m_Items: []
-  - m_Id: 75323510838
-    m_Key: cat_common_19
-    m_Metadata:
-      m_Items: []
-  - m_Id: 75323510839
-    m_Key: cat_common_20
-    m_Metadata:
-      m_Items: []
-  - m_Id: 75323510840
-    m_Key: cat_common_21
-    m_Metadata:
-      m_Items: []
-  - m_Id: 75323510841
-    m_Key: cat_common_22
-    m_Metadata:
-      m_Items: []
   - m_Id: 75323510842
-    m_Key: cat_common_23
-    m_Metadata:
-      m_Items: []
-  - m_Id: 75323510843
-    m_Key: cat_common_24
-    m_Metadata:
-      m_Items: []
-  - m_Id: 75323510844
-    m_Key: cat_common_25
-    m_Metadata:
-      m_Items: []
-  - m_Id: 75323510845
-    m_Key: cat_common_26
-    m_Metadata:
-      m_Items: []
-  - m_Id: 75323510846
-    m_Key: cat_common_27
+    m_Key: cat_common_18
     m_Metadata:
       m_Items: []
   - m_Id: 75323510847
@@ -892,31 +856,31 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 6976500000000150
-    m_Key: dock_depart_abyss
-    m_Metadata:
-      m_Items: []
-  - m_Id: 6976500000000151
     m_Key: cat_legendary_04
     m_Metadata:
       m_Items: []
-  - m_Id: 6976500000000152
+  - m_Id: 6976500000000151
     m_Key: cat_legendary_05
     m_Metadata:
       m_Items: []
-  - m_Id: 6976500000000153
+  - m_Id: 6976500000000152
     m_Key: cat_legendary_06
     m_Metadata:
       m_Items: []
-  - m_Id: 6976500000000154
+  - m_Id: 6976500000000153
     m_Key: cat_legendary_07
     m_Metadata:
       m_Items: []
-  - m_Id: 6976500000000155
+  - m_Id: 6976500000000154
     m_Key: cat_legendary_08
     m_Metadata:
       m_Items: []
-  - m_Id: 6976500000000156
+  - m_Id: 6976500000000155
     m_Key: cat_legendary_09
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6976500000000156
+    m_Key: dock_depart_abyss
     m_Metadata:
       m_Items: []
   m_Metadata:

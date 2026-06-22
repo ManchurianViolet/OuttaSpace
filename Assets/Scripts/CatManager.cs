@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using System;
 using System.Collections.Generic;
 
@@ -85,6 +85,8 @@ public class CatManager : MonoBehaviour
         ownedCats.Add(id);
         OnCatsChanged?.Invoke();
         Save();
+        if (AchievementManager.Instance != null)
+            AchievementManager.Instance.CheckCollection();
         return true;
     }
 

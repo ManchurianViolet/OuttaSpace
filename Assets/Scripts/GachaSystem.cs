@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using System.Collections;
@@ -259,6 +259,9 @@ public class GachaSystem : MonoBehaviour
         }
 
         // 도감 추가 - 중복이면 GACHA_REFUND만큼 환급
+        if (AchievementManager.Instance != null)
+            AchievementManager.Instance.OnGachaDrawn();
+
         bool isNew = CatManager.Instance.AddFromGacha(finalCatId);
         if (!isNew && CatDatabase.GACHA_REFUND > 0 && GameManager.Instance != null)
         {

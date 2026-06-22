@@ -17,14 +17,14 @@ public class CatDatabase : MonoBehaviour
 {
     public static CatDatabase Instance { get; private set; }
 
-    [Header("Cat Sprites (45 total: 27 Common + 9 Rare + 9 Legendary)")]
+    [Header("Cat Sprites (36 total: 18 Common + 9 Rare + 9 Legendary)")]
     [Tooltip("순서대로 0-26=일반, 27-35=희귀, 36-38=전설")]
-    public Sprite[] catSprites = new Sprite[45];
+    public Sprite[] catSprites = new Sprite[36];
 
-    public const int COMMON_COUNT = 27;
+    public const int COMMON_COUNT = 18;
     public const int RARE_COUNT = 9;
     public const int LEGENDARY_COUNT = 9;
-    public const int TOTAL_COUNT = 45;
+    public const int TOTAL_COUNT = 36;
 
     public const int STARTER_CAT_ID = 0;
 
@@ -44,56 +44,47 @@ public class CatDatabase : MonoBehaviour
     /// </summary>
     private static readonly Color[] FLAME_COLORS = new Color[TOTAL_COUNT]
     {
-        // Common 0-26 (음식/색감/털)
-        HexC("#FFB8D9"), // 00 Mochi - 분홍
-        HexC("#D4A574"), // 01 Toast - 갈색
-        HexC("#B07A4B"), // 02 Cookie - 진갈색
-        HexC("#E5C99E"), // 03 Biscuit - 베이지
-        HexC("#FF8C42"), // 04 Pumpkin - 주황
-        HexC("#D9A86C"), // 05 Peanut - 황갈
-        HexC("#F4D580"), // 06 Noodle - 연노랑
-        HexC("#FF6B35"), // 07 Ginger - 오렌지빨강
-        HexC("#5C5C5C"), // 08 Pepper - 진회
-        HexC("#D8D8D8"), // 09 Marble - 화이트그레이
-        HexC("#EFE3D0"), // 10 Mittens - 베이지화이트
-        HexC("#C9A57B"), // 11 Whiskers - 라이트브라운
-        HexC("#E8B04D"), // 12 Patches - 다채로운 황
+        // Common 0-17 (CSV 이름 기준)
+        HexC("#FF6B35"), // 00 Ginger - 오렌지빨강
+        HexC("#7A7A8A"), // 01 Smokey - 스모키그레이
+        HexC("#E8B04D"), // 02 Patches - 다채로운 황
+        HexC("#D4A574"), // 03 Toast - 토스트 갈색
+        HexC("#F5F5FA"), // 04 Snow - 화이트
+        HexC("#D8D8D8"), // 05 Marble - 화이트그레이
+        HexC("#8B5E3C"), // 06 Mocha - 모카 브라운
+        HexC("#2E2A2A"), // 07 Oreo - 오레오 블랙
+        HexC("#B07A4B"), // 08 Cookie - 쿠키 진갈
+        HexC("#C9A57B"), // 09 Latte - 라떼 베이지
+        HexC("#3D3D44"), // 10 Domino - 흑백 다크그레이
+        HexC("#C8431F"), // 11 Maple - 단풍빨강
+        HexC("#C5D1E0"), // 12 Cloud - 라이트블루그레이
         HexC("#3D3D44"), // 13 Shadow - 다크그레이
-        HexC("#F5F5FA"), // 14 Snow - 화이트
-        HexC("#7A7A8A"), // 15 Smokey - 스모키그레이
-        HexC("#C5D1E0"), // 16 Cloud - 라이트블루그레이
-        HexC("#C29DA0"), // 17 Dusty - 더스티핑크
-        HexC("#9B9080"), // 18 Pebble - 스톤그레이
-        HexC("#704020"), // 19 Coco - 코코아
-        HexC("#828B3D"), // 20 Olive - 올리브그린
-        HexC("#A67F5D"), // 21 Hazel - 헤이즐넛
-        HexC("#C8431F"), // 22 Maple - 단풍빨강
-        HexC("#F5EFD9"), // 23 Tofu - 아이보리
-        HexC("#C89A5A"), // 24 Bagel - 골든브라운
-        HexC("#9C6E48"), // 25 Muffin - 머핀브라운
-        HexC("#F0E6D2"), // 26 Dumpling - 크림화이트
+        HexC("#23232A"), // 14 Tuxedo - 턱시도 블랙
+        HexC("#E8924D"), // 15 Calico - 삼색 주황
+        HexC("#C29DA0"), // 16 Dusty - 더스티핑크
+        HexC("#F5EFD9"), // 17 Tofu - 아이보리
 
-        // Rare 27-35 (우주/SF)
-        HexC("#4FD1E0"), // 27 Comet - 시안
-        HexC("#FF3838"), // 28 Rocket - 강렬한 빨강
-        HexC("#3D7EFF"), // 29 Astro - 일렉트릭블루
-        HexC("#2DD4BF"), // 30 Orbit - 청록
-        HexC("#39FF14"), // 31 Pixel - 네온그린
-        HexC("#B19CD9"), // 32 Stardust - 라벤더
-        HexC("#5B2C8A"), // 33 Eclipse - 딥퍼플
-        HexC("#FF6B1A"), // 34 Phoenix - 불사조 주황
-        HexC("#1A0F2E"), // 35 Onyx - 검정+자주광
+        // Rare 18-26 (우주/SF/영웅)
+        HexC("#5FFFE0"), // 18 Aurora - 오로라 시안초록
+        HexC("#FF3838"), // 19 Hero - 영웅 빨강
+        HexC("#FFC93C"), // 20 Honey - 꿀 황금
+        HexC("#B19CD9"), // 21 Einstein - 라벤더(천재)
+        HexC("#3D7EFF"), // 22 Captain - 캡틴 블루
+        HexC("#2DD4BF"), // 23 Orbit - 청록
+        HexC("#39FF14"), // 24 Pixel - 네온그린
+        HexC("#B19CD9"), // 25 Stardust - 라벤더
+        HexC("#5B2C8A"), // 26 Eclipse - 딥퍼플
 
-        // Legendary 36-44 (천체현상/신화)
-        HexC("#FFF4B8"), // 36 백색폭발
-        HexC("#5FFFE0"), // 37 오로라 시안초록
-        HexC("#FF00FF"), // 38 우주 마젠타
-        HexC("#FFE08A"), // 39 Nova - 백금 폭발
-        HexC("#C8D8FF"), // 40 Luna - 은빛 달
-        HexC("#FFE830"), // 41 Zeus - 번개 노랑
-        HexC("#6A7BFF"), // 42 Titan - 강철 블루
-        HexC("#9B30FF"), // 43 Cosmos - 딥 바이올렛
-        HexC("#6050E0"), // 44 Galaxy - 푸른 보라
+        // Legendary 27-35 (천체/신화)
+        HexC("#FF5252"), // 27 Rudolph - 루돌프 레드
+        HexC("#FFF4B8"), // 28 Angel - 천사 백금
+        HexC("#FFD24A"), // 29 Apollo - 태양 골드
+        HexC("#FFE08A"), // 30 Nova - 백금 폭발
+        HexC("#C8D8FF"), // 31 Luna - 은빛 달
+        HexC("#FFE830"), // 32 Zeus - 번개 노랑
+        HexC("#6A7BFF"), // 33 Titan - 강철 블루
+        HexC("#9B30FF"), // 34 Cosmos - 딥 바이올렛
+        HexC("#6050E0"), // 35 Galaxy - 푸른 보라
     };
 
     static Color HexC(string hex)
