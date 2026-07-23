@@ -355,6 +355,10 @@ public class GameManager : MonoBehaviour
 
     // ============ UPGRADES ============
 
+    // 무한 모드(M87 도달)로 레벨 캡 해제 후, maxLevel을 넘어선 레벨부터 비용이 다시 상승.
+    // maxCost 고정값에 1.02^(레벨-maxLevel)을 곱해 무한 가속을 억제.
+    private const double POST_CAP_COST_GROWTH = 1.02;
+
     public double GetUpgradeCost(UpgradeType type)
     {
         UpgradeData data = UpgradeDatabase.Get(type);
@@ -363,6 +367,14 @@ public class GameManager : MonoBehaviour
         // 상한 적용 (0이면 무제한)
         if (data.maxCost > 0 && cost > data.maxCost)
             cost = data.maxCost;
+
+        // 레벨 캡(maxLevel)을 넘어선 구간: maxCost에서 멈추지 않고 지수 상승
+        if (data.maxLevel > 0 && level >= data.maxLevel && data.maxCost > 0)
+        {
+            int over = level - data.maxLevel;
+            cost = Math.Floor(data.maxCost * Math.Pow(POST_CAP_COST_GROWTH, over));
+        }
+
         return cost;
     }
 

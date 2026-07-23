@@ -40,6 +40,17 @@ public class WindowStateManager : MonoBehaviour
     public float dockedFadeInTime = 0.8f;
     public float shipFadeTime = 0.3f;
 
+    [Header("Intro Overlay Objects (인트로 동안만 표시)")]
+    [Tooltip("인트로(지구 출발) 동안 켜지고, 끝나면 꺼지는 오브젝트 1")]
+    public GameObject introOverlay1;
+    [Tooltip("인트로(지구 출발) 동안 켜지고, 끝나면 꺼지는 오브젝트 2")]
+    public GameObject introOverlay2;
+    [Tooltip("인트로 오버레이 깜빡임 주기(초). 켜짐/꺼짐 각각 이 시간만큼")]
+    public float introBlinkInterval = 0.5f;
+    [Tooltip("인트로 오버레이 총 깜빡임 시간(초). 이후 꺼진 채 유지")]
+    public float introBlinkDuration = 10f;
+    private bool introBlinkActive;
+
     [Header("Intro Settings (첫 실행 시)")]
     [Tooltip("지구 출발 인트로 - 수직 이륙 단계 시간")]
     public float introLaunchDuration = 1.5f;
@@ -239,6 +250,12 @@ public class WindowStateManager : MonoBehaviour
     {
         currentState = WindowState.Intro;
 
+        // 인트로 오버레이 오브젝트 2개 깜빡임 시작 (인트로 끝나면 정지+숨김)
+        if (introOverlay1 != null) introOverlay1.SetActive(true);
+        if (introOverlay2 != null) introOverlay2.SetActive(true);
+        introBlinkActive = true;
+        StartCoroutine(BlinkIntroOverlays());
+
         // 카메라 줌 비활성 - 인트로 중 휠 굴리면 표면 짤림
         CameraZoomController zoom = null;
         if (Camera.main != null)
@@ -400,6 +417,11 @@ public class WindowStateManager : MonoBehaviour
         if (destinationVisual != null)
             destinationVisual.EndDepartureMode();
 
+        // 인트로 오버레이 깜빡임 정지 + 숨김
+        introBlinkActive = false;
+        if (introOverlay1 != null) introOverlay1.SetActive(false);
+        if (introOverlay2 != null) introOverlay2.SetActive(false);
+
         if (GameManager.Instance != null)
             GameManager.Instance.MarkIntroSeen();
     }
@@ -419,6 +441,25 @@ public class WindowStateManager : MonoBehaviour
     // ============ 기존 메서드들 ============
 
     private bool wasMinimized;
+
+    // 인트로 오버레이 점멸 (통째로 on/off). 지정 시간 후 꺼진 상태로 종료.
+    IEnumerator BlinkIntroOverlays()
+    {
+        bool on = true;
+        float elapsed = 0f;
+        while (introBlinkActive && elapsed < introBlinkDuration)
+        {
+            on = !on;
+            if (introOverlay1 != null) introOverlay1.SetActive(on);
+            if (introOverlay2 != null) introOverlay2.SetActive(on);
+            yield return new WaitForSeconds(introBlinkInterval);
+            elapsed += introBlinkInterval;
+        }
+        // 점멸 종료 — 켜진 상태로 고정 (인트로 끝나면 그때 숨겨짐)
+        introBlinkActive = false;
+        if (introOverlay1 != null) introOverlay1.SetActive(true);
+        if (introOverlay2 != null) introOverlay2.SetActive(true);
+    }
 
     void Update()
     {
